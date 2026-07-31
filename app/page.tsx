@@ -6,6 +6,7 @@ import LoadingScreen from '@/app/components/loadingscreen';
 import About from '@/app/components/About';
 import Header from '@/app/components/header';
 import Combat from '@/app/components/Combat';
+import Abilities from '@/app/components/Ability';
 
 export default function Home() {
   const [entered, setEntered] = useState(false);
@@ -111,6 +112,9 @@ export default function Home() {
 
         {/* COMBAT TAB RENDERS HERE */}
         {activeTab === 'combat' && <Combat />}
+
+        {/* ABILITIES TAB RENDERS HERE */}
+        {activeTab === 'abilities' && <Abilities />}
 
       </div>
     </main>
