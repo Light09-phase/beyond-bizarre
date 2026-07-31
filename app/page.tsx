@@ -91,11 +91,6 @@ export default function Home() {
                     Enter Game
                   </button>
 
-                  <div className="relative p-[1px] bg-gradient-to-br from-[#c5a059]/40 to-[#c5a059]/10 transition-all duration-300 hover:scale-105 hover:shadow-[0_0_25px_rgba(197,160,89,0.6)] [clip-path:polygon(15px_0,100%_0,100%_calc(100%-15px),calc(100%-15px)_100%,0_100%,0_15px)]">
-                    <button className="h-full w-full bg-[#0a0b0e]/90 backdrop-blur-sm px-10 py-3.5 text-sm font-mono uppercase tracking-widest text-white transition-all hover:bg-[#c5a059]/20 hover:text-[#c5a059] [clip-path:polygon(15px_0,100%_0,100%_calc(100%-15px),calc(100%-15px)_100%,0_100%,0_15px)]">
-                      Socials
-                    </button>
-                  </div>
                 </motion.div>
               </div>
 
@@ -103,7 +98,7 @@ export default function Home() {
                 initial={{ opacity: 0 }}
                 animate={entered ? { opacity: 1 } : { opacity: 0 }}
                 transition={{ duration: 1.5, delay: 2.6 }}
-                className="absolute bottom-8 z-10 flex flex-col items-center gap-2 text-[10px] font-mono uppercase tracking-[0.3em] text-zinc-400 animate-bounce"
+                className="absolute bottom-8 z-12 flex flex-col items-center gap-1 text-[12px] font-mono uppercase tracking-[0.3em] text-zinc-400 animate-bounce"
               >
                 <span>Scroll</span>
                 <span>↓</span>

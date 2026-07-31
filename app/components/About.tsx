@@ -1,4 +1,3 @@
-// app/components/About.tsx
 'use client';
 
 import { useRef } from 'react';
@@ -10,14 +9,14 @@ interface AboutProps {
 
 export default function About({ setActiveTab }: AboutProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-
+  
   const { scrollYProgress } = useScroll({
     target: containerRef,
     offset: ['start end', 'end start'],
   });
-
+  
   const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.97, 1.03, 0.97]);
-
+  
   return (
     <section
       ref={containerRef}
@@ -36,20 +35,55 @@ export default function About({ setActiveTab }: AboutProps) {
       {/* GAME METADATA BAR */}
       <div className="w-full bg-[#121116] border border-[#2a2418] py-4 px-6 mb-16 flex flex-wrap justify-between items-center gap-6 text-xs tracking-widest uppercase font-mono shadow-xl">
         <div>
-          <span className="text-[#8a857a] block text-[10px] font-['Cormorant_Upright',serif] text-base">Genre</span>
-          <span className="text-[#e6c278] font-semibold">Action / Open World</span>
+          <span className="text-[#8a857a] block text-[10px] font-['Cormorant_Upright',serif] text-base mb-1">Genre</span>
+          <motion.span 
+            initial={{ clipPath: 'inset(0 100% 0 0)' }}
+            whileInView={{ clipPath: 'inset(0 0 0 0)' }}
+            viewport={{ once: false, margin: "-50px" }}
+            transition={{ duration: 1.5, ease: 'linear', delay: 0.2 }}
+            className="text-[#e6c278] font-semibold inline-block whitespace-nowrap"
+          >
+            Action / Open World
+          </motion.span>
         </div>
+        
         <div>
-          <span className="text-[#8a857a] block text-[10px] font-['Cormorant_Upright',serif] text-base">Developer</span>
-          <span className="text-[#e6c278] font-semibold">Phase Zero Interactive</span>
+          <span className="text-[#8a857a] block text-[10px] font-['Cormorant_Upright',serif] text-base mb-1">Developer</span>
+          <motion.span 
+            initial={{ clipPath: 'inset(0 100% 0 0)' }}
+            whileInView={{ clipPath: 'inset(0 0 0 0)' }}
+            viewport={{ once: false, margin: "-50px" }}
+            transition={{ duration: 1.5, ease: 'linear', delay: 0.7 }}
+            className="text-[#e6c278] font-semibold inline-block whitespace-nowrap"
+          >
+            Phase Zer0 Interactive
+          </motion.span>
         </div>
+        
         <div>
-          <span className="text-[#8a857a] block text-[10px] font-['Cormorant_Upright',serif] text-base">Platform</span>
-          <span className="text-[#e6c278] font-semibold">Roblox / PC</span>
+          <span className="text-[#8a857a] block text-[10px] font-['Cormorant_Upright',serif] text-base mb-1">Platform</span>
+          <motion.span 
+            initial={{ clipPath: 'inset(0 100% 0 0)' }}
+            whileInView={{ clipPath: 'inset(0 0 0 0)' }}
+            viewport={{ once: false, margin: "-50px" }}
+            transition={{ duration: 1.5, ease: 'linear', delay: 1.2 }}
+            className="text-[#e6c278] font-semibold inline-block whitespace-nowrap"
+          >
+            Roblox / PC & Console
+          </motion.span>
         </div>
+        
         <div>
-          <span className="text-[#8a857a] block text-[10px] font-['Cormorant_Upright',serif] text-base">Status</span>
-          <span className="text-[#c3a35e] font-semibold">In Development</span>
+          <span className="text-[#8a857a] block text-[10px] font-['Cormorant_Upright',serif] text-base mb-1">Status</span>
+          <motion.span 
+            initial={{ clipPath: 'inset(0 100% 0 0)' }}
+            whileInView={{ clipPath: 'inset(0 0 0 0)' }}
+            viewport={{ once: false, margin: "-50px" }}
+            transition={{ duration: 1.5, ease: 'linear', delay: 1.7 }}
+            className="text-[#c3a35e] font-semibold inline-block whitespace-nowrap"
+          >
+            In Development
+          </motion.span>
         </div>
       </div>
 

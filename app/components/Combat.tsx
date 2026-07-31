@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 // ============================================================================
 // TYPES & INTERFACES
@@ -22,6 +22,8 @@ interface VideoOption {
   inputTag?: string;
   properties?: string[];
   stats?: StatItem[];
+  videoSrc?: string;
+  posterSrc?: string;
 }
 
 interface DynamicVideoPlateProps {
@@ -29,6 +31,7 @@ interface DynamicVideoPlateProps {
   options: VideoOption[];
   defaultOptionId?: string;
   sectionBadge?: string;
+  variantTheme?: 'gold' | 'red';
 }
 
 interface SingleVideoPlateProps {
@@ -39,6 +42,8 @@ interface SingleVideoPlateProps {
   description: string;
   properties?: string[];
   stats?: StatItem[];
+  videoSrc?: string;
+  posterSrc?: string;
 }
 
 interface StatusEffectCardProps {
@@ -92,7 +97,9 @@ const heavyStrikeOptions: VideoOption[] = [
       { label: "Damage", value: "2x M1 Base" },
       { label: "Heat Cost", value: "15 Heat" },
       { label: "Cooldown", value: "5.0s" }
-    ]
+    ],
+    videoSrc: "UNIQUE VIDEO HERE",
+    posterSrc: "UNIQUE VIDEO HERE"
   },
   {
     id: "down",
@@ -112,7 +119,9 @@ const heavyStrikeOptions: VideoOption[] = [
       { label: "Spike Type", value: "Grand Down-Spike" },
       { label: "Guard Property", value: "Guard Bypass" },
       { label: "Cooldown", value: "5.0s" }
-    ]
+    ],
+    videoSrc: "UNIQUE VIDEO HERE",
+    posterSrc: "UNIQUE VIDEO HERE"
   },
   {
     id: "sky",
@@ -131,7 +140,9 @@ const heavyStrikeOptions: VideoOption[] = [
       { label: "Spike Type", value: "Grand Up-Spike" },
       { label: "Guard Property", value: "Guard Bypass" },
       { label: "Cooldown", value: "5.0s" }
-    ]
+    ],
+    videoSrc: "UNIQUE VIDEO HERE",
+    posterSrc: "UNIQUE VIDEO HERE"
   },
   {
     id: "ground",
@@ -150,7 +161,9 @@ const heavyStrikeOptions: VideoOption[] = [
       { label: "Pin Property", value: "Ground Pin" },
       { label: "Bypass", value: "Grounded & Ragdoll" },
       { label: "Cooldown", value: "5.0s" }
-    ]
+    ],
+    videoSrc: "UNIQUE VIDEO HERE",
+    posterSrc: "UNIQUE VIDEO HERE"
   },
   {
     id: "rush",
@@ -169,7 +182,9 @@ const heavyStrikeOptions: VideoOption[] = [
       { label: "Strike Type", value: "Grand Upper Strike" },
       { label: "Guard Property", value: "Guardable" },
       { label: "Cooldown", value: "5.0s" }
-    ]
+    ],
+    videoSrc: "UNIQUE VIDEO HERE",
+    posterSrc: "UNIQUE VIDEO HERE"
   },
   {
     id: "flash",
@@ -187,7 +202,9 @@ const heavyStrikeOptions: VideoOption[] = [
       { label: "Effective Range", value: "1/2 Flash Range" },
       { label: "Chain Input", value: "M2 After Flash" },
       { label: "Finisher", value: "Down Strike" }
-    ]
+    ],
+    videoSrc: "UNIQUE VIDEO HERE",
+    posterSrc: "UNIQUE VIDEO HERE"
   },
   {
     id: "clash",
@@ -205,7 +222,9 @@ const heavyStrikeOptions: VideoOption[] = [
       { label: "Result", value: "Mutual Pushback" },
       { label: "Victor", value: "None" },
       { label: "Cooldown", value: "5.0s Triggered" }
-    ]
+    ],
+    videoSrc: "UNIQUE VIDEO HERE",
+    posterSrc: "UNIQUE VIDEO HERE"
   }
 ];
 
@@ -218,7 +237,9 @@ const criticalArtOptions: VideoOption[] = [
     inputTag: "M1 in Perception Zone",
     description: "Executing M1 inside Perception Zone with supercharged guard bar triggers Amplified Strike, leaving opponent heavily stunned for combo setup.",
     properties: ["Guard Depletion", "Overdrive Trigger", "Target Stun"],
-    stats: [{ label: "Type", value: "Amplified (M1)" }, { label: "Effect", value: "Opponent Stunned" }]
+    stats: [{ label: "Type", value: "Amplified (M1)" }, { label: "Effect", value: "Opponent Stunned" }],
+    videoSrc: "UNIQUE VIDEO HERE",
+    posterSrc: "UNIQUE VIDEO HERE"
   },
   {
     id: "m1-crit",
@@ -228,7 +249,9 @@ const criticalArtOptions: VideoOption[] = [
     inputTag: "M1 (Green Zone QTE)",
     description: "Timing the QTE bar inside the Green Zone initiates standard Critical Strike, dealing huge damage and putting user into Overdrive.",
     properties: ["Guard Depletion", "Overdrive State", "Will Scaling"],
-    stats: [{ label: "Type", value: "Critical (M1)" }, { label: "Trigger", value: "Overdrive State" }]
+    stats: [{ label: "Type", value: "Critical (M1)" }, { label: "Trigger", value: "Overdrive State" }],
+    videoSrc: "UNIQUE VIDEO HERE",
+    posterSrc: "UNIQUE VIDEO HERE"
   },
   {
     id: "m1-max",
@@ -238,7 +261,9 @@ const criticalArtOptions: VideoOption[] = [
     inputTag: "M1 (Blue Center QTE)",
     description: "Hitting the ultra-thin center Blue Zone delivers Maximum Critical Strike for catastrophic damage and full status debuff on target.",
     properties: ["Maximum Damage", "Full Will Scaling", "Debuff Applied"],
-    stats: [{ label: "Type", value: "Max Critical (M1)" }, { label: "Damage", value: "Immense" }]
+    stats: [{ label: "Type", value: "Max Critical (M1)" }, { label: "Damage", value: "Immense" }],
+    videoSrc: "UNIQUE VIDEO HERE",
+    posterSrc: "UNIQUE VIDEO HERE"
   },
   {
     id: "m2-amp",
@@ -248,7 +273,9 @@ const criticalArtOptions: VideoOption[] = [
     inputTag: "M2 in Perception Zone",
     description: "Executing M2 inside Perception Zone delivers heavy amplified strike resulting in Grand Knockback across the arena.",
     properties: ["Grand Knockback", "Guard Depletion", "Overdrive Trigger"],
-    stats: [{ label: "Type", value: "Amplified (M2)" }, { label: "Effect", value: "Grand Knockback" }]
+    stats: [{ label: "Type", value: "Amplified (M2)" }, { label: "Effect", value: "Grand Knockback" }],
+    videoSrc: "UNIQUE VIDEO HERE",
+    posterSrc: "UNIQUE VIDEO HERE"
   },
   {
     id: "m2-crit",
@@ -258,7 +285,9 @@ const criticalArtOptions: VideoOption[] = [
     inputTag: "M2 (Green Zone QTE)",
     description: "Heavy Critical Strike hitting Green Zone QTE, blasting target away and applying Will-scaled damage bonuses.",
     properties: ["Grand Knockback", "Will Scaling", "Overdrive State"],
-    stats: [{ label: "Type", value: "Critical (M2)" }, { label: "Trigger", value: "Overdrive State" }]
+    stats: [{ label: "Type", value: "Critical (M2)" }, { label: "Trigger", value: "Overdrive State" }],
+    videoSrc: "UNIQUE VIDEO HERE",
+    posterSrc: "UNIQUE VIDEO HERE"
   },
   {
     id: "m2-max",
@@ -268,7 +297,9 @@ const criticalArtOptions: VideoOption[] = [
     inputTag: "M2 (Blue Center QTE)",
     description: "Maximum Heavy Critical Strike hitting center Blue Zone timing, triggering extreme knockback and devastating health loss.",
     properties: ["Extreme Knockback", "Max Will Damage", "Target Debuffed"],
-    stats: [{ label: "Type", value: "Max Critical (M2)" }, { label: "Knockback", value: "Grand Knockback" }]
+    stats: [{ label: "Type", value: "Max Critical (M2)" }, { label: "Knockback", value: "Grand Knockback" }],
+    videoSrc: "UNIQUE VIDEO HERE",
+    posterSrc: "UNIQUE VIDEO HERE"
   }
 ];
 
@@ -300,7 +331,7 @@ const CodexBox: React.FC<CodexBoxProps> = ({
             )}
           </div>
           {badge && (
-            <span className="self-start sm:self-auto bg-[#1c1a24] text-[#e6c278] border border-[#3d3423] group-hover:border-[#c3a35e] text-xs font-mono px-2.5 py-1 transition-colors">
+            <span className="self-start sm:self-auto bg-[#1c1a24] text-[#e6c278] border border-[#3d3423] group-hover:border-[#d9181b] text-xs font-mono px-2.5 py-1 transition-colors">
               {badge}
             </span>
           )}
@@ -322,8 +353,20 @@ const VideoPlate: React.FC<SingleVideoPlateProps> = ({
   duration = "0:12",
   description,
   properties,
-  stats
+  stats,
+  videoSrc,
+  posterSrc
 }) => {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handlePlay = () => {
+    if (videoRef.current) {
+      videoRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
   return (
     <div className="group relative bg-[#0a0a0d] border border-[#2a2418] hover:border-[#c3a35e] transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.01] overflow-hidden my-6 shadow-xl hover:shadow-[0_0_30px_rgba(195,163,94,0.22)] rounded-sm">
       {/* Top Bar / Header */}
@@ -347,13 +390,37 @@ const VideoPlate: React.FC<SingleVideoPlateProps> = ({
         <div className="md:col-span-5 relative aspect-video bg-[#121216] overflow-hidden flex items-center justify-center border-b md:border-b-0 md:border-r border-[#2a2418]">
           <div className="absolute inset-0 bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:14px_14px] opacity-15 group-hover:opacity-30 transition-opacity" />
           
-          <div className="relative z-10 w-14 h-14 rounded-full bg-black/80 border-2 border-[#c3a35e] flex items-center justify-center group-hover:scale-110 group-hover:bg-[#c3a35e] transition-all duration-300 shadow-2xl">
-            <svg className="w-6 h-6 text-[#c3a35e] group-hover:text-black translate-x-0.5 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </div>
+          {videoSrc ? (
+            <>
+              <video
+                ref={videoRef}
+                src={videoSrc}
+                poster={posterSrc}
+                className="absolute inset-0 w-full h-full object-cover z-10"
+                controls={isPlaying}
+                onPause={() => setIsPlaying(false)}
+                onEnded={() => setIsPlaying(false)}
+              />
+              {!isPlaying && (
+                <div 
+                  onClick={handlePlay}
+                  className="relative z-20 w-14 h-14 rounded-full bg-black/80 border-2 border-[#c3a35e] flex items-center justify-center group-hover:scale-110 group-hover:bg-[#c3a35e] transition-all duration-300 shadow-2xl cursor-pointer"
+                >
+                  <svg className="w-6 h-6 text-[#c3a35e] group-hover:text-black translate-x-0.5 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="relative z-10 w-14 h-14 rounded-full bg-black/80 border-2 border-[#c3a35e] flex items-center justify-center group-hover:scale-110 group-hover:bg-[#c3a35e] transition-all duration-300 shadow-2xl">
+              <svg className="w-6 h-6 text-[#c3a35e] group-hover:text-black translate-x-0.5 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          )}
 
-          <div className="absolute bottom-2 left-2 text-[10px] font-mono text-[#8a857a] uppercase tracking-widest bg-black/80 px-2 py-0.5 border border-[#2a2418]">
+          <div className="absolute bottom-2 left-2 z-20 text-[10px] font-mono text-[#8a857a] uppercase tracking-widest bg-black/80 px-2 py-0.5 border border-[#2a2418] pointer-events-none">
             Preview Reel
           </div>
         </div>
@@ -408,20 +475,81 @@ const DynamicVideoPlate: React.FC<DynamicVideoPlateProps> = ({
   title,
   options,
   defaultOptionId,
-  sectionBadge = "INTERACTIVE VARIANT SELECTOR"
+  sectionBadge = "INTERACTIVE VARIANT SELECTOR",
+  variantTheme = 'gold'
 }) => {
   const [selectedId, setSelectedId] = useState<string>(defaultOptionId || options[0]?.id || "");
+  const [flashId, setFlashId] = useState<string | null>(null);
+
+  const [isPlaying, setIsPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   const activeOption = options.find((opt) => opt.id === selectedId) || options[0];
 
+  // Reset video state when switching tabs
+  useEffect(() => {
+    setIsPlaying(false);
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  }, [selectedId]);
+
+  const handleTabClick = (id: string) => {
+    setSelectedId(id);
+    setFlashId(id);
+    // Shortened to 150ms for a quicker, snappier flash
+    setTimeout(() => {
+      setFlashId(null);
+    }, 150);
+  };
+
+  const handlePlay = () => {
+    if (videoRef.current) {
+      videoRef.current.play();
+      setIsPlaying(true);
+    }
+  };
+
+  // Theme configuration object for easy switching
+  const theme = {
+    gold: {
+      containerHover: 'hover:border-[#c3a35e] hover:shadow-[0_0_35px_rgba(195,163,94,0.25)]',
+      badge: 'bg-[#c3a35e] text-black',
+      title: 'text-[#e6c278]',
+      tabActive: 'bg-[#1c1a24] text-[#e6c278] border-[#c3a35e] shadow-[0_0_10px_rgba(195,163,94,0.3)]',
+      tabHover: 'hover:border-[#3d3423]',
+      flash: 'shadow-[0_0_15px_3px_rgba(195,163,94,0.7),0_0_20px_5px_rgba(0,0,0,0.8)] border-[#c3a35e]',
+      radial: 'bg-[radial-gradient(#c3a35e_1px,transparent_1px)]',
+      playBtn: 'border-[#c3a35e] text-[#c3a35e] group-hover:bg-[#c3a35e] group-hover:text-black',
+      tag: 'bg-[#1c1a24] text-[#e6c278] border-[#3d3423]',
+      propTag: 'text-[#e6c278] border-[#3d3423] bg-[#14121a]',
+      stat: 'text-[#e6c278]'
+    },
+    red: {
+      containerHover: 'hover:border-[#d40000] hover:shadow-[0_0_35px_rgba(212,0,0,0.25)]',
+      badge: 'bg-[#d40000] text-white',
+      title: 'text-[#d40000]',
+      tabActive: 'bg-[#2a0000] text-[#d40000] border-[#d40000] shadow-[0_0_12px_rgba(212,0,0,0.4)]',
+      tabHover: 'hover:border-[#d40000]/50',
+      flash: 'shadow-[0_0_15px_3px_rgba(212,0,0,0.8),0_0_20px_5px_rgba(0,0,0,0.9)] border-[#d40000]',
+      radial: 'bg-[radial-gradient(#d40000_1px,transparent_1px)]',
+      playBtn: 'border-[#d40000] text-[#d40000] group-hover:bg-[#d40000] group-hover:text-white',
+      tag: 'bg-[#2a0000] text-[#d40000] border-[#d40000]/50',
+      propTag: 'text-[#d40000] border-[#d40000]/40 bg-[#14121a]',
+      stat: 'text-[#d40000]'
+    }
+  }[variantTheme];
+
   return (
-    <div className="group relative bg-[#0a0a0d] border border-[#2a2418] hover:border-[#c3a35e] transition-all duration-300 transform hover:-translate-y-1 my-8 shadow-2xl hover:shadow-[0_0_35px_rgba(195,163,94,0.25)] rounded-sm overflow-hidden">
+    <div className={`group relative bg-[#0a0a0d] border border-[#2a2418] transition-all duration-300 transform hover:-translate-y-1 my-8 shadow-2xl rounded-sm overflow-hidden ${theme.containerHover}`}>
       {/* Header Bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-[#121116] px-5 py-3 border-b border-[#2a2418] gap-2">
         <div className="flex items-center space-x-3">
-          <span className="bg-[#c3a35e] text-black text-xs font-bold px-2.5 py-0.5 uppercase tracking-wider font-['Cormorant_Upright',serif]">
+          <span className={`text-xs font-bold px-2.5 py-0.5 uppercase tracking-wider font-['Cormorant_Upright',serif] ${theme.badge}`}>
             {activeOption.badge || "DEMO"}
           </span>
-          <span className="text-lg font-['Gilda_Display',serif] text-[#e6c278]">
+          <span className={`text-lg font-['Gilda_Display',serif] ${theme.title}`}>
             {title}
           </span>
         </div>
@@ -435,11 +563,15 @@ const DynamicVideoPlate: React.FC<DynamicVideoPlateProps> = ({
         {options.map((opt) => (
           <button
             key={opt.id}
-            onClick={() => setSelectedId(opt.id)}
-            className={`px-3 py-1.5 text-xs font-['Cormorant_Upright',serif] font-bold uppercase tracking-wider transition-all border ${
+            onClick={() => handleTabClick(opt.id)}
+            className={`relative px-3 py-1.5 text-xs font-['Cormorant_Upright',serif] font-bold uppercase tracking-wider transition-all duration-150 ease-out border ${
               selectedId === opt.id
-                ? 'bg-[#1c1a24] text-[#e6c278] border-[#c3a35e] shadow-[0_0_10px_rgba(195,163,94,0.3)]'
-                : 'bg-[#0e0d12] text-[#716c62] border-[#221e15] hover:text-[#a09a8e] hover:border-[#3d3423]'
+                ? theme.tabActive
+                : `bg-[#0e0d12] text-[#716c62] border-[#221e15] hover:text-[#a09a8e] ${theme.tabHover}`
+            } ${
+              flashId === opt.id
+                ? `scale-[1.03] bg-black text-white z-10 ${theme.flash}`
+                : 'z-0'
             }`}
           >
             {opt.label}
@@ -451,19 +583,43 @@ const DynamicVideoPlate: React.FC<DynamicVideoPlateProps> = ({
       <div className="grid grid-cols-1 md:grid-cols-12">
         {/* Left Aspect Video Box */}
         <div className="md:col-span-5 relative aspect-video bg-[#121216] overflow-hidden flex items-center justify-center border-b md:border-b-0 md:border-r border-[#2a2418]">
-          <div className="absolute inset-0 bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:14px_14px] opacity-20 group-hover:opacity-35 transition-opacity" />
+          <div className={`absolute inset-0 [background-size:14px_14px] opacity-20 group-hover:opacity-35 transition-opacity ${theme.radial}`} />
           
-          <div className="relative z-10 w-16 h-16 rounded-full bg-black/80 border-2 border-[#c3a35e] flex items-center justify-center group-hover:scale-110 group-hover:bg-[#c3a35e] transition-all duration-300 shadow-2xl">
-            <svg className="w-7 h-7 text-[#c3a35e] group-hover:text-black translate-x-0.5 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </div>
+          {activeOption.videoSrc ? (
+            <>
+              <video
+                ref={videoRef}
+                src={activeOption.videoSrc}
+                poster={activeOption.posterSrc}
+                className="absolute inset-0 w-full h-full object-cover z-10"
+                controls={isPlaying}
+                onPause={() => setIsPlaying(false)}
+                onEnded={() => setIsPlaying(false)}
+              />
+              {!isPlaying && (
+                <div 
+                  onClick={handlePlay}
+                  className={`relative z-20 w-16 h-16 rounded-full bg-black/80 border-2 flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-2xl cursor-pointer ${theme.playBtn}`}
+                >
+                  <svg className="w-7 h-7 translate-x-0.5 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className={`relative z-10 w-16 h-16 rounded-full bg-black/80 border-2 flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-2xl ${theme.playBtn}`}>
+              <svg className="w-7 h-7 translate-x-0.5 transition-colors" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          )}
 
-          <div className="absolute top-2 left-2 text-[10px] font-mono text-[#e6c278] bg-black/80 px-2 py-0.5 border border-[#3d3423]">
+          <div className={`absolute top-2 left-2 z-20 text-[10px] font-mono px-2 py-0.5 border pointer-events-none ${theme.tag}`}>
             {activeOption.duration}
           </div>
 
-          <div className="absolute bottom-2 left-2 text-[10px] font-mono text-[#8a857a] uppercase tracking-widest bg-black/80 px-2 py-0.5 border border-[#2a2418]">
+          <div className="absolute bottom-2 left-2 z-20 text-[10px] font-mono text-[#8a857a] uppercase tracking-widest bg-black/80 px-2 py-0.5 border border-[#2a2418] pointer-events-none">
             Variant: {activeOption.label}
           </div>
         </div>
@@ -472,11 +628,11 @@ const DynamicVideoPlate: React.FC<DynamicVideoPlateProps> = ({
         <div className="md:col-span-7 p-6 flex flex-col justify-between bg-gradient-to-br from-[#0a0a0d] to-[#050505]">
           <div>
             <div className="flex justify-between items-start mb-2">
-              <h5 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">
+              <h5 className={`text-2xl font-['Gilda_Display',serif] ${theme.title}`}>
                 {activeOption.label}
               </h5>
               {activeOption.inputTag && (
-                <span className="bg-[#1c1a24] text-[#e6c278] border border-[#3d3423] text-xs font-mono px-2 py-1">
+                <span className={`text-xs font-mono px-2 py-1 border ${theme.tag}`}>
                   {activeOption.inputTag}
                 </span>
               )}
@@ -492,7 +648,7 @@ const DynamicVideoPlate: React.FC<DynamicVideoPlateProps> = ({
                 <span className="block text-[10px] font-mono text-[#8a857a] uppercase mb-1">Move Properties:</span>
                 <div className="flex flex-wrap gap-1.5">
                   {activeOption.properties.map((prop, idx) => (
-                    <span key={idx} className="text-xs font-mono text-[#e6c278] bg-[#14121a] border border-[#3d3423] px-2 py-0.5">
+                    <span key={idx} className={`text-xs font-mono px-2 py-0.5 border ${theme.propTag}`}>
                       {prop}
                     </span>
                   ))}
@@ -509,7 +665,7 @@ const DynamicVideoPlate: React.FC<DynamicVideoPlateProps> = ({
                   <span className="block text-[10px] text-[#8a857a] uppercase font-['Cormorant_Upright',serif] tracking-wider">
                     {st.label}
                   </span>
-                  <span className="text-sm font-bold text-[#e6c278] font-mono">
+                  <span className={`text-sm font-bold font-mono ${theme.stat}`}>
                     {st.value}
                   </span>
                 </div>
@@ -521,10 +677,6 @@ const DynamicVideoPlate: React.FC<DynamicVideoPlateProps> = ({
     </div>
   );
 };
-
-// ============================================================================
-// STATUS EFFECT CARDS
-// ============================================================================
 
 const StatusEffectCard: React.FC<StatusEffectCardProps> = ({
   type,
@@ -869,6 +1021,8 @@ export default function CombatPage() {
                     { label: "Hitstun Decay", value: "-5% / hit" },
                     { label: "Knockback", value: "35 Studs" }
                   ]}
+                  videoSrc="UNIQUE VIDEO HERE"
+                  posterSrc="UNIQUE VIDEO HERE"
                 />
 
                 <VideoPlate 
@@ -882,6 +1036,8 @@ export default function CombatPage() {
                     { label: "Rebound Height", value: "12 Studs" },
                     { label: "Heat Gained", value: "+10 Heat" }
                   ]}
+                  videoSrc="UNIQUE VIDEO HERE"
+                  posterSrc="UNIQUE VIDEO HERE"
                 />
               </CodexBox>
 
@@ -962,6 +1118,8 @@ export default function CombatPage() {
                       { label: "Decay Stun", value: "1.5 - 2.0s" },
                       { label: "Decay Delay", value: "4.0 Seconds" }
                     ]}
+                    videoSrc="UNIQUE VIDEO HERE"
+                    posterSrc="UNIQUE VIDEO HERE"
                   />
                 </div>
 
@@ -988,6 +1146,8 @@ export default function CombatPage() {
                       { label: "Perception Zone", value: "3.0 Seconds" },
                       { label: "Types", value: "Light & Heavy" }
                     ]}
+                    videoSrc="UNIQUE VIDEO HERE"
+                    posterSrc="UNIQUE VIDEO HERE"
                   />
                 </div>
 
@@ -1011,6 +1171,8 @@ export default function CombatPage() {
                       { label: "Miss Cost", value: "50 Guard Pts" },
                       { label: "Low HP Penalty", value: "Explosion (<2.5%)" }
                     ]}
+                    videoSrc="UNIQUE VIDEO HERE"
+                    posterSrc="UNIQUE VIDEO HERE"
                   />
                 </div>
 
@@ -1034,26 +1196,28 @@ export default function CombatPage() {
                       { label: "Target", value: "Projectiles" },
                       { label: "Style", value: "Sonic Sway" }
                     ]}
+                    videoSrc="UNIQUE VIDEO HERE"
+                    posterSrc="UNIQUE VIDEO HERE"
                   />
                 </div>
 
                 {/* Critical Arts / Critical Strike */}
                 <div className="space-y-4 border-t border-[#2a2418] pt-6 my-6">
-                  <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">
+                  <h4 className="text-2xl font-['Gilda_Display',serif] text-[#f21616]">
                     Critical Arts / Critical Strike
                   </h4>
                   <p className="text-base text-[#c7c2b5]">
-                    Critical Arts are activated by using your M1 or M2 while in <strong className="text-[#e6c278]">Perception Zone</strong> with a fully supercharged guard bar.
+                    Critical Arts are activated by using your M1 or M2 while in <strong className="text-[#f21616]">Perception Zone</strong> with a fully supercharged guard bar.
                   </p>
                   <p className="text-base text-[#c7c2b5]">
-                    Casting initiates a Quick Time Bar where you must hit the casted keybind again. The closer to center, the more powerful the art. Hitting the thin blue inner zone triggers a <strong className="text-[#e6c278]">Maximum Critical Strike</strong> for immense damage!
+                    Casting initiates a Quick Time Bar where you must hit the casted keybind again. The closer to center, the more powerful the art. Hitting the thin blue inner zone triggers a <strong className="text-[#f21616]">Maximum Critical Strike</strong> for immense damage!
                   </p>
 
                   <ul className="list-disc list-inside space-y-2 text-base text-[#c7c2b5] my-4">
                     <li>★ M1 leaves opponent stunned; M2 deals Grand Knockback.</li>
                     <li>★ Block bar is fully depleted upon use.</li>
-                    <li>★ Places user in <strong className="text-[#e6c278]">[Overdrive]</strong> state.</li>
-                    <li>★ Damage scales directly with <strong className="text-[#e6c278]">WILL</strong> stat.</li>
+                    <li>★ Places user in <strong className="text-[##f21616]">[Overdrive]</strong> state.</li>
+                    <li>★ Damage scales directly with <strong className="text-[##f21616]">WILL</strong> stat.</li>
                     <li>★ Applies debuffs to the victim.</li>
                   </ul>
 
@@ -1063,6 +1227,7 @@ export default function CombatPage() {
                     options={criticalArtOptions}
                     defaultOptionId="m1-max"
                     sectionBadge="SELECT ART VARIANT"
+                    variantTheme="red"
                   />
                 </div>
 
@@ -1093,6 +1258,8 @@ export default function CombatPage() {
                         { label: "Tag Duration", value: "30 Seconds" },
                         { label: "Log Penalty", value: "1 Min Lockout" }
                       ]}
+                      videoSrc="UNIQUE VIDEO HERE"
+                      posterSrc="UNIQUE VIDEO HERE"
                     />
                   </CodexBox>
 
@@ -1117,6 +1284,8 @@ export default function CombatPage() {
                         { label: "Properties", value: "True Bypass" },
                         { label: "Scaling", value: "Combo Length" }
                       ]}
+                      videoSrc="UNIQUE VIDEO HERE"
+                      posterSrc="UNIQUE VIDEO HERE"
                     />
                   </CodexBox>
 
@@ -1161,6 +1330,8 @@ export default function CombatPage() {
                         { label: "Target Lock", value: "Soft Directional" },
                         { label: "Obstacle Bypass", value: "Active" }
                       ]}
+                      videoSrc="UNIQUE VIDEO HERE"
+                      posterSrc="UNIQUE VIDEO HERE"
                     />
                   </CodexBox>
 
@@ -1301,6 +1472,8 @@ export default function CombatPage() {
                         { label: "Wall Damage", value: "+15% Extra" },
                         { label: "Knockback Range", value: "25 - 75 Studs" }
                       ]}
+                      videoSrc="UNIQUE VIDEO HERE"
+                      posterSrc="UNIQUE VIDEO HERE"
                     />
                   </CodexBox>
 
@@ -1359,6 +1532,8 @@ export default function CombatPage() {
                     { label: "Slide Speed", value: "+30% Boost" },
                     { label: "Stamina Cost", value: "15 Stamina" }
                   ]}
+                  videoSrc="UNIQUE VIDEO HERE"
+                  posterSrc="UNIQUE VIDEO HERE"
                 />
               </CodexBox>
 
@@ -1382,6 +1557,8 @@ export default function CombatPage() {
                     { label: "Tech Roll Window", value: "0.25 Seconds" },
                     { label: "Invincibility", value: "On Recovery" }
                   ]}
+                  videoSrc="UNIQUE VIDEO HERE"
+                  posterSrc="UNIQUE VIDEO HERE"
                 />
               </CodexBox>
             </div>
@@ -1422,6 +1599,8 @@ export default function CombatPage() {
                     { label: "Reach Bonus", value: "+40% Range" },
                     { label: "Clash State", value: "Equal Speed" }
                   ]}
+                  videoSrc="UNIQUE VIDEO HERE"
+                  posterSrc="UNIQUE VIDEO HERE"
                 />
               </CodexBox>
 
@@ -1443,6 +1622,8 @@ export default function CombatPage() {
                     { label: "Heat Cost", value: "10 Heat" },
                     { label: "Difficulty", value: "High" }
                   ]}
+                  videoSrc="UNIQUE VIDEO HERE"
+                  posterSrc="UNIQUE VIDEO HERE"
                 />
               </CodexBox>
             </div>

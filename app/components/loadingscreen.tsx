@@ -8,6 +8,7 @@ export default function LoadingScreen({ onEnter }: { onEnter: () => void }) {
   const [progress, setProgress] = useState(0);
   const [leaving, setLeaving] = useState(false);
 
+  // 1. Handles the progress bar incrementing from 0 to 100
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress((prev) => {
@@ -22,14 +23,23 @@ export default function LoadingScreen({ onEnter }: { onEnter: () => void }) {
     return () => clearInterval(interval);
   }, []);
 
-  const handleEnter = () => {
-    setLeaving(true);
-    // Jump instantly to the top of the page when entering the game
-    window.scrollTo({ top: 0, behavior: 'instant' });
-    setTimeout(() => {
-      onEnter();
-    }, 800); // Gives time for exit transition
-  };
+  // 2. Automatically triggers the transition and music hook when progress hits 100%
+  useEffect(() => {
+    if (progress === 100) {
+      const transitionTimer = setTimeout(() => {
+        setLeaving(true);
+        // Jump instantly to the top of the page when entering the game
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        
+        // Gives time for the exit animation before unmounting/triggering music in parent
+        setTimeout(() => {
+          onEnter();
+        }, 800);
+      }, 400);
+
+      return () => clearTimeout(transitionTimer);
+    }
+  }, [progress, onEnter]);
 
   return (
     <AnimatePresence>
@@ -73,7 +83,7 @@ export default function LoadingScreen({ onEnter }: { onEnter: () => void }) {
               className="w-full max-w-md space-y-3 font-mono text-xs uppercase tracking-widest text-zinc-400"
             >
               <div className="flex justify-between items-center text-[10px]">
-                <span>Initializing</span>
+                <span>{progress >= 100 ? 'Initialization Complete' : 'Initializing'}</span>
                 <span className="text-[#c5a059]">{progress}%</span>
               </div>
 
@@ -84,26 +94,6 @@ export default function LoadingScreen({ onEnter }: { onEnter: () => void }) {
                   style={{ width: `${progress}%` }}
                 />
               </div>
-            </motion.div>
-
-            {/* ENTER BUTTON */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 1.0 }}
-              className="mt-12"
-            >
-              <button
-                onClick={handleEnter}
-                disabled={progress < 100}
-                className={`border px-10 py-3 font-mono text-xs uppercase tracking-[0.3em] transition-all duration-300 ${
-                  progress >= 100
-                    ? 'border-white bg-white text-black hover:bg-[#c5a059] hover:border-[#c5a059] hover:text-black cursor-pointer shadow-lg shadow-white/10'
-                    : 'border-white/10 bg-transparent text-zinc-600 cursor-not-allowed'
-                }`}
-              >
-                {progress >= 100 ? 'Enter' : 'Please Wait'}
-              </button>
             </motion.div>
           </div>
         </motion.div>
