@@ -35,7 +35,7 @@ export default function About({ setActiveTab }: AboutProps) {
       {/* GAME METADATA BAR */}
       <div className="w-full bg-[#121116] border border-[#2a2418] py-4 px-6 mb-16 flex flex-wrap justify-between items-center gap-6 text-xs tracking-widest uppercase font-mono shadow-xl">
         <div>
-          <span className="text-[#8a857a] block text-[10px] font-['Cormorant_Upright',serif] text-base mb-1">Genre</span>
+          <span className="text-[#8a857a] block text-[14px] font-['Cormorant_Upright',serif] text-base mb-1">Genre</span>
           <motion.span 
             initial={{ clipPath: 'inset(0 100% 0 0)' }}
             whileInView={{ clipPath: 'inset(0 0 0 0)' }}
@@ -48,20 +48,20 @@ export default function About({ setActiveTab }: AboutProps) {
         </div>
         
         <div>
-          <span className="text-[#8a857a] block text-[10px] font-['Cormorant_Upright',serif] text-base mb-1">Developer</span>
+          <span className="text-[#8a857a] block text-[14px] font-['Cormorant_Upright',serif] text-base mb-1">Developer</span>
           <motion.span 
             initial={{ clipPath: 'inset(0 100% 0 0)' }}
             whileInView={{ clipPath: 'inset(0 0 0 0)' }}
             viewport={{ once: false, margin: "-50px" }}
             transition={{ duration: 1.5, ease: 'linear', delay: 0.7 }}
-            className="text-[#e6c278] font-semibold inline-block whitespace-nowrap"
+            className="text-[#e3e3e3] font-semibold inline-block whitespace-nowrap"
           >
             Phase Zer0 Interactive
           </motion.span>
         </div>
         
         <div>
-          <span className="text-[#8a857a] block text-[10px] font-['Cormorant_Upright',serif] text-base mb-1">Platform</span>
+          <span className="text-[#8a857a] block text-[14px] font-['Cormorant_Upright',serif] text-base mb-1">Platform</span>
           <motion.span 
             initial={{ clipPath: 'inset(0 100% 0 0)' }}
             whileInView={{ clipPath: 'inset(0 0 0 0)' }}
@@ -74,13 +74,13 @@ export default function About({ setActiveTab }: AboutProps) {
         </div>
         
         <div>
-          <span className="text-[#8a857a] block text-[10px] font-['Cormorant_Upright',serif] text-base mb-1">Status</span>
+          <span className="text-[#8a857a] block text-[14px] font-['Cormorant_Upright',serif] text-base mb-1">Status</span>
           <motion.span 
             initial={{ clipPath: 'inset(0 100% 0 0)' }}
             whileInView={{ clipPath: 'inset(0 0 0 0)' }}
             viewport={{ once: false, margin: "-50px" }}
             transition={{ duration: 1.5, ease: 'linear', delay: 1.7 }}
-            className="text-[#c3a35e] font-semibold inline-block whitespace-nowrap"
+            className="text-[#ff0000] font-semibold inline-block whitespace-nowrap"
           >
             In Development
           </motion.span>

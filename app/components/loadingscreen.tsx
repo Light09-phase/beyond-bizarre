@@ -68,7 +68,7 @@ export default function LoadingScreen({ onEnter }: { onEnter: () => void }) {
               className="text-center mb-12"
             >
               <p className="text-[10px] font-mono uppercase tracking-[0.5em] text-[#c5a059] mb-2">
-                A Bizarre Adventure
+                Welcome to the world of...
               </p>
               <h1 className="font-gloock text-4xl sm:text-6xl uppercase tracking-wider text-white">
                 Beyond Bizarre

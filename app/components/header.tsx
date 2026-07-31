@@ -13,8 +13,8 @@ export default function Header({ setActiveTab, activeTab, playMusic }: HeaderPro
   const navItems = [
     { id: 'homepage', label: 'Homepage' },
     { id: 'combat', label: 'Mechanics' },
-    { id: 'videos', label: 'Videos' },
-    { id: 'news', label: 'News & Info' },
+    { id: 'abilities', label: 'Abilities' },
+    { id: 'news', label: 'News & Updates' },
     { id: 'background', label: 'Background' },
   ];
 
@@ -58,7 +58,7 @@ export default function Header({ setActiveTab, activeTab, playMusic }: HeaderPro
         <MusicPlayer play={playMusic} />
 
         {/* PLAY NOW BUTTON */}
-        <button className="bg-[#c5a059] text-black px-10 py-3 text-lg skew-x-[-15deg] hover:bg-white transition-all duration-300 shadow-[0_0_25px_rgba(197,160,89,0.6)] hover:shadow-[0_0_35px_rgba(255,255,255,0.8)] scale-105">
+        <button className="bg-[#c5a059] text-black px-5 py-1.5 text-lg skew-x-[-15deg] hover:bg-white transition-all duration-300 shadow-[0_0_25px_rgba(197,160,89,0.6)] hover:shadow-[0_0_35px_rgba(255,255,255,0.8)] scale-105">
           <span className="block skew-x-[15deg] font-serif italic font-extrabold tracking-wider">PLAY NOW</span>
         </button>
 

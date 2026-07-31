@@ -836,7 +836,7 @@ const SiteFooter: React.FC = () => {
         <div className="flex items-center space-x-6">
           <span>SYSTEM ARCHIVE: VOL. I</span>
           <span>STATUS: SECURE</span>
-          <span className="text-[#c3a35e]">PHASE ZER0 INTERACTIVE</span>
+          <span className="text-[#e3e3e3]">PHASE ZER0 INTERACTIVE</span>
         </div>
       </div>
     </footer>
