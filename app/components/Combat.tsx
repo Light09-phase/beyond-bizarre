@@ -83,7 +83,7 @@ const styleRanks = [
 const heavyStrikeOptions: VideoOption[] = [
   {
     id: "basic",
-    label: "Basic Heavy Strike",
+    label: "Heavy Strike",
     badge: "HEAVY DEMO",
     duration: "0:12",
     inputTag: "M2 / MMB",
@@ -762,13 +762,13 @@ const SiteHeader: React.FC = () => {
         <div className="flex items-center space-x-3">
           <span className="w-3 h-3 bg-[#c3a35e] rotate-45 shadow-[0_0_15px_#c3a35e] animate-pulse" />
           <span className="font-['Cormorant_Upright',serif] text-xl font-bold uppercase tracking-widest text-[#e6c278]">
-            Codex Registry // Vol. IV
+            Codex Registry // Vol. I
           </span>
         </div>
         <div className="flex items-center space-x-6 text-xs font-mono text-[#8a857a]">
-          <span>SYSTEM VERSION: 2.8.5</span>
+          <span>SYSTEM VERSION: 1.0.0</span>
           <span>STATUS: ACTIVE COMBAT</span>
-          <span className="text-[#c3a35e]">JOESTAR ARCHIVE</span>
+          <span className="text-[#c3a35e]">PHASE ZER0 INTERACTIVE</span>
         </div>
       </div>
 
@@ -782,20 +782,20 @@ const SiteHeader: React.FC = () => {
               <div className="mb-4 flex items-center gap-3">
                 <span className="h-px w-8 bg-[#c3a35e]" />
                 <span className="font-mono text-[10px] font-bold uppercase tracking-[0.4em] text-[#e6c278]">
-                  Official Gameplay Compendium
+                  Official Gameplay Unabridgment
                 </span>
               </div>
 
               <h1 className="font-[var(--font-gloock)] text-5xl uppercase tracking-tight text-white md:text-7xl">
-                Project{" "}
+                Game{" "}
                 <span className="text-[#c3a35e]">
-                  Bizarre
+                  Mechanics
                 </span>
               </h1>
 
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#8a857a] md:text-base">
-                Master the intricacies of Stand combat, frame data, cancels,
-                progression paths, and advanced mechanics in this complete
+                Master the intricacies of Combat, Movement, Stand Combat,
+                Progression Paths, and advanced mechanics in this complete
                 tactical manual.
               </p>
             </div>
@@ -811,7 +811,7 @@ const SiteHeader: React.FC = () => {
                     Current Patch
                   </span>
                   <strong className="font-mono text-sm text-white">
-                    v1.04.2 — Stand Awaken
+                    v1.00.0 — Combat Systems & Mechanics
                   </strong>
                 </div>
               </div>
@@ -834,9 +834,9 @@ const SiteFooter: React.FC = () => {
           </span>
         </div>
         <div className="flex items-center space-x-6">
-          <span>SYSTEM ARCHIVE: VOL. IV</span>
+          <span>SYSTEM ARCHIVE: VOL. I</span>
           <span>STATUS: SECURE</span>
-          <span className="text-[#c3a35e]">JOESTAR CORP</span>
+          <span className="text-[#c3a35e]">PHASE ZER0 INTERACTIVE</span>
         </div>
       </div>
     </footer>

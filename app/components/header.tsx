@@ -12,7 +12,7 @@ interface HeaderProps {
 export default function Header({ setActiveTab, activeTab, playMusic }: HeaderProps) {
   const navItems = [
     { id: 'homepage', label: 'Homepage' },
-    { id: 'combat', label: 'Combat' },
+    { id: 'combat', label: 'Mechanics' },
     { id: 'videos', label: 'Videos' },
     { id: 'news', label: 'News & Info' },
     { id: 'background', label: 'Background' },
