@@ -83,6 +83,7 @@ export default function About({ setActiveTab }: AboutProps) {
             className="text-[#ff0000] font-semibold inline-block whitespace-nowrap"
           >
             In Development
+
           </motion.span>
         </div>
       </div>
