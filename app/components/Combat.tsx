@@ -1288,7 +1288,7 @@ export default function GameGuide() {
                 </div>
                 <div className="p-3 bg-[#0d0c10] border border-[#1e1b24]">
                   <div className="text-xs text-[#8a8578] uppercase">Combat Style</div>
-                  <div className="text-sm font-bold text-[#e6c278]">Fast-Paced Cancel Mechanics</div>
+                  <div className="text-sm font-bold text-[#e6c278]">Fast-Paced, Multi Layer Complexity</div>
                 </div>
               </div>
             </CodexBox>
