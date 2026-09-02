@@ -1,25 +1,16 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Shield, 
-  Zap, 
-  Flame, 
-  Swords, 
-  Sparkles, 
-  Award, 
-  BookOpen, 
-  Target, 
-  Crosshair, 
-  Activity, 
-  Compass, 
-  Layers, 
-  Feather, 
-  Radio, 
-  Info, 
-  ChevronRight,
-  TrendingUp,
-  AlertCircle
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import {
+  Sparkles,
+  Wrench,
+  Swords,
+  ChevronLeft,
+  Info,
+  Lock,
+  HelpCircle,
+  PlayCircle,
+  Film
 } from 'lucide-react';
 
 // ============================================================================
@@ -33,7 +24,6 @@ function useVisibility(rootMargin = "0px") {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        // Triggers the moment the margin is crossed, resets only when completely out.
         setIsVisible(entry.isIntersecting);
       },
       { threshold: 0, rootMargin }
@@ -44,11 +34,15 @@ function useVisibility(rootMargin = "0px") {
     };
   }, [rootMargin]);
 
-  return [ref as any, isVisible];
+  return [ref as any, isVisible] as const;
 }
 
-const FadeScaleIn: React.FC<{ children: React.ReactNode, delay?: number, className?: string }> = ({ children, delay = 0, className = "" }) => {
-  const [ref, isVisible] = useVisibility("-40px 0px"); // Triggers slightly inside the viewport
+const FadeScaleIn: React.FC<{ children: React.ReactNode; delay?: number; className?: string }> = ({
+  children,
+  delay = 0,
+  className = "",
+}) => {
+  const [ref, isVisible] = useVisibility("-40px 0px");
   return (
     <div
       ref={ref}
@@ -62,7 +56,10 @@ const FadeScaleIn: React.FC<{ children: React.ReactNode, delay?: number, classNa
   );
 };
 
-const ScrollBackground: React.FC<{ activeOpacity?: string, className?: string }> = ({ activeOpacity = "opacity-100", className = "" }) => {
+const ScrollBackground: React.FC<{ activeOpacity?: string; className?: string }> = ({
+  activeOpacity = "opacity-100",
+  className = "",
+}) => {
   const [ref, isVisible] = useVisibility("0px 0px");
   return (
     <div
@@ -74,92 +71,39 @@ const ScrollBackground: React.FC<{ activeOpacity?: string, className?: string }>
   );
 };
 
-const TypewriterText: React.FC<{ text?: string, delay?: number, speed?: number, className?: string }> = ({ text = "", delay = 0, speed = 10, className = "" }) => {
-  const [ref, isVisible] = useVisibility("-20px 0px");
-  const [charCount, setCharCount] = useState(0);
-
-  useEffect(() => {
-    if (!isVisible) {
-      setCharCount(0); // Resets when off-screen
-      return;
-    }
-    setCharCount(0); // Restart typing on text change or re-entry
-    const timeout = setTimeout(() => {
-      let i = 0;
-      const timer = setInterval(() => {
-        if (i <= text.length) {
-          setCharCount(i);
-          i += 2; // Types multiple characters per tick for a swift, clean look
-        } else {
-          clearInterval(timer);
-        }
-      }, speed);
-      return () => clearInterval(timer);
-    }, delay);
-    return () => clearTimeout(timeout);
-  }, [isVisible, text, delay, speed]);
-
-  return (
-    <span ref={ref} className={className}>
-      {text.substring(0, charCount)}
-      {/* Hidden text maintains perfectly accurate element sizing preventing layout shifts */}
-      <span className="opacity-0">{text.substring(charCount)}</span>
-    </span>
-  );
-};
-
-
 // ============================================================================
-// TYPES & INTERFACES
+// TYPES
 // ============================================================================
 
-type SubTab = 'combat' | 'mobility' | 'stand-combat';
+type AbilityTab = 'stands' | 'specs' | 'weapons';
 
-interface StatItem {
-  label: string;
-  value: string;
-}
+type StandPart = 'Part 3' | 'Part 4' | 'Part 5' | 'Part 6' | 'Part 7' | 'Part 8';
 
-interface VideoOption {
+interface Move {
   id: string;
-  label: string;
-  badge: string;
-  duration: string;
+  name: string;
   description: string;
-  inputTag?: string;
-  properties?: string[];
-  stats?: StatItem[];
-  videoSrc?: string;
-  posterSrc?: string;
+  videoSrc: string;
+  hasFinisher?: boolean;
+  finisherDescription?: string;
+  finisherVideoSrc?: string;
 }
 
-interface DynamicVideoPlateProps {
-  title: string;
-  options: VideoOption[];
-  defaultOptionId?: string;
-  sectionBadge?: string;
-  variantTheme?: 'gold' | 'red';
-}
-
-interface SingleVideoPlateProps {
-  title: string;
-  inputTag?: string;
-  badge?: string;
-  duration?: string;
-  description: string;
-  properties?: string[];
-  stats?: StatItem[];
-  videoSrc?: string;
-  posterSrc?: string;
-}
-
-interface StatusEffectCardProps {
-  type: 'bleed' | 'burn' | 'poison' | 'wither';
-  title: string;
-  badgeText: string;
-  duration: string;
-  description: string;
-  stats: string;
+interface Stand {
+  id: string;
+  name: string;
+  part: StandPart;
+  quote: string;
+  color: string;
+  secondaryColor?: string;
+  confirmed: boolean;
+  description?: string;
+  rarity?: string;
+  standType?: string;
+  moves?: Move[];
+  awakeningMoves?: Move[];
+  pfpSrc?: string;      // NEW: Individually insert Stand PFP path
+  fullArtSrc?: string;  // NEW: Individually insert Stand Full Art path
 }
 
 interface CodexBoxProps {
@@ -172,251 +116,542 @@ interface CodexBoxProps {
 }
 
 // ============================================================================
-// DATA & VARIANT CONFIGURATIONS
+// DATA
 // ============================================================================
 
-const styleRanks = [
-  { rank: "D", title: "Di Molto!", color: "border-[#555] text-[#8a857a]" },
-  { rank: "C", title: "Crazy!!", color: "border-[#666] text-[#a09a8e]" },
-  { rank: "B", title: "Bizarre!", color: "border-[#888] text-[#c7c2b5]" },
-  { rank: "BB", title: "BEYOND!", color: "border-[#c3a35e] text-[#e6c278]" },
-  { rank: "A", title: "All Star!", color: "border-[#e6c278] text-[#e6c278]" },
-  { rank: "S", title: "Stardust!", color: "border-[#34d399] text-[#34d399]" },
-  { rank: "SS", title: "Super!", color: "border-[#60a5fa] text-[#60a5fa]" },
-  { rank: "SSS", title: "SSS Style!", color: "border-[#c084fc] text-[#c084fc]" },
-  { rank: "O", title: "OVERDRIVE", color: "border-[#ff2a4b] text-[#ff4d6d] font-bold bg-[#26050b]" },
+const PART_ORDER: StandPart[] = ['Part 3', 'Part 4', 'Part 5', 'Part 6', 'Part 7', 'Part 8'];
+
+const PART_TITLES: Record<StandPart, string> = {
+  'Part 3': 'Stardust Crusaders',
+  'Part 4': 'Diamond is Unbreakable',
+  'Part 5': 'Golden Wind',
+  'Part 6': 'Stone Ocean',
+  'Part 7': 'Steel Ball Run',
+  'Part 8': 'JoJolion',
+};
+
+const STANDS: Stand[] = [
+  // --- Part 3: 12 confirmed ---
+  { 
+    id: 'star-platinum', 
+    name: 'Star Platinum', 
+    part: 'Part 3', 
+    color: '#8144e4', 
+    confirmed: true,
+    pfpSrc: 'Source Here', // <-- Example of how to individually insert the PFP path
+    fullArtSrc: '/Star Platinum Full Art.png', // <-- Example of how to individually insert the Full Art path
+    quote: "I can't beat your ass without getting closer",
+    description: `Awakened in 1988, Jotaro Kujo was possessed by what he deemed an evil spirit.[cite: 2] Star Platinum is the pinnacle of close-range combat, capable of breaking even the planet.[cite: 2]\n\nBase Stats: M1 Damage: 8.1, M1 Uppercut: 10.2, Speed Tier: A, Power Tier: A.[cite: 3]\n\nExtra Traits: Combo Break [Star Burst + Unstoppable Force] replaces standard combo break, stunning nearby opponents and canceling non-I-Frame moves.[cite: 3]\n\nAdd-on Passives:\n- Star Guardian: Guard hitbox increased from 200° to 300°.[cite: 3] Guard HP increases 100%-200% based on player's hp loss.[cite: 3] Perfect Guards trigger a swift jab doing 20hp (cannot kill) and grant 10% more damage on the next hit.[cite: 3]\n- True Stardust Spirit: Awakening costs 20 meters and 25% Stand Endurance.[cite: 2] Special moves use 25% less endurance but require more heat.[cite: 2] Dashes in awakening become flash warps.[cite: 2] Awakening grants Super Armour (tanks up to 50 damage).[cite: 2]\n\nMaturity Refineries:\n- Power (Immesurable Power): All damage becomes TRUE DAMAGE.[cite: 2] Barrage Finisher gets a true block break end hit.[cite: 2]\n- Agility (Shooting Star): Grab moves get 10% damage increase.[cite: 2] Attack speed increases by 35% under 50% HP or in awakening.[cite: 2]\n- Endurance (Unstoppable Force): Perfect guards give 15% more guard bar and 10 heat.[cite: 2] Under 20% HP, combo break does a burst Timestop automatically putting you in awakening.[cite: 2]`,
+    rarity: "High Tier Rarity[cite: 2]", 
+    standType: "Awakening (Class: Strength/Pow) - Close Range Grappler[cite: 2, 3]",
+    moves: [
+      {
+        id: "m2-brute-force",
+        name: "M2/LMB - [Brute Force] 🔴",
+        description: "Star Platinum grabs the opponent's neck and performs a secondary punch with their other hand straight to the victim's skull, sending them hurdling back.[cite: 3]\n\nDamage: 3.3(Grab) + 13.6 + (Skull Damage) | CD: 10s[cite: 3]\nTags: Grab | Ragdoll+Knockback | Guardable | COMBO ENDER/GRAB | CLOSE RANGE[cite: 3]\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.15s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/m2-brute-force.mp4"
+      },
+      {
+        id: "m2-you-bastard",
+        name: "M2/LMB [🧱] - [\"You Bastard!\"] 🔴",
+        description: "Star Platinum chokes the enemy to the wall before using their other arm to release a one armed barrage of strikes to the opponent before punching them through the wall.[cite: 3]\n\nDamage: 1.2 + 0.5*10 + 5.3 | CD: 10s[cite: 3]\nTags: Ragdoll+Knockback | Guardable | Wall Crash | COMBO ENDER | CLOSE RANGE[cite: 3]\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.2s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/m2-you-bastard.mp4"
+      },
+      {
+        id: "m2-stand-uppercut",
+        name: "M2/LMB [🔼] - [Stand Uppercut] 🔴",
+        description: "The stand uppercuts the enemy into the air, allowing for air combos.[cite: 3]\n\nDamage: 8.5 | CD: 10s[cite: 3]\nTags: Stun (1.0s) | Guardable | Upper-Spike | COMBO EXTENDER | CLOSE RANGE[cite: 3]\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.1s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/m2-stand-uppercut.mp4"
+      },
+      {
+        id: "e-barrage",
+        name: "E [♦️] - [Barrage] 🔴",
+        description: "Stand unleashes a burst of rapid punches, dealing stun (lasts 3.5s).[cite: 3]\n\nDamage: 1.2*28 @8 hits/s | CD: 8s[cite: 3]\nTags: Stun (0.5/hit) | Stun Evasive | Ragdoll Bypass | Guardable | Uncancellable | COMBO EXTENDER | EXTENDED CLOSE RANGE[cite: 3]\nHeat Cost: 0 | Heat Gain: 1*12 @4/s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/star-platinum-barrage.mp4",
+        hasFinisher: true,
+        finisherDescription: "E+M2 - [Barrage Finisher] 🔴: Stand ends the barrage with a heavy strike that knocks away the opponent.[cite: 3]\n\nDamage: 6.8 | CD: (E+2s)[cite: 3]\nTags: Guard Break | True Follow-Up | Soft Ragdoll | Slight Knockback | Parriable | Uncancellable | COMBO ENDER [MINI CUTSCENE] | EXTENDED CLOSE RANGE[cite: 3]\nHeat Cost: 5 | Heat Gain: 0 | Endlag: 0.15s[cite: 3]",
+        finisherVideoSrc: "MOVE VIDEO HERE/star-platinum-barrage-finisher.mp4"
+      },
+      {
+        id: "r-star-breaker",
+        name: "R - [Star Breaker] 🔴",
+        description: "Star Platinum strikes the victim's skull with immense force, dealing massive damage.[cite: 3]\n\nDamage: 19.5 | CD: 16s[cite: 3]\nTags: Guard Break| Ragdoll | Heavy Knockback | Hyper Armor | Hyper Armor Crash | Heavy Parriable | Uncancellable | COMBO ENDER | CLOSE RANGE[cite: 3]\nHeat Cost: 0 | Heat Gain: 20 | Endlag: 0.3s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/r-star-breaker.mp4"
+      },
+      {
+        id: "r-skull-crusher",
+        name: "R [🟥] - [Skull Crusher] 🔴",
+        description: "Star Platinum charges its strike to unleash an even more powerful blow, crushing the opponents skull and sending them flying away. (User moves slightly forward upon use)[cite: 3]\n\nDamage: 29.5 + (Skull Damage) | CD: 18s[cite: 3]\nTags: Guard Break | Stand Crasher | Ragdoll | Heavy Knockback | Hyper Armor | Hyper Armor Bypass | Heavy Parriable | COMBO ENDER | CLOSE RANGE+ | STAND POSITIONABLE[cite: 3]\nHeat Cost: 25 | Heat Gain: 0 | Endlag: 0.3s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/r-skull-crusher.mp4",
+        hasFinisher: true,
+        finisherDescription: "R [🟥] - [Skull Crusher] Finisher: Partial Cutscene/Impact Frame. Star Platinum crushes the opponent's skull, shattering it 3 times before the entire skeleton is shattered, right before the stand launches the body miles away.[cite: 3]\n\nHP Required: >40hp[cite: 3]",
+        finisherVideoSrc: "MOVE VIDEO HERE/r-skull-crusher-finisher.mp4"
+      },
+      {
+        id: "t-star-finger",
+        name: "T - [\"Star Finger!\"] 🔴",
+        description: "Star Platinum extends its index and middle fingers to pierce anyone within its range.[cite: 3]\n\nDamage: 10.3 + [BLEED(T1)] | CD: 12s[cite: 3]\nTags: True Stun (0.85s) | Guardable | Dodge Bypass | Enemy Pull | Knockback Cancel | COMBO EXTENDER/MIXUP | CLOSE RANGE+[cite: 3]\nHeat Cost: 0 | Heat Gain: 5[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/t-star-finger.mp4"
+      },
+      {
+        id: "t-down",
+        name: "T [🔝] - [\"I’ll stop him before he kills me!\"] 🔴",
+        description: "Star Platinum swipes its finger, slicing the opponent downwards.[cite: 3]\n\nDamage: 12.3 + [BLEED(T1)] | CD: 14s[cite: 3]\nTags: Soft Ragdoll | Guardable | Rebound | Enemy Pull | Knockback Cancel | Grounded Bypass | Stun (0.45s) | COMBO EXTENDER/MIXUP | CLOSE RANGE+[cite: 3]\nHeat Cost: 0 | Heat Gain: 5[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/t-down.mp4"
+      },
+      {
+        id: "t-whirling",
+        name: "T [✴️] - [Whirling Star] 🔴",
+        description: "Star Platinum zooms out, grabs their opponent and spins them around a couple times, before throwing them away (User is left behind).[cite: 3]\n\nDamage: 9.1 | CD: 12s[cite: 3]\nTags: Aimable(Camera) | Guardable | Knockback | Stun (0.65s) | COMBO EXTENDER | SEMI MID RANGE[cite: 3]\nHeat Cost: 0 | Heat Gain: 6[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/t-whirling.mp4"
+      },
+      {
+        id: "g-stardust-smash",
+        name: "G [♦️+❇️] - [Stardust Smash] 🔴",
+        description: "Star Platinum destroys the ground beneath them with its fist, forming a massive crater that is larger and more spiked towards the front. Each of the 3 charge stages do 15% more dmg. Can be used to get out stun.[cite: 3]\n\nDamage: 20.8 (Front) + 18.2 (AOE) | CD: 23s[cite: 3]\nTags: Grounded Bypass | Guard Break | Knockback+Ragdoll | Stand Crash | Hyper Armor+Break | Heavy Parriable[Unparriable at 3rd charge] | Dodge Bypass | Stun Evasive | COMBO ENDER | AOE (SMALL - SUB-MID SCALE)[cite: 3]\nHeat Cost: 0 | Heat Gain: 8 | Endlag: 0.35s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/g-stardust-smash.mp4"
+      },
+      {
+        id: "g-stardust-meteor",
+        name: "G [⏏️]  - [Stardust Meteor] 🔴",
+        description: "Star Platinum does a diving downward punch into the ground after a stand jump to unleash an even more powerful impact, destroying anything in the area.[cite: 3]\n\nDamage: 28.7 | CD: 23s[cite: 3]\nTags: Grounded Bypass | True Guard Break | Knockback+Ragdoll | Stand Crash | Hyper Armor+Hyper Armor Bypass | Aimable | Dodge Bypass | COMBO ENDER | AOE (SUB-MID - MID SCALE)[cite: 3]\nHeat Cost: 0 | Heat Gain: 8 | Endlag: 0.35s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/g-stardust-meteor.mp4"
+      },
+      {
+        id: "x-mach-impact",
+        name: "X [🛡️] - [Mach Impact] 🔴",
+        description: "Star Platinum lunges forward for a powerful skull punch to the opponent, knocking them back from the impact (Has 3 charge stages, this is 1st stage).[cite: 3]\n\nDamage: 16.2 | CD: 12s[cite: 3]\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | COMBO EXTENDER | SEMI-MID RANGE[cite: 3]\nHeat Cost: 0 | Heat Gain: 5 | Endlag: 0.3s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/x-mach-impact.mp4"
+      },
+      {
+        id: "x-supersonic-impact",
+        name: "X [1st 🟥] [🛡️] - [Supersonic Impact] 🔴",
+        description: "Star Platinum lunges forward for a hard hitting punch to the opponent’s skull, (2nd Stage).[cite: 3]\n\nDamage: 18.2 | CD: 12s[cite: 3]\nTags: Knockback+Soft Ragdoll | Guard Break | Heavy Parriable | COMBO EXTENDER/ENDER | SEMI-MID RANGE[cite: 3]\nHeat Cost: 0 | Heat Gain: 7 | Endlag: 0.35s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/x-supersonic-impact.mp4"
+      },
+      {
+        id: "x-hypersonic-impact",
+        name: "X [ 2nd 🟥] [🛡️] - [Hypersonic Impact] 🔴",
+        description: "Star Platinum lunges out for a powerful punch to the opponent’s skull, knocking them away from the impact. (Third and final charge of mach impact).[cite: 3]\n\nDamage: 20.2 | CD: 12s[cite: 3]\nTags: Heavy Knockback+Ragdoll | True Guard Break | COMBO ENDER | SEMI-MID RANGE | STAND POSITIONABLE[cite: 3]\nHeat Cost: 0 | Heat Gain: 9 | Endlag: 0.4s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/x-hypersonic-impact.mp4",
+        hasFinisher: true,
+        finisherDescription: "X [🟥] - [Hypersonic Impact] Finisher: Non-Cutscene. A hitstop effect occurs right before the victim is sent flying miles away (body causes destruction).[cite: 3]\n\nHP Required >40hp[cite: 3]",
+        finisherVideoSrc: "MOVE VIDEO HERE/x-hypersonic-impact-finisher.mp4"
+      },
+      {
+        id: "x-c-judge-you",
+        name: "X [🟥]+C  - [\"I’ll Judge You Myself!\"] 🔴",
+        description: "Star Platinum lunges forward and grabs the opponent before doing a series of punches with its right arm and finally uppercutting them into the air. Each charge variant does a different version upon impact (Variant 1: Non-Cutscene, Variant 2: Short Cutscene, Variant 3: Cutscene w/ Skull Damage + Grand Upper-Spike).[cite: 3]\n\nDamage: Dependant on variant | CD: Dependant on Variant[cite: 3]\nTags: Light Parriable[Unparriable at 3rd charge] | Guard Bypass | Knockback+Ragdoll | Grab | Hyper Armor Crash | Rebound | Uncancellable | Upper-Spike | COMBO ENDER [SUPER] | SEMI-MID RANGE | STAND POSITIONABLE[cite: 3]\nHeat Cost: 40 | Heat Gain: 0 | Endlag: 0.5s (if missed)[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/x-c-judge-you.mp4",
+        hasFinisher: true,
+        finisherDescription: "X+C (Variant 3) - [\"I’ll Judge You Myself!\"] Finisher: Cutscene Finisher. On the final uppercut hit, Star Platinum puts in more force, releasing its punch as the victim is seen in the background flying in the sky with a cartoon twinkle.[cite: 3]\n\nHP Required >65hp[cite: 3]",
+        finisherVideoSrc: "MOVE VIDEO HERE/x-c-judge-you-finisher.mp4"
+      },
+      {
+        id: "x-t-beat-breath",
+        name: "X+T - [\"Beat In A Breath\"] 🔴",
+        description: "Star Platinum does a strong inhale that can pull multiple enemies towards him.[cite: 3]\n\nDamage: 0 | CD: 10s[cite: 3]\nTags: True Stun (0.75s) | Guard Bypass | Dodge Bypass | Enemy Pull | Knockback Cancel | COMBO EXTENDER/MIXUP | SEMI-MID | STAND POSITIONABLE[cite: 3]\nHeat Cost: 0 | Heat Gain: 0 | Endlag: 0.45s (if missed)[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/x-t-beat-breath.mp4"
+      },
+      {
+        id: "y-jaw-breaker",
+        name: "Y - [Jaw Breaker] 🔴",
+        description: "Star Platinum does a shoving elbow jab at the opponent’s jaw that stuns them.[cite: 3]\n\nDamage: 9.5 | CD: 12s[cite: 3]\nTags: Guardable | Stun (0.65s) | Push Back | MIXUP | EXTENDED CLOSE RANGE[cite: 3]\nHeat Cost: 0 | Heat Gain: 8[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/y-jaw-breaker.mp4"
+      },
+      {
+        id: "c-immense-power",
+        name: "C - [\"What Immense Power!\"] 🔴",
+        description: "Star Platinum lunges out and drags the opponent on the ground before throwing them in the air.[cite: 3]\n\nDamage: 5.3 | CD: 12s[cite: 3]\nTags: Guardable | Grab | Medium Knockback+Soft Ragdoll | Stun (0.5s) | Rebound | COMBO EXTENDER/ENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE[cite: 3]\nHeat Cost: 0 | Heat Gain: 12 | Endlag: 0.2s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/c-immense-power.mp4"
+      },
+      {
+        id: "c-space-immense-power",
+        name: "C+[SPACE]{HELD} [🔼] - [\"What Immense Power!\"] 🔴",
+        description: "Star Platinum lunges out and drags the opponent on the ground before throwing them in the air.[cite: 3]\n\nDamage: 5.3 | CD: 12s[cite: 3]\nTags: Guardable | Grab | Knockback+Soft Ragdoll | Stun (0.5s) | Rebound | Upper-Spike | COMBO EXTENDER/ENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE[cite: 3]\nHeat Cost: 0 | Heat Gain: 12 | Endlag: 0.2s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/c-space-immense-power.mp4"
+      },
+      {
+        id: "c-up-no-mercy",
+        name: "C [⬆️] - [\"No Mercy!\"] 🔴",
+        description: "Star Platinum does an uppercut, before slamming the opponent back down to the ground with a strong hit.[cite: 3]\n\nDamage: 8.2 + 11.2 | CD: 12s[cite: 3]\nTags: True Guard Break | Knockback+Ragdoll | Down-Spike | COMBO ENDER [PARTIAL CUTSCENE] | CLOSE RANGE[cite: 3]\nHeat Cost: 0 | Heat Gain: 4+10 | Endlag: 0.2s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/c-up-no-mercy.mp4"
+      },
+      {
+        id: "z-star-synchrony",
+        name: "Z - [Star Synchrony] 🔴",
+        description: "The user runs up and grabs the opponent, tumbling over with the victim’s neck in their arms. Star Platinum summons and the user chokes the victim, allowing Star Platinum to M1 before spinning them around and throwing them away.[cite: 3]\n\nDamage: 8.2 (grab) + 6.3 (throw) | CD: 25s[cite: 3]\nTags: Grab | Guard-Bypass | Light Parriable | Hyper Armor | Dodge Bypass > Knockback + Ragdoll | Rebound | COMBO ENDER [SUPER & PARTIAL CUTSCENE] | MID RANGE[cite: 3]\nHeat Cost: 30 | Heat Gain: 0 | Endlag: 0.5s(if missed)[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/z-star-synchrony.mp4",
+        hasFinisher: true,
+        finisherDescription: "Z - [Star Synchrony] Finisher: Cutscene. A cinematic beatdown where Star Platinum comes forward to face the victim, finishing with a black screen impact.[cite: 3]\n\nHP Required >45hp[cite: 3]",
+        finisherVideoSrc: "MOVE VIDEO HERE/z-star-synchrony-finisher.mp4"
+      },
+      {
+        id: "z-up-star-drive",
+        name: "Z [⬆️/✴️] - [Star Drive] 🔴",
+        description: "Star Platinum catches the enemy, throws them in the air, before catching them and pile driving them to the floor.[cite: 3]\n\nDamage: 5.2 (grab) + 29.3 (ground hit) | CD: 20s[cite: 3]\nTags: Camera Aimable | Hyper Armor | True Guard Bypass | Grab | Knockback+Ragdoll | COMBO ENDER | CLOSE RANGE[cite: 3]\nHeat Cost: 20 | Heat Gain: 0 | Endlag: 0.4s(if missed)[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/z-up-star-drive.mp4"
+      },
+      {
+        id: "h-stellar-resolve",
+        name: "H - [Stellar Resolve] 🟣",
+        description: "The user awakens its inner resolve and grows more powerful, as Star platinum goes in front of the user as the user does the iconic pose and yells in rage before returning to its original stance.[cite: 3]\n\nDamage: 1*10+25 | CD: 50s[cite: 3]\nTags: I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | Slows if in AOE | Stun (0.9s) | Push-Back | AWAKENING MOVE + PARTIAL-CUTSCENE | SUB-MID AOE[cite: 3]\nHeat Cost: 50 | Heat Gain: 0[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/h-stellar-resolve.mp4"
+      },
+      {
+        id: "h-up-stellar-resolve",
+        name: "H [⬆️] - [Stellar Resolve] 🟣",
+        description: "The user awakens its inner resolve and grows more powerful, as Star platinum bursts out with rage.[cite: 3]\n\nDamage: 1*10+25 | CD: 50s[cite: 3]\nTags: I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | Slows if in AOE | Stun (0.9s) | Push-Back | AWAKENING MOVE + PARTIAL-CUTSCENE | SUB-MID AOE[cite: 3]\nHeat Cost: 50 | Heat Gain: 0[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/h-up-stellar-resolve.mp4"
+      },
+      {
+        id: "h-red-stellar-resolve",
+        name: "H [🟥] - [Stellar Resolve] 🟣",
+        description: "CUTSCENE: The user drops to the floor on his knees then enters a flashback. Star Platinum's arm partially manifests and causes a massive crater, bigger than G move, and the roar stuns players and knocks them away at the end.[cite: 3]\n\nDamage: 12.2+ 1.2*7+7.3 | CD: 50s[cite: 3]\nTags: True I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | 90% Slowed after groundslam | Knockback+Ragdoll after roar | Stun (0.55s) | AWAKENING MOVE [SUPER & PARTIAL CUTSCENE] | MID+ AOE[cite: 3]\nHeat Cost: 50 | Heat Gain: 0[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/h-red-stellar-resolve.mp4"
+      },
+      {
+        id: "j-destructive-uppercut",
+        name: "J - [Destructive Uppercut] 🔴",
+        description: "Star Platinum lunges forward and grabs the opponent, and launches them into the air before doing a second uppercut punch.[cite: 3]\n\nDamage: 3.2 (grab)+ 21.3 (punch)+ (Torso Damage) | CD: 16s[cite: 3]\nTags: Guardable | Grab | Knockback | Soft Ragdoll | Upper-Spike | COMBO EXTENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE[cite: 3]\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.3s(if missed)[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/j-destructive-uppercut.mp4",
+        hasFinisher: true,
+        finisherDescription: "J - [Destructive Uppercut] Finisher: Cutscene. As the victim flies in the air, Star Platinum ZOOMS out to deliver a final punch to the victim.[cite: 3]\n\nHP Required >30hp[cite: 3]",
+        finisherVideoSrc: "MOVE VIDEO HERE/j-destructive-uppercut-finisher.mp4"
+      },
+      {
+        id: "j-x-destructive-impact",
+        name: "J+X - [Destructive Impact] 🔴",
+        description: "Star Platinum lunges forward and grabs the opponent, and launches them into the air before doing a second skull punch to send them away.[cite: 3]\n\nDamage: 3.2 (grab)+ 26.3 (punch)+ (Skull Damage) | CD: 16s[cite: 3]\nTags: Guardable | Grab | Knockback | Soft Ragdoll | Rebound | COMBO EXTENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE[cite: 3]\nHeat Cost: 0 | Heat Gain: 12 | Endlag: 0.3s(if missed)[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/j-x-destructive-impact.mp4",
+        hasFinisher: true,
+        finisherDescription: "J+X - [Destructive Impact] Finisher: Cutscene. As the victim flies in the air, The user flash steps behind the enemy and follows up with an uppercut.[cite: 3]\n\nHP Required >45hp[cite: 3]",
+        finisherVideoSrc: "MOVE VIDEO HERE/j-x-destructive-impact-finisher.mp4"
+      },
+      {
+        id: "j-up-sparking-fist",
+        name: "J [🔼] - [Sparking Fist] 🔴",
+        description: "Star Platinum and the user charges before lunging a punch forward that hits the enemy’s head before a second gut punch that sends the victim flying far away.[cite: 3]\n\nDamage: 25.3 + (Aimed Body Part Damage) | CD: 16s[cite: 3]\nTags: Guard Break | Knockback | Soft Ragdoll | Light Parriable | Hyper Armor | Grounded Bypass | COMBO EXTENDER | SEMI-MID RANGE[cite: 3]\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.3s(if missed)[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/j-up-sparking-fist.mp4"
+      },
+      {
+        id: "j-wall-crushing-fist",
+        name: "J [🧱] - [Crushing Fist] 🔴",
+        description: "Star Platinum does a series of punches to the victim on the wall before a final punch to send them away.[cite: 3]\n\nDamage: 25.3 + (Aimed Body Part Damage) | CD: 16s[cite: 3]\nTags: Guard Break | Knockback | Soft Ragdoll | Light Parriable | Hyper Armor | Grounded Bypass | COMBO EXTENDER | SEMI-MID RANGE[cite: 3]\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.3s(if missed)[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/j-wall-crushing-fist.mp4"
+      },
+      {
+        id: "j-up-red-nova",
+        name: "J [🔼🟥] - [Nova Sparking Fist] 🔴",
+        description: "Star Platinum and the user charges even more before lunging a punch forward. Upon impact, the stand drives their fist into the victim slowly until they blow away from the impact.[cite: 3]\n\nDamage: 29.3 (punch)+ (Aimed Body Part Damage) | CD: 16s[cite: 3]\nTags: True Guard Break | Heavy Knockback | Ragdoll | Counter Bypass | Hyper Armor+ Crash | Grounded Bypass | COMBO ENDER | SEMI-MID RANGE[cite: 3]\nHeat Cost: 15 | Heat Gain: 0 | Endlag: 0.4s(if missed)[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/j-up-red-nova.mp4",
+        hasFinisher: true,
+        finisherDescription: "J [🔼🟥] - [Nova Sparking Fist] Finisher: Non-Cutscene. Upon Impact, the screen goes grey for a second as the stand’s fist drives deeper into the victim's skull. Until their skull explodes due to the sheer force.[cite: 3]\n\nHP Required >30hp[cite: 3]",
+        finisherVideoSrc: "MOVE VIDEO HERE/j-up-red-nova-finisher.mp4"
+      },
+      // --- STAND-OFF MOVES ---
+      {
+        id: "so-e-blitz",
+        name: "[Stand-Off] E - [Blitz Strike] 🔴",
+        description: "Star Platinum zooms forward to punch the nearest opponent if they're in range.[cite: 4]\n\nDamage: 8.5 | CD: 12s[cite: 4]\nTags: Auto-Aim | Stun (0.7s) | Guardable | MIXUP | CLOSE RANGE+ | STAND POSITIONABLE[cite: 4]\nHeat Cost: 0 | Heat Gain: 10[cite: 4]",
+        videoSrc: "MOVE VIDEO HERE/so-e-blitz.mp4"
+      },
+      {
+        id: "so-ee-rising",
+        name: "[Stand-Off] E+E - [Rising Star] 🔴",
+        description: "Star Platinum follows up with an upper punch that knocks the opponent away.[cite: 4]\n\nDamage: 7.9 | CD: 10s[cite: 4]\nTags: Follow-Up | Knockback+Ragdoll | Guard Break | Rebound | Light Parriable | Upper-Spike | ENDER | CLOSE RANGE+ | STAND POSITIONABLE[cite: 4]\nHeat Cost: 5 | Heat Gain: 0[cite: 4]",
+        videoSrc: "MOVE VIDEO HERE/so-ee-rising.mp4"
+      },
+      {
+        id: "so-r-skull-shredder",
+        name: "[Stand-Off] R - [Skull Shredder] 🔴",
+        description: "Star Platinum blitzes out, grabs and crashes the victim to the floor and them tosses them away.[cite: 4]\n\nDamage: 9.4 + 4.2 | CD: 15s[cite: 4]\nTags: Knockback+Ragdoll | Guardable | COMBO ENDER | CLOSE+ RANGE | STAND POSITIONABLE[cite: 4]\nHeat Cost: 0 | Heat Gain: 3+1[cite: 4]",
+        videoSrc: "MOVE VIDEO HERE/so-r-skull-shredder.mp4"
+      },
+      {
+        id: "so-t-neo-star",
+        name: "[Stand-Off] T [♦️] - [Neo Star Breaker] 🔴",
+        description: "Star Platinum charges one of its strongest punches at the victim. For every 3 seconds this is held, the move gets 50% more damage.[cite: 4]\n\nDamage: [Minimum] 16.0 | CD: 30s (+10s if past 4s charge)[cite: 4]\nTags: Heavy Knockback+Ragdoll | True Guard Break | Counter Bypass | Dodge Bypass | COMBO ENDER | CLOSE+ RANGE | STAND POSITIONABLE | AUTO STAND SUMMON[cite: 4]\nHeat Cost: 15 | Heat Gain: 0[cite: 4]",
+        videoSrc: "MOVE VIDEO HERE/so-t-neo-star.mp4"
+      },
+      {
+        id: "so-y-back-off",
+        name: "[Stand-Off] Y - [\"Back Off!\"] 🔴",
+        description: "The user grabs the opponent as star platinum knocks them away.[cite: 4]\n\nDamage: 9.2 | CD: 15s[cite: 4]\nTags: Knockback+Soft Ragdoll | Guardable | Counter Bypass | COMBO ENDER/EXTENDER | CLOSE RANGE | AUTO STAND SUMMON[cite: 4]\nHeat Cost: 0 | Heat Gain: 5[cite: 4]",
+        videoSrc: "MOVE VIDEO HERE/so-y-back-off.mp4"
+      },
+      {
+        id: "so-yr-understand",
+        name: "[Stand-Off] Y+R - [\"Do You Understand?\"] 🔴",
+        description: "The user grabs the opponent and restrains from behind for a couple seconds.[cite: 4]\n\nDamage: 2.1 | CD: 15s[cite: 4]\nTags: Knockback+Soft Ragdoll | Guardable | Counter Bypass | COMBO ENDER/EXTENDER | CLOSE RANGE | AUTO STAND SUMMON[cite: 4]\nHeat Cost: 0 | Heat Gain: 1[cite: 4]",
+        videoSrc: "MOVE VIDEO HERE/so-yr-understand.mp4"
+      },
+      {
+        id: "so-yr-missed",
+        name: "[Stand-Off] Y+R [🛑] - [\"Do You Understand\" Missed] 🔴",
+        description: "When Missed, Star Platinum does a strong inhale that pulls in the enemy.[cite: 4]\n\nDamage: 0.0 | CD: 15s[cite: 4]\nTags: True Stun (0.85s) | Guardable | Dodge Bypass | Enemy Pull | Knockback Cancel | COMBO EXTENDER/MIXUP | SEMI MID[cite: 4]\nHeat Cost: 0 | Heat Gain: 0[cite: 4]",
+        videoSrc: "MOVE VIDEO HERE/so-yr-missed.mp4"
+      },
+      {
+        id: "so-yre-brutal",
+        name: "[Stand-Off] Y+R+E - [Brutal Beatdown] 🔴",
+        description: "When used, Star Platinum comes out and does a swift combo of attacks leading to an uppercut hit before throwing them away from their legs.[cite: 4]\n\nDamage: 2.1 + X | CD: 15s[cite: 4]\nTags: Knockback+Soft Ragdoll | Guardable | Counter Bypass | COMBO ENDER/EXTENDER | CLOSE RANGE | AUTO STAND SUMMON[cite: 4]\nHeat Cost: 0 | Heat Gain: 1+X[cite: 4]",
+        videoSrc: "MOVE VIDEO HERE/so-yre-brutal.mp4"
+      },
+      {
+        id: "so-y-knockout",
+        name: "[Stand-Off] Y [✴️] - [\"Knockout!\"] 🔴",
+        description: "Star Platinum appears in front of the enemy and grabs them before slamming them vertically to the ground.[cite: 4]\n\nDamage: 13.3 (-10% per 10 studs past 20 stud range, limit=70) | CD: 15s[cite: 4]\nTags: Knockback+Soft Ragdoll | Guardable | Dodge Bypass | COMBO ENDER/EXTENDER | MID + RANGE[cite: 4]\nHeat Cost: 15 | Heat Gain: 0[cite: 4]",
+        videoSrc: "MOVE VIDEO HERE/so-y-knockout.mp4"
+      },
+      {
+        id: "so-h-platinum-fists",
+        name: "[Stand-Off] H - [Platinum Fists] 🔴",
+        description: "Star Platinum engulfs the user’s arms partially, acting as a damage, defence and attack speed buff. Mode can be toggled on and off freely.[cite: 4]\n\nDamage: Null | CD: 10s[cite: 4]\nTags: Move Buff | PASSIVE BUFFER | RANGE IRRELEANT[cite: 4]\nHeat Cost: 20 + 5/s | Heat Gain: 0[cite: 4]",
+        videoSrc: "MOVE VIDEO HERE/so-h-platinum-fists.mp4"
+      }
+    ],
+    awakeningMoves: [
+      {
+        id: "awk-m2-crushing-grip",
+        name: "M2 - [Crushing Grip] 🔴",
+        description: "Star Platinum grabs the opponent and throws them away with one arm.[cite: 3]\n\nDamage: 14.2 | CD: 10s[cite: 3]\nTags: Guardable | Knockback | Soft Ragdoll | COMBO ENDER | CLOSE RANGE | STAND POSITIONABLE[cite: 3]\nHeat Cost: 0 | Heat Gain: 6[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-m2-crushing-grip.mp4"
+      },
+      {
+        id: "awk-m2x-crushing-rage",
+        name: "M2+X - [Crushing Rage] 🔴",
+        description: "Star Platinum grabs the opponent and slams them on the ground before tossing them away with one arm.[cite: 3]\n\nDamage: 17.2 + 3.2 + (Torso Damage) | CD: 10s[cite: 3]\nTags: Guardable | Knockback | Soft Ragdoll | COMBO ENDER | CLOSE RANGE | STAND POSITIONABLE[cite: 3]\nHeat Cost: 0 | Heat Gain: 6[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-m2x-crushing-rage.mp4"
+      },
+      {
+        id: "awk-m2xc-crushing-fury",
+        name: "M2+X+C - [Crushing Fury] 🔴",
+        description: "Star Platinum grabs the opponent and slams them on the ground, dragging them on the floor and throwing them into the air.[cite: 3]\n\nDamage: 17.2 + 3.2 | CD: 10s[cite: 3]\nTags: Guardable | Knockback | Soft Ragdoll | COMBO ENDER | CLOSE RANGE | STAND POSITIONABLE[cite: 3]\nHeat Cost: 0 | Heat Gain: 6[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-m2xc-crushing-fury.mp4"
+      },
+      {
+        id: "awk-r-star-breaker",
+        name: "R [♦️] - [Star Breaker] 🔴",
+        description: "This move loses the charged variant, however, for every 2 seconds this is held, the move’s power is increased by 50%.[cite: 3]\n\nDamage: 20.0 + (Skull Damage) | CD: 18s[cite: 3]\nTags: Guard Break | True Follow-Up | Ragdoll | Heavy Knockback | Hyper Armor | Hyper Armor Crash | Heavy Parriable | Uncancellable | COMBO ENDER | CLOSE RANGE[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-r-star-breaker.mp4"
+      },
+      {
+        id: "awk-x-lightspeed-impact",
+        name: "X [3nd 🟥] [🛡️] - [Lightspeed Impact] 🔴",
+        description: "Star Platinum blitzes out for a powerful lightspeed punch to the opponent’s skull. The pressure from the wind acts as a projectile.[cite: 3]\n\nDamage: 40.4 | CD: 20s[cite: 3]\nTags: Heavy Knockback+Ragdoll | True Guard Bypass | Rebound | COMBO ENDER | MID RANGE + SEMI-MID RANGE | STAND POSITIONABLE[cite: 3]\nHeat Cost: 15 | Heat Gain: 5 | Endlag: 0.8s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-x-lightspeed-impact.mp4"
+      },
+      {
+        id: "awk-h-timestop",
+        name: "H - [\"Star Platinum!\"] 🟣",
+        description: "Star Platinum stops the flow of time down to a standstill. Can be pre-emptively ended. Counters other timestops.[cite: 3]\n\nCD: 30s (-10s for each second cut short) | Cost: 50% Stand Endurance/s[cite: 3]\nTags: True Stun | Hyper Armor | SPECIAL MOVE [PARTIAL CUTSCENE] | AOE (HYPER LARGE SCALE)[cite: 3]\nHeat Requirement: 25 | Heat Gain Reduction: 50%[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-h-timestop.mp4"
+      },
+      {
+        id: "awk-hm2-grab",
+        name: "H+M2/LMB - [Grab] 🔴",
+        description: "Star Platinum simply grabs the opponent, clicking again throws them.[cite: 3]\n\nDamage: 5.0 | CD: 10s[cite: 3]\nTags: Grab | Ragdoll+Knockback | Guardable | GRAB | CLOSE RANGE[cite: 3]\nHeat Cost: 0 | Heat Gain: 0 | Endlag: 0.15s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-hm2-grab.mp4"
+      },
+      {
+        id: "awk-g-neo-stardust-smash",
+        name: "G [♦️] + G [🔳] - [Neo Stardust Smash] 🔴",
+        description: "Star Platinum does a charged ground slam, if pressed again at the right time, causes a stronger shockwave impact.[cite: 3]\n\nDamage: 31.3 + 19.9 (shockwave) | CD: 23s[cite: 3]\nTags: Follow-up | Guardable | Stun | Bypass Getup I-Frames | Grounded Bypass | Hyper Armor | Trip Ragdoll | Dodge Bypass | Stage Destruction | COMBO EXTENDER | AOE[cite: 3]\nHeat Cost: 0 | Heat Gain: 2+2+5[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-g-neo-stardust-smash.mp4"
+      },
+      {
+        id: "awk-gm2-meteor-launch",
+        name: "G+M2 - [Meteor Launch] 🔴",
+        description: "Star Platinum punches the floor for a giant spiked boulder to flip out. Charges up to throw it.[cite: 3]\n\nDamage: 44.2 | CD: 25s[cite: 3]\nTags: True Guard Bypass | Counter Bypass | I-Frame Charge Up | Bypass Getup I-Frames | Insta Stand Crash | Ragdoll + Hyper Armor Bypass | Knockback + Ragdoll | Dodge Bypass | Grounded Bypass | COMBO ENDER / HEAVY PROJECTILE | MID RANGE | STAND POSITIONABLE[cite: 3]\nHeat Cost: 0 | Heat Gain: 20[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-gm2-meteor-launch.mp4",
+        hasFinisher: true,
+        finisherDescription: "G+M2 - [Meteor Launch] Finisher: Non-Cutscene. The victim just splats in blood upon impact.[cite: 3]\n\nHP Required: >50hp[cite: 3]",
+        finisherVideoSrc: "MOVE VIDEO HERE/awk-gm2-meteor-launch-finisher.mp4"
+      },
+      {
+        id: "awk-y-keep-change",
+        name: "Y [🟥] - [\"And Keep The Damn Change!\"] 🔴",
+        description: "Star Platinum punches the enemy, does a long, extensive barrage of punches, with stronger individual punches in-between.[cite: 3]\n\nDamage: 45.4 | CD: 30s[cite: 3]\nTags: Guardable | Counter Bypass | Grab | Hyper Armor | Heavy Knockback + Ragdoll | COMBO ENDER [SUPER] | EXTENDED CLOSE RANGE | STAND POSITIONABLE[cite: 3]\nHeat Cost: 20 | Heat Gain: 0[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-y-keep-change.mp4",
+        hasFinisher: true,
+        finisherDescription: "Y [🟥] - [Platinum Fists] Finisher: Cutscene. A cinematic barrage sequence ending with an impact frame and shattered glass effect as the victim flies away.[cite: 3]\n\nHP Required: >50hp[cite: 3]",
+        finisherVideoSrc: "MOVE VIDEO HERE/awk-y-keep-change-finisher.mp4"
+      },
+      {
+        id: "awk-hy-ora-ora",
+        name: "H+Y [🟥] - [\"Ora Ora Ora!\"] 🔴",
+        description: "In timestop, Star Platinum uppercuts the enemy, cracks knuckles, delivers a swift barrage, and the user casually dodges the flying victim and writes a receipt.[cite: 3]\n\nDamage: XX.XX | CD: 30s[cite: 3]\nTags: Guardable | Counter Bypass | Grab | Hyper Armor | Heavy Knockback + Ragdoll | COMBO ENDER [SUPER + MINI CUTSCENE] | CLOSE RANGE[cite: 3]\nHeat Cost: 20 | Heat Gain: 0[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-hy-ora-ora.mp4"
+      },
+      {
+        id: "awk-c-crusading-comet",
+        name: "C - [Crusading Comet] 🔴",
+        description: "The user and star platinum rams a short distance, knocking away anyone in their path.[cite: 3]\n\nDamage: 17.2 | CD: 19s[cite: 3]\nTags: Guard Break | Counter Bypass | Hyper Armor | Light Parriable | Hyper Armor Bypass | Knockback + Soft Ragdoll | Dodge Bypass | Grounded Bypass | COMBO EXTENDER | SEMI-MID RANGE | STAND POSITIONABLE[cite: 3]\nHeat Cost: 0 | Heat Gain: 7 | Endlag: 0.55s (if missed)[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-c-crusading-comet.mp4"
+      },
+      {
+        id: "awk-c-run-up",
+        name: "C [▶️/🟥] - [Crusading Comet] 🔴",
+        description: "The user readies up and does a run up, grabbing anyone caught, holding them with Star Platinum's arms, then jumping and throwing them to the floor.[cite: 3]\n\nDamage: 13.2 (Grab) + 8.2 (Throw) | CD: 19s[cite: 3]\nTags: Guard Bypass | Grab | Hyper Armor Charge Up | Heavy Parriable | Insta Stand Crash | Hyper Armor Bypass | Knockback + Ragdoll | Dodge Bypass | Grounded Bypass | COMBO EXTENDER | LONG RANGE[cite: 3]\nHeat Cost: 0 | Heat Gain: 3+2 | Endlag: 0.6s (if missed)[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-c-run-up.mp4"
+      },
+      {
+        id: "awk-cg-destructive-rage",
+        name: "C [▶️/🟥]+G - [Destructive Rage] 🔴+🟣",
+        description: "After the throw, a QTE triggers 2 extra punches. If successful, user flash-warps behind the victim for a final back punch.[cite: 3]\n\nDamage: 17*3 + 25.9 + (Torso Damage) | CD: 30s | Cost: 20% Stand Endurance[cite: 3]\nTags: Grab Follow Up | Heavy Knockback+Ragdoll | Guard Bypass | Heavy Parriable | Insta Stand Crash | Hyper Armor Bypass | Dodge Bypass | Grounded Bypass | COMBO ENDER[cite: 3]\nHeat Cost: 0 | Heat Gain: 3+2[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-cg-destructive-rage.mp4",
+        hasFinisher: true,
+        finisherDescription: "C [🟥]+G - [Destructive Rage] Finisher: Cutscene Ender. The final punch breaks ribs, then zooms out showing the skeleton fracturing, sending the body miles away.[cite: 3]\n\nHP Required: >80hp[cite: 3]",
+        finisherVideoSrc: "MOVE VIDEO HERE/awk-cg-destructive-rage-finisher.mp4"
+      },
+      {
+        id: "awk-fh-no-pity",
+        name: "F+H [⚠️] - [\"I feel no pity for you at all...\"] 🟣",
+        description: "Counter Move: Stops time, shatters victim's shins from behind, then gut punches them away. If missed, Star Platinum swipes fist.[cite: 3]\n\nDamage: 6.2 + 15.1 + (Leg Damage) . 12.3 if missed | CD: 25s + 3s Block CD | Cost: 40% Stand Endurance[cite: 3]\nTags: Ragdoll + Knockback | True Guard Break | Melee Counter | Missed > Stun + Push-Back | COMBO ENDER [MINI CUTSCENE + Counter] | SEMI-MID RANGE[cite: 3]\nHeat Cost: 20 (1 bar) | Heat Gain: 0 | Endlag: 0.35s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-fh-no-pity.mp4"
+      },
+      {
+        id: "awk-x-ora-strike",
+        name: "X [⏩] - [Ora Strike] 🔴",
+        description: "As the user flashsteps, Star Platinum has already prepared a skull crushing punch to knock the victim away.[cite: 3]\n\nDamage: 18.5 | CD: 12s[cite: 3]\nTags: Standing Knockback | Guardable | Stun (0.35s) | COMBO EXTENDER | SEMI-MID RANGE[cite: 3]\nHeat Cost: 0 | Heat Gain: 8 | Endlag: 0.3s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-x-ora-strike.mp4",
+        hasFinisher: true,
+        finisherDescription: "X [⏩] - [Ora Strike] Finisher: Cutscene Ender. The punch sends the victim flying as the user and Star Platinum swiftly follow up for a quick combo of punches, ending with a final one to the skull.[cite: 3]\n\nHP Required: >20hp[cite: 3]",
+        finisherVideoSrc: "MOVE VIDEO HERE/awk-x-ora-strike-finisher.mp4"
+      },
+      {
+        id: "awk-z-stardust-showdown",
+        name: "Z - [Stardust Showdown] 🔴+🟡",
+        description: "Star Platinum strikes the opponent as the camera pans to cutscene mode. The stand then delivers a series of punches to the victim before its final strike.[cite: 3]\n\nDamage: 10.0 + 2*49 + 42 | CD: 45s[cite: 3]\nTags: Guard Bypass | Counter Bypass | Hyper Armor Charge Up | Parriable | Insta Stand Crash | Hyper Armor Bypass | Heavy Knockback + Ragdoll | Dodge Bypass | COMBO ENDER [ULTIMATE & CUTSCENE] | CLOSE RANGE+[cite: 3]\nHeat Cost: 40 (2 Bars) | Heat Gain: 0 | Endlag: 0.85s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-z-stardust-showdown.mp4",
+        hasFinisher: true,
+        finisherDescription: "Z - [Stardust Showdown] Finisher: Cutscene. The victim imitates Dio in Cairo before the beatdown, ending with Star Platinum charging up its strongest skull punch to send the victim flying.[cite: 3]\n\nHP Required: >150hp[cite: 3]",
+        finisherVideoSrc: "MOVE VIDEO HERE/awk-z-stardust-showdown-finisher.mp4"
+      },
+      {
+        id: "awk-hz-time-stands-still",
+        name: "H+Z - [\"While Time Stands Still\"] 🔴+🟡",
+        description: "Similar beatdown, but extends the timestop and does not grant endurance fatigue immunity. Time resumes when finished.[cite: 3]\n\nDamage: 125.0 | CD: 45s[cite: 3]\nTags: Guard Bypass | Counter Bypass | Hyper Armor Charge Up | Parriable | Insta Stand Crash | Hyper Armor Bypass | Heavy Knockback + Ragdoll | Dodge Bypass | Auto Timestop Ender | COMBO ENDER [ULTIMATE & CUTSCENE] | CLOSE RANGE+[cite: 3]\nHeat Cost: 40 (2 Bars) | Heat Gain: 0 | Endlag: 0.85s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-hz-time-stands-still.mp4"
+      },
+      {
+        id: "awk-j-supernova-strike",
+        name: "J - [Supernova Strike] 🔴",
+        description: "Star Platinum charges up its strongest punch. Player mashes button to increase gigatons. Has 4 charges (Charged, Super Charged, Hyper Charged, Neo Charged).[cite: 3]\n\nDamage: [Base] 55.9 [Ultra] 185.9 (+ Skull Damage) | CD: 80s (40s if missed)[cite: 3]\nTags: True Guard Bypass | Counter Bypass | Hyper Armor | Heavy Parriable | Insta Stand Crash | Hyper Armor Bypass | Extreme Knockback + Ragdoll | True Damage | Dodge Bypass | COMBO ENDER [ULTIMATE & NON-CUTSCENE] | CLOSE RANGE+ | STAND POSITIONABLE[cite: 3]\nHeat Cost: 40 (2 Bars) | Heat Gain: 0 | Endlag: 0.65s[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-j-supernova-strike.mp4",
+        hasFinisher: true,
+        finisherDescription: "J - [Supernova Strike] Finisher: Cutscene. (Neo Charge) The stand downward hooks the victim, charging up to 100,000 gigatons and unleashing a punch that shatters the skeleton and sends a shockwave visible from outer space.[cite: 3]\n\nHP Required: >200hp[cite: 3]",
+        finisherVideoSrc: "MOVE VIDEO HERE/awk-j-supernova-strike-finisher.mp4"
+      },
+      {
+        id: "awk-hj-swift-fist",
+        name: "H+J [💠] - [Swift Fist] 🔴",
+        description: "Star Platinum lunges out and does a straight jab. Can be re-casted a total of 5 times with the last one being a mini cutscene and stronger.[cite: 3]\n\nDamage: 15.3 | CD: 0s[cite: 3]\nTags: Guardable | Standing Knockback | Ragdoll Bypass | Stun | COMBO EXTENDER/ENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE[cite: 3]\nHeat Cost: 0 | Heat Gain: 5[cite: 3]",
+        videoSrc: "MOVE VIDEO HERE/awk-hj-swift-fist.mp4"
+      }
+    ]
+  },
+  { 
+    id: 'the-world', name: 'The World', part: 'Part 3', color: '#F1C232', confirmed: true,
+    quote: 'Invincibility, Immortality, STAND POWER!',
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+  { 
+    id: 'silver-chariot', name: 'Silver Chariot', part: 'Part 3', color: '#7CA9DE', confirmed: true,
+    quote: 'Bravo OH Bravo!',
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+  { 
+    id: 'hierophant-green', name: 'Hierophant Green', part: 'Part 3', color: '#0DCB74', confirmed: true,
+    quote: "It's time for your punishment, baby",
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+  { 
+    id: 'anubis', name: 'Anubis', part: 'Part 3', color: '#70237c', confirmed: true,
+    quote: 'No one is stronger than you….use me and kill!',
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+  { 
+    id: 'magicians-red', name: "Magician's Red", part: 'Part 3', color: '#FF3C00', confirmed: true,
+    quote: 'Hell 2 U!',
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+  { 
+    id: 'cursed-chariot', name: 'Cursed Chariot', part: 'Part 3', color: '#990000', confirmed: true,
+    quote: "You're no match for two master swordsmen combined!",
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+  { 
+    id: 'horus', name: 'Horus', part: 'Part 3', color: '#3CC2FF', confirmed: true,
+    quote: 'CRAWWWW!',
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+  { 
+    id: 'hermit-purple', name: 'Hermit Purple', part: 'Part 3', color: '#B651F0', confirmed: true,
+    quote: 'OH MY GOD!!',
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+  { 
+    id: 'cream', name: 'Cream', part: 'Part 3', color: '#9c93c5', confirmed: true,
+    quote: "One by one, one after the other, I'll scatter your atoms across my void",
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+  { 
+    id: 'emperor-hanged-man', name: 'Emperor + Hanged Man', part: 'Part 3', color: '#BF9000', secondaryColor: '#E7C279', confirmed: true,
+    quote: 'Aye Aye Sir!',
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+  { 
+    id: 'shadow-the-world', name: 'Shadow The World', part: 'Part 3', color: '#A83AA6', confirmed: true,
+    quote: 'What is it that you truly desire?',
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+
+  // --- Part 3: 6 unconfirmed, expected ---
+  { 
+    id: 'the-fool', name: 'The Fool', part: 'Part 3', color: '#E7C279', confirmed: false,
+    quote: "Seems like I can't let a kid who likes dogs die",
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+  { 
+    id: 'justice', name: 'Justice', part: 'Part 3', color: '#CCCCCC', confirmed: false,
+    quote: 'Justice Always wins!',
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+  { 
+    id: 'death-13', name: 'Death 13', part: 'Part 3', color: '#4B2FA0', secondaryColor: '#F1C232', confirmed: false,
+    quote: 'Lali-Ho',
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+  { 
+    id: 'tower-of-grey', name: 'Tower of Grey', part: 'Part 3', color: '#6FA8DC', confirmed: false,
+    quote: 'M A S S A C R E',
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+  { 
+    id: 'sun', name: 'Sun', part: 'Part 3', color: '#E69138', confirmed: false,
+    quote: 'THE SUN IS A DEADLY LASER',
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
+  { 
+    id: 'geb', name: 'Geb', part: 'Part 3', color: '#3C7DE0', confirmed: false,
+    quote: 'I do not fear death, for evil needs a saviour as well',
+    description: "Desc Here", rarity: "Desc Here", standType: "Desc Here", moves: []
+  },
 ];
 
-const heavyStrikeOptions: VideoOption[] = [
-  {
-    id: "basic",
-    label: "Heavy Strike",
-    badge: "HEAVY COMBO ENDER",
-    duration: "0:12",
-    inputTag: "M2 / RMB",
-    description: "Used while grounded; can be used to end combos or as a quick way to destroy defensive options if used right. Usable casually, but can be parried, so use wisely. Deals triple M1 damage with soft ragdoll launch.",
-    properties: [
-      "Guard Break",
-      "Light Parriable",
-      "Super Knockback & Ragdoll"
-    ],
-    stats: [
-      { label: "Damage", value: "3x M1 Base" },
-      { label: "Heat Cost", value: "15 Heat" },
-      { label: "Cooldown", value: "2.0s" }
-    ],
-    videoSrc: "UNIQUE VIDEO HERE",
-    posterSrc: "UNIQUE VIDEO HERE"
-  },
-  {
-    id: "down",
-    label: "Down Strike",
-    badge: "AIR COMBAT",
-    duration: "0:10",
-    inputTag: "Airborne M2",
-    description: "Executed while in the air and leveled with your opponent for air combos. Transforms M2 into a heavy down slam to your opponent, sending them back down to earth.",
-    properties: [
-      "Guard Bypass",
-      "Parriable",
-      "Super Knockback & Ragdoll",
-      "Grand Down-Spike",
-      "Rebound"
-    ],
-    stats: [
-      { label: "Spike Type", value: "Grand Down-Spike" },
-      { label: "Guard Property", value: "Guard Bypass" },
-      { label: "Cooldown", value: "2.0s" }
-    ],
-    videoSrc: "UNIQUE VIDEO HERE",
-    posterSrc: "UNIQUE VIDEO HERE"
-  },
-  {
-    id: "sky",
-    label: "Sky Strike",
-    badge: "LAUNCHER",
-    duration: "0:11",
-    inputTag: "Hold Space during M2 Windup",
-    description: "While grounded, holding the space key during the M2's windup transforms your M2 into Sky Strike uppercut / upper kick to your opponent, launching them into the air.",
-    properties: [
-      "Guard Bypass",
-      "Parriable",
-      "Super Knockback & Ragdoll",
-      "Grand Up-Spike"
-    ],
-    stats: [
-      { label: "Spike Type", value: "Grand Up-Spike" },
-      { label: "Guard Property", value: "Guard Bypass" },
-      { label: "Cooldown", value: "2.0s" }
-    ],
-    videoSrc: "UNIQUE VIDEO HERE",
-    posterSrc: "UNIQUE VIDEO HERE"
-  },
-  {
-    id: "ground",
-    label: "Ground Strike",
-    badge: "GROUND PIN",
-    duration: "0:12",
-    inputTag: "Airborne (Above Opponent) + M2",
-    description: "Executed while above your opponent; transforms M2 into an angled kick down to your opponent, which is aimable as well.",
-    properties: [
-      "Guard Break",
-      "Parriable",
-      "Grounded & Ragdoll Bypass",
-      "Ground Pin"
-    ],
-    stats: [
-      { label: "Pin Property", value: "Ground Pin" },
-      { label: "Bypass", value: "Grounded & Ragdoll" },
-      { label: "Cooldown", value: "2.0s" }
-    ],
-    videoSrc: "UNIQUE VIDEO HERE",
-    posterSrc: "UNIQUE VIDEO HERE"
-  },
-  {
-    id: "rush",
-    label: "Rush Strike",
-    badge: "MOBILITY STRIKE",
-    duration: "0:13",
-    inputTag: "Forward Dash + M2",
-    description: "While using forward dash and your M2 together, M2's can turn into a Rush Strike, forward dashing strike in a linear path with more mobility.",
-    properties: [
-      "Guardable",
-      "Parriable",
-      "Super Knockback & Ragdoll",
-      "Grand Upper Strike"
-    ],
-    stats: [
-      { label: "Strike Type", value: "Grand Upper" },
-      { label: "Guard Property", value: "Guardable" },
-      { label: "Cooldown", value: "2.0s" }
-    ],
-    videoSrc: "UNIQUE VIDEO HERE",
-    posterSrc: "UNIQUE VIDEO HERE"
-  },
-  {
-    id: "flash",
-    label: "Flash Strike & Flash Rush",
-    badge: "TELEPORTING STRIKE",
-    duration: "0:15",
-    inputTag: "Flash Step + M2",
-    description: "Instantaneous strike that can surprise opponents with a sudden strike. Effective range is roughly half of flash step range. Can chain into Flash Rush by using your M2 multiple times in succession that end in a Down Strike. [Limit decided by skill tree upgrades].",
-    properties: [
-      "Guardable",
-      "Parriable",
-      "Super Knockback & Ragdoll"
-    ],
-    stats: [
-      { label: "Strike Type", value: "Stun & Down Spike" },
-      { label: "Effective Range", value: "1/2 Flash-Step Range" },
-      { label: "Chain Input", value: "M2 After Flash-Step" },
-      { label: "Guard Property", value: "Light Parriable" },
-      { label: "Finisher", value: "Down Strike" },
-      { label: "Cooldown", value: "2.0s & 8.0s" }
-    ],
-    videoSrc: "UNIQUE VIDEO HERE",
-    posterSrc: "UNIQUE VIDEO HERE"
-  },
-  {
-    id: "clash",
-    label: "M2 Clashing",
-    badge: "CLASH MECHANIC",
-    duration: "0:09",
-    inputTag: "Simultaneous M2",
-    description: "Should 2 players use M2 at the same time and clash, their clash usually has no victor at the end and simply has both enemies being pushed back from the clash point.",
-    properties: [
-      "Mutual Pushback",
-      "No Victor",
-      "Stun Neutralization",
-      "2/3 used heat refunded"
-    ],
-    stats: [
-      { label: "Result", value: "Mutual Pushback" },
-      { label: "Victor", value: "None" },
-      { label: "Cooldown", value: "10.0s Triggered" },
-      { label: "Heat", value: "10 heat refund" }
-    ],
-    videoSrc: "UNIQUE VIDEO HERE",
-    posterSrc: "UNIQUE VIDEO HERE"
-  }
-];
-
-const criticalArtOptions: VideoOption[] = [
-  {
-    id: "m1-amp",
-    label: "Amplified Strike (M1)",
-    badge: "CRITICAL ART",
-    duration: "0:15",
-    inputTag: "M1 in Perception Zone",
-    description: "Executing M1 inside Perception Zone with supercharged guard bar triggers Amplified Strike, leaving opponent heavily stunned for combo setup.",
-    properties: ["Guard Depletion", "Overdrive Trigger", "Target Stun"],
-    stats: [{ label: "Type", value: "Amplified (M1)" }, { label: "Effect", value: "Opponent Stunned" }],
-    videoSrc: "UNIQUE VIDEO HERE",
-    posterSrc: "UNIQUE VIDEO HERE"
-  },
-  {
-    id: "m1-crit",
-    label: "Critical Strike (M1)",
-    badge: "CRITICAL ART",
-    duration: "0:18",
-    inputTag: "M1 (Green Zone QTE)",
-    description: "Timing the QTE bar inside the Green Zone initiates standard Critical Strike, dealing huge damage and putting user into Overdrive.",
-    properties: ["Guard Depletion", "Overdrive State", "Will Scaling"],
-    stats: [{ label: "Type", value: "Critical (M1)" }, { label: "Trigger", value: "Overdrive State" }],
-    videoSrc: "UNIQUE VIDEO HERE",
-    posterSrc: "UNIQUE VIDEO HERE"
-  },
-  {
-    id: "m1-max",
-    label: "Maximum Critical Strike (M1)",
-    badge: "MAX CRITICAL",
-    duration: "0:20",
-    inputTag: "M1 (Blue Center QTE)",
-    description: "Hitting the ultra-thin center Blue Zone delivers Maximum Critical Strike for catastrophic damage and full status debuff on target.",
-    properties: ["Maximum Damage", "Full Will Scaling", "Debuff Applied"],
-    stats: [{ label: "Type", value: "Max Critical (M1)" }, { label: "Damage", value: "Immense" }],
-    videoSrc: "UNIQUE VIDEO HERE",
-    posterSrc: "UNIQUE VIDEO HERE"
-  },
-  {
-    id: "m2-amp",
-    label: "Amplified Strike (M2)",
-    badge: "CRITICAL ART",
-    duration: "0:15",
-    inputTag: "M2 in Perception Zone",
-    description: "Executing M2 inside Perception Zone delivers heavy amplified strike resulting in Grand Knockback across the arena.",
-    properties: ["Grand Knockback", "Guard Depletion", "Overdrive Trigger"],
-    stats: [{ label: "Type", value: "Amplified (M2)" }, { label: "Effect", value: "Grand Knockback" }],
-    videoSrc: "UNIQUE VIDEO HERE",
-    posterSrc: "UNIQUE VIDEO HERE"
-  },
-  {
-    id: "m2-crit",
-    label: "Critical Strike (M2)",
-    badge: "CRITICAL ART",
-    duration: "0:18",
-    inputTag: "M2 (Green Zone QTE)",
-    description: "Heavy Critical Strike hitting Green Zone QTE, blasting target away and applying Will-scaled damage bonuses.",
-    properties: ["Grand Knockback", "Will Scaling", "Overdrive State"],
-    stats: [{ label: "Type", value: "Critical (M2)" }, { label: "Trigger", value: "Overdrive State" }],
-    videoSrc: "UNIQUE VIDEO HERE",
-    posterSrc: "UNIQUE VIDEO HERE"
-  },
-  {
-    id: "m2-max",
-    label: "Maximum Critical Strike (M2)",
-    badge: "MAX CRITICAL",
-    duration: "0:22",
-    inputTag: "M2 (Blue Center QTE)",
-    description: "Maximum Heavy Critical Strike hitting center Blue Zone timing, triggering extreme knockback and devastating health loss.",
-    properties: ["Extreme Knockback", "Max Will Damage", "Target Debuffed"],
-    stats: [{ label: "Type", value: "Max Critical (M2)" }, { label: "Knockback", value: "Grand Knockback" }],
-    videoSrc: "UNIQUE VIDEO HERE",
-    posterSrc: "UNIQUE VIDEO HERE"
-  }
-];
+function useStandsByPart(): Record<StandPart, Stand[]> {
+  return useMemo(() => {
+    const map = {} as Record<StandPart, Stand[]>;
+    PART_ORDER.forEach((p) => (map[p] = []));
+    STANDS.forEach((s) => map[s.part].push(s));
+    return map;
+  }, []);
+}
 
 // ============================================================================
-// REUSABLE HOVERABLE CONTAINER & CARDS
+// SHARED CODEX BOX
 // ============================================================================
 
 const CodexBox: React.FC<CodexBoxProps> = ({
@@ -425,23 +660,22 @@ const CodexBox: React.FC<CodexBoxProps> = ({
   badge,
   children,
   accentColor = "border-[#2a2418] hover:border-[#c3a35e]",
-  className = ""
+  className = "",
 }) => {
   return (
     <FadeScaleIn className={className}>
-      <div className={`group relative bg-[#0a0a0d] border ${accentColor} transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_0_25px_rgba(195,163,94,0.18)] p-6 rounded-sm overflow-hidden`}>
-        {/* Top Accent Bar */}
+      <div
+        className={`group relative bg-[#0a0a0d] border ${accentColor} transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.01] hover:shadow-[0_0_25px_rgba(195,163,94,0.18)] p-6 rounded-sm overflow-hidden h-full`}
+      >
         <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#c3a35e]/40 to-transparent group-hover:via-[#c3a35e] transition-all duration-500" />
-        
+
         {(title || badge) && (
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 pb-3 border-b border-[#2a2418] group-hover:border-[#3d3423] transition-colors">
             <div>
               <h4 className="text-xl md:text-2xl font-['Gilda_Display',serif] text-[#e6c278] group-hover:text-white transition-colors tracking-wide">
                 {title}
               </h4>
-              {subtitle && (
-                <span className="text-xs font-mono text-[#8a857a] block mt-0.5">{subtitle}</span>
-              )}
+              {subtitle && <span className="text-xs font-mono text-[#8a857a] block mt-0.5">{subtitle}</span>}
             </div>
             {badge && (
               <span className="self-start sm:self-auto bg-[#1c1a24] text-[#e6c278] border border-[#3d3423] group-hover:border-[#d9181b] text-xs font-mono px-2.5 py-1 transition-colors">
@@ -457,425 +691,527 @@ const CodexBox: React.FC<CodexBoxProps> = ({
 };
 
 // ============================================================================
-// SINGLE VIDEO PLATE COMPONENT
+// HEXAGON HONEYCOMB GRID
 // ============================================================================
 
-const VideoPlate: React.FC<SingleVideoPlateProps> = ({
-  title,
-  inputTag,
-  badge = "VIDEO DEMO",
-  duration = "0:12",
-  description,
-  properties,
-  stats,
-  videoSrc,
-  posterSrc
-}) => {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+const HEX_GRID_STYLES = `
+.hexcomb { --hex-w: 168px; --hex-h: calc(var(--hex-w) * 1.1547); }
+@media (max-width: 1024px) { .hexcomb { --hex-w: 132px; } }
+@media (max-width: 640px)  { .hexcomb { --hex-w: 100px; } }
+@media (max-width: 420px)  { .hexcomb { --hex-w: 78px; } }
 
-  const handlePlay = () => {
-    if (videoRef.current) {
-      videoRef.current.play();
-      setIsPlaying(true);
-    }
-  };
+.hexcomb .hex-row { display: flex; }
+.hexcomb .hex-row + .hex-row { margin-top: calc(var(--hex-h) * -0.25); }
+.hexcomb .hex-row-offset { margin-left: calc(var(--hex-w) / 2); }
 
+.hexcomb .hex-tile {
+  width: var(--hex-w);
+  height: var(--hex-h);
+  flex-shrink: 0;
+  position: relative;
+}
+
+.hexcomb .hex-clip {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+
+.typewriter-text {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 0;
+  transition: width 0.5s steps(20, end);
+}
+
+.hex-tile:hover .typewriter-text,
+.hex-tile:focus-visible .typewriter-text {
+  width: 100%;
+}
+`;
+
+const StandHex: React.FC<{ stand: Stand; onSelect: (s: Stand) => void }> = ({ stand, onSelect }) => {
   return (
-    <FadeScaleIn className="my-6">
-      <div className="group relative bg-[#0a0a0d] border border-[#2a2418] hover:border-[#c3a35e] transition-all duration-300 transform hover:-translate-y-1 hover:scale-[1.01] overflow-hidden shadow-xl hover:shadow-[0_0_30px_rgba(195,163,94,0.22)] rounded-sm">
-        {/* Top Bar / Header */}
-        <div className="flex items-center justify-between bg-[#121116] px-4 py-2.5 border-b border-[#2a2418]">
-          <div className="flex items-center space-x-3">
-            <span className="bg-[#c3a35e] text-black text-xs font-bold px-2.5 py-0.5 uppercase tracking-wider font-['Cormorant_Upright',serif]">
-              {badge}
-            </span>
-            {inputTag && (
-              <span className="bg-[#1c1a24] text-[#e6c278] border border-[#3d3423] text-xs font-mono px-2 py-0.5">
-                {inputTag}
-              </span>
-            )}
-          </div>
-          <span className="text-[#8a857a] text-xs font-mono">{duration}</span>
+    <button
+      type="button"
+      onClick={() => onSelect(stand)}
+      aria-label={`Open ${stand.name} — ${stand.confirmed ? 'confirmed' : 'unconfirmed'}`}
+      className={`hex-tile group outline-none transition-[filter] duration-300 hover:z-20 focus-visible:z-20 hover:drop-shadow-[0_0_18px_var(--stand-glow)] focus-visible:drop-shadow-[0_0_18px_var(--stand-glow)] ${
+        stand.confirmed ? '' : 'opacity-[0.72]'
+      }`}
+      style={{ ['--stand-glow' as any]: stand.color }}
+    >
+      <span
+        className="hex-clip absolute inset-0 bg-[#242019] transition-colors duration-300 group-hover:bg-[var(--stand-glow)] group-focus-visible:bg-[var(--stand-glow)]"
+      />
+      <span className="hex-clip absolute inset-[2.5px] bg-[#0d0c10] flex flex-col items-center justify-center transition-transform duration-300 group-hover:scale-[1.04]">
+        
+        {/* NEW FULL HEXAGON PFP - Updates conditionally if individual src is given */}
+        <img 
+          src={stand.pfpSrc || `INSERT STAND PFP HERE/${stand.id}.png`} 
+          alt={`${stand.name} Profile`}
+          className="absolute inset-0 w-full h-full object-cover opacity-[0.85] group-hover:opacity-100 transition-opacity duration-300"
+        />
+        
+        {/* INVISIBLE TEXT CONTAINER WITH BACKGROUND BOX AND TYPEWRITER REVEAL */}
+        <div className="absolute z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-[#0a0a0d]/90 border border-[var(--stand-glow)] px-3 py-1 flex items-center justify-center shadow-lg">
+          <span className="font-['Cormorant_Upright',serif] text-[10px] sm:text-xs font-bold text-center leading-tight text-white typewriter-text">
+            {stand.name}
+          </span>
         </div>
-
-        {/* Main Container: Video Preview + Details */}
-        <div className="grid grid-cols-1 md:grid-cols-12">
-          {/* Left Aspect-Video Box */}
-          <div className="md:col-span-5 relative aspect-video bg-[#121216] overflow-hidden flex items-center justify-center border-b md:border-b-0 md:border-r border-[#2a2418]">
-            <ScrollBackground className="bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:14px_14px] group-hover:opacity-30 transition-opacity" activeOpacity="opacity-15" />
-            
-            {videoSrc ? (
-              <>
-                <video
-                  ref={videoRef}
-                  src={videoSrc}
-                  poster={posterSrc}
-                  className="absolute inset-0 w-full h-full object-cover z-10"
-                  controls={isPlaying}
-                  onPause={() => setIsPlaying(false)}
-                  onEnded={() => setIsPlaying(false)}
-                />
-                {!isPlaying && (
-                  <div 
-                    onClick={handlePlay}
-                    className="relative z-20 w-14 h-14 rounded-full bg-black/80 border-2 border-[#c3a35e] flex items-center justify-center group-hover:scale-110 group-hover:bg-[#c3a35e] transition-all duration-300 shadow-2xl cursor-pointer"
-                  >
-                    <svg className="w-6 h-6 text-[#c3a35e] group-hover:text-black translate-x-0.5 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="relative z-10 w-14 h-14 rounded-full bg-black/80 border-2 border-[#c3a35e] flex items-center justify-center group-hover:scale-110 group-hover:bg-[#c3a35e] transition-all duration-300 shadow-2xl">
-                <svg className="w-6 h-6 text-[#c3a35e] group-hover:text-black translate-x-0.5 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </div>
-            )}
-
-            <div className="absolute bottom-2 left-2 z-20 text-[10px] font-mono text-[#8a857a] uppercase tracking-widest bg-black/80 px-2 py-0.5 border border-[#2a2418] pointer-events-none">
-              Preview Reel
-            </div>
-          </div>
-
-          {/* Right Details Panel */}
-          <div className="md:col-span-7 p-5 flex flex-col justify-between bg-gradient-to-br from-[#0a0a0d] to-[#050505]">
-            <div>
-              <h5 className="text-xl font-['Gilda_Display',serif] text-[#e6c278] tracking-wide mb-2 group-hover:text-white transition-colors">
-                {title}
-              </h5>
-              <p className="text-sm md:text-base text-[#b8b3a8] font-['Zen_Old_Mincho',serif] leading-relaxed mb-4">
-                <TypewriterText text={description} delay={200} />
-              </p>
-            </div>
-
-            {/* Optional Properties Badges */}
-            {properties && properties.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mb-3">
-                {properties.map((prop, idx) => (
-                  <span key={idx} className="text-[11px] font-mono text-[#e6c278] bg-[#14121a] border border-[#2a2418] px-2 py-0.5">
-                    {prop}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {stats && stats.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-3 border-t border-[#2a2418]">
-                {stats.map((st, idx) => (
-                  <div key={idx} className="bg-[#100f14] p-2 border border-[#221e15]">
-                    <span className="block text-[10px] text-[#8a857a] uppercase font-['Cormorant_Upright',serif] tracking-wider">
-                      {st.label}
-                    </span>
-                    <span className="text-xs md:text-sm font-bold text-[#e6c278] font-mono">
-                      {st.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </FadeScaleIn>
+        
+        {!stand.confirmed && <HelpCircle className="absolute bottom-2 w-4 h-4 text-[#8a857a] z-10 drop-shadow-md" />}
+      </span>
+    </button>
   );
 };
 
-// ============================================================================
-// DYNAMIC VIDEO PLATE (WITH SWITCHABLE VARIANT TABS)
-// ============================================================================
-
-const DynamicVideoPlate: React.FC<DynamicVideoPlateProps> = ({
-  title,
-  options,
-  defaultOptionId,
-  sectionBadge = "INTERACTIVE VARIANT SELECTOR",
-  variantTheme = 'gold'
+const PartHexSection: React.FC<{ part: StandPart; stands: Stand[]; onSelect: (s: Stand) => void }> = ({
+  part,
+  stands,
+  onSelect,
 }) => {
-  const [selectedId, setSelectedId] = useState<string>(defaultOptionId || options[0]?.id || "");
-  const [flashId, setFlashId] = useState<string | null>(null);
-
-  const [isPlaying, setIsPlaying] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  const activeOption = options.find((opt) => opt.id === selectedId) || options[0];
-
-  useEffect(() => {
-    setIsPlaying(false);
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
-  }, [selectedId]);
-
-  const handleTabClick = (id: string) => {
-    setSelectedId(id);
-    setFlashId(id);
-    setTimeout(() => {
-      setFlashId(null);
-    }, 150);
-  };
-
-  const handlePlay = () => {
-    if (videoRef.current) {
-      videoRef.current.play();
-      setIsPlaying(true);
-    }
-  };
-
-  const theme = {
-    gold: {
-      containerHover: 'hover:border-[#c3a35e] hover:shadow-[0_0_35px_rgba(195,163,94,0.25)]',
-      badge: 'bg-[#c3a35e] text-black',
-      title: 'text-[#e6c278]',
-      tabActive: 'bg-[#1c1a24] text-[#e6c278] border-[#c3a35e] shadow-[0_0_10px_rgba(195,163,94,0.3)]',
-      tabHover: 'hover:border-[#3d3423]',
-      flash: 'shadow-[0_0_15px_3px_rgba(195,163,94,0.7),0_0_20px_5px_rgba(0,0,0,0.8)] border-[#c3a35e]',
-      radial: 'bg-[radial-gradient(#c3a35e_1px,transparent_1px)]',
-      playBtn: 'border-[#c3a35e] text-[#c3a35e] group-hover:bg-[#c3a35e] group-hover:text-black',
-      tag: 'bg-[#1c1a24] text-[#e6c278] border-[#3d3423]',
-      propTag: 'text-[#e6c278] border-[#3d3423] bg-[#14121a]',
-      stat: 'text-[#e6c278]'
-    },
-    red: {
-      containerHover: 'hover:border-[#d40000] hover:shadow-[0_0_35px_rgba(212,0,0,0.25)]',
-      badge: 'bg-[#d40000] text-white',
-      title: 'text-[#d40000]',
-      tabActive: 'bg-[#2a0000] text-[#d40000] border-[#d40000] shadow-[0_0_12px_rgba(212,0,0,0.4)]',
-      tabHover: 'hover:border-[#d40000]/50',
-      flash: 'shadow-[0_0_15px_3px_rgba(212,0,0,0.8),0_0_20px_5px_rgba(0,0,0,0.9)] border-[#d40000]',
-      radial: 'bg-[radial-gradient(#d40000_1px,transparent_1px)]',
-      playBtn: 'border-[#d40000] text-[#d40000] group-hover:bg-[#d40000] group-hover:text-white',
-      tag: 'bg-[#2a0000] text-[#d40000] border-[#d40000]/50',
-      propTag: 'text-[#d40000] border-[#d40000]/40 bg-[#14121a]',
-      stat: 'text-[#d40000]'
-    }
-  }[variantTheme];
+  const PER_ROW = 6;
+  const rows: Stand[][] = [];
+  for (let i = 0; i < stands.length; i += PER_ROW) rows.push(stands.slice(i, i + PER_ROW));
 
   return (
-    <FadeScaleIn className="my-8">
-      <div className={`group relative bg-[#0a0a0d] border border-[#2a2418] transition-all duration-300 transform hover:-translate-y-1 shadow-2xl rounded-sm overflow-hidden ${theme.containerHover}`}>
-        {/* Header Bar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-[#121116] px-5 py-3 border-b border-[#2a2418] gap-2">
-          <div className="flex items-center space-x-3">
-            <span className={`text-xs font-bold px-2.5 py-0.5 uppercase tracking-wider font-['Cormorant_Upright',serif] ${theme.badge}`}>
-              {activeOption.badge || "DEMO"}
-            </span>
-            <span className={`text-lg font-['Gilda_Display',serif] ${theme.title}`}>
-              {title}
-            </span>
-          </div>
-          <span className="text-[#8a857a] text-xs font-mono uppercase tracking-widest bg-black/60 px-2 py-1 border border-[#2a2418]">
-            {sectionBadge}
+    <FadeScaleIn className="mb-20">
+      <div className="flex items-center gap-4 mb-10">
+        <span className="h-px flex-1 bg-[#2a2418]" />
+        <h3 className="text-xl md:text-2xl font-['Cormorant_Upright',serif] font-bold uppercase tracking-[0.3em] text-[#e6c278] whitespace-nowrap text-center">
+          {part}
+          <span className="block sm:inline text-[#8a857a] text-[11px] sm:text-sm tracking-widest font-mono normal-case sm:ml-3">
+            {PART_TITLES[part]}
           </span>
-        </div>
-
-        {/* Option Selector Subtabs */}
-        <div className="bg-[#070709] border-b border-[#2a2418] p-2 flex flex-wrap gap-2">
-          {options.map((opt) => (
-            <button
-              key={opt.id}
-              onClick={() => handleTabClick(opt.id)}
-              className={`relative px-3 py-1.5 text-xs font-['Cormorant_Upright',serif] font-bold uppercase tracking-wider transition-all duration-150 ease-out border ${
-                selectedId === opt.id
-                  ? theme.tabActive
-                  : `bg-[#0e0d12] text-[#716c62] border-[#221e15] hover:text-[#a09a8e] ${theme.tabHover}`
-              } ${
-                flashId === opt.id
-                  ? `scale-[1.03] bg-black text-white z-10 ${theme.flash}`
-                  : 'z-0'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Main Content: Video Preview Box + Details */}
-        <div className="grid grid-cols-1 md:grid-cols-12">
-          {/* Left Aspect Video Box */}
-          <div className="md:col-span-5 relative aspect-video bg-[#121216] overflow-hidden flex items-center justify-center border-b md:border-b-0 md:border-r border-[#2a2418]">
-            <ScrollBackground className={`[background-size:14px_14px] group-hover:opacity-35 transition-opacity ${theme.radial}`} activeOpacity="opacity-20" />
-            
-            {activeOption.videoSrc ? (
-              <>
-                <video
-                  ref={videoRef}
-                  src={activeOption.videoSrc}
-                  poster={activeOption.posterSrc}
-                  className="absolute inset-0 w-full h-full object-cover z-10"
-                  controls={isPlaying}
-                  onPause={() => setIsPlaying(false)}
-                  onEnded={() => setIsPlaying(false)}
-                />
-                {!isPlaying && (
-                  <div 
-                    onClick={handlePlay}
-                    className={`relative z-20 w-16 h-16 rounded-full bg-black/80 border-2 flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-2xl cursor-pointer ${theme.playBtn}`}
-                  >
-                    <svg className="w-7 h-7 translate-x-0.5 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className={`relative z-10 w-16 h-16 rounded-full bg-black/80 border-2 flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-2xl ${theme.playBtn}`}>
-                <svg className="w-7 h-7 translate-x-0.5 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </div>
-            )}
-
-            <div className={`absolute top-2 left-2 z-20 text-[10px] font-mono px-2 py-0.5 border pointer-events-none ${theme.tag}`}>
-              {activeOption.duration}
-            </div>
-
-            <div className="absolute bottom-2 left-2 z-20 text-[10px] font-mono text-[#8a857a] uppercase tracking-widest bg-black/80 px-2 py-0.5 border border-[#2a2418] pointer-events-none">
-              Variant: {activeOption.label}
-            </div>
-          </div>
-
-          {/* Right Details Panel */}
-          <div className="md:col-span-7 p-6 flex flex-col justify-between bg-gradient-to-br from-[#0a0a0d] to-[#050505]">
-            <div>
-              <div className="flex justify-between items-start mb-2">
-                <h5 className={`text-2xl font-['Gilda_Display',serif] ${theme.title}`}>
-                  {activeOption.label}
-                </h5>
-                {activeOption.inputTag && (
-                  <span className={`text-xs font-mono px-2 py-1 border ${theme.tag}`}>
-                    {activeOption.inputTag}
-                  </span>
-                )}
-              </div>
-
-              <p className="text-base text-[#b8b3a8] font-['Zen_Old_Mincho',serif] leading-relaxed mb-4 min-h-[60px]">
-                <TypewriterText key={selectedId} text={activeOption.description} delay={200} />
-              </p>
-
-              {/* Properties Tags */}
-              {activeOption.properties && activeOption.properties.length > 0 && (
-                <div className="mb-4">
-                  <span className="block text-[10px] font-mono text-[#8a857a] uppercase mb-1">Move Properties:</span>
-                  <div className="flex flex-wrap gap-1.5">
-                    {activeOption.properties.map((prop, idx) => (
-                      <span key={idx} className={`text-xs font-mono px-2 py-0.5 border ${theme.propTag}`}>
-                        {prop}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Stats Bar */}
-            {activeOption.stats && activeOption.stats.length > 0 && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-3 border-t border-[#2a2418]">
-                {activeOption.stats.map((st, idx) => (
-                  <div key={idx} className="bg-[#100f14] p-2 border border-[#221e15]">
-                    <span className="block text-[10px] text-[#8a857a] uppercase font-['Cormorant_Upright',serif] tracking-wider">
-                      {st.label}
-                    </span>
-                    <span className={`text-sm font-bold font-mono ${theme.stat}`}>
-                      {st.value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+        </h3>
+        <span className="h-px flex-1 bg-[#2a2418]" />
       </div>
-    </FadeScaleIn>
-  );
-};
 
-const StatusEffectCard: React.FC<StatusEffectCardProps> = ({
-  type,
-  title,
-  badgeText,
-  duration,
-  description,
-  stats
-}) => {
-  const styles = {
-    bleed: {
-      border: "border-[#f21616] shadow-[0_0_15px_rgba(255,42,75,0.3)] hover:shadow-[0_0_30px_rgba(255,42,75,0.6)]",
-      badge: "bg-[#38060c] text-[#f21616] border-[#f21616]",
-      title: "text-[#f21616]",
-      gradient: "from-[#1a0508] to-[#0a0a0d]",
-      pulse: "bg-[#f21616]"
-    },
-    burn: {
-      border: "border-[#ff7b00] shadow-[0_0_15px_rgba(255,123,0,0.3)] hover:shadow-[0_0_30px_rgba(255,123,0,0.6)]",
-      badge: "bg-[#381a03] text-[#ffa048] border-[#ff7b00]",
-      title: "text-[#ffa048]",
-      gradient: "from-[#1f0e02] to-[#0a0a0d]",
-      pulse: "bg-[#ff7b00]"
-    },
-    poison: {
-      border: "border-[#10b981] shadow-[0_0_15px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.6)]",
-      badge: "bg-[#03291c] text-[#34d399] border-[#10b981]",
-      title: "text-[#34d399]",
-      gradient: "from-[#021810] to-[#0a0a0d]",
-      pulse: "bg-[#10b981]"
-    },
-    wither: {
-      border: "border-[#a855f7] shadow-[0_0_15px_rgba(168,85,247,0.3)] hover:shadow-[0_0_30px_rgba(168,85,247,0.6)]",
-      badge: "bg-[#240a38] text-[#c084fc] border-[#a855f7]",
-      title: "text-[#c084fc]",
-      gradient: "from-[#140421] to-[#0a0a0d]",
-      pulse: "bg-[#a855f7]"
-    }
-  }[type];
-
-  return (
-    <FadeScaleIn>
-      <div
-        className={`relative p-6 bg-gradient-to-br ${styles.gradient} border ${styles.border} transition-all duration-300 transform hover:-translate-y-1.5 hover:scale-[1.03] group rounded-sm overflow-hidden flex flex-col justify-between`}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <span
-            className={`text-xs font-mono font-bold px-2.5 py-0.5 uppercase tracking-wider border ${styles.badge}`}
-          >
-            {badgeText}
-          </span>
-          <div className="flex items-center space-x-2">
-            <span className={`w-2 h-2 rounded-full ${styles.pulse} animate-ping`} />
-            <span className="text-xs font-mono text-[#8a857a]">{duration}</span>
-          </div>
-        </div>
-
-        <div>
-          <h4 className={`text-2xl font-['Gilda_Display',serif] ${styles.title} mb-2 tracking-wide`}>
-            {title}
-          </h4>
-          <p className="text-sm text-[#b8b3a8] font-['Zen_Old_Mincho',serif] leading-relaxed mb-4">
-            <TypewriterText text={description} delay={300} speed={10} />
+      {stands.length === 0 ? (
+        <div className="border border-dashed border-[#2a2418] bg-[#0a0a0d]/60 py-14 text-center">
+          <Lock className="w-5 h-5 text-[#3d3728] mx-auto mb-3" />
+          <p className="font-mono text-xs uppercase tracking-widest text-[#5c584f]">
+            Archive Pending — No Stands Logged For This Part Yet
           </p>
         </div>
-
-        <div className="pt-3 border-t border-white/10 text-xs font-mono text-[#8a857a] flex justify-between items-center">
-          <span>DEBUFF</span>
-          <span className="text-white font-bold">{stats}</span>
+      ) : (
+        <div className="hexcomb flex flex-col items-center overflow-x-auto pb-4">
+          <style>{HEX_GRID_STYLES}</style>
+          <div className="pt-2">
+            {rows.map((row, rIdx) => (
+              <div key={rIdx} className={`hex-row ${rIdx % 2 === 1 ? 'hex-row-offset' : ''}`}>
+                {row.map((stand) => (
+                  <StandHex key={stand.id} stand={stand} onSelect={onSelect} />
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </FadeScaleIn>
   );
 };
 
 // ============================================================================
-// HEADER & FOOTER COMPONENTS
+// MOVE CARD COMPONENT
+// Handles individual moves, swapping between Base and Finisher tabs, and Video
 // ============================================================================
 
-const SiteHeader: React.FC = () => {
+const MoveCard: React.FC<{ move: Move; standColor: string }> = ({ move, standColor }) => {
+  const [activeTab, setActiveTab] = useState<'base' | 'finisher'>('base');
+
   return (
-    <header className="max-w-7xl mx-auto mb-10 relative border-b border-[#2a2418]">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:16px_16px]" />
-      {/* Bottom Banner */}
+    <div className="flex flex-col bg-[#0a0a0d] border border-[#2a2418] hover:border-[#3d3423] transition-colors h-full">
+      <div className="flex items-center justify-between p-4 border-b border-[#2a2418]">
+        <h5 className="font-['Gilda_Display',serif] text-lg text-[#e6c278] tracking-wide flex items-center gap-2">
+          <Film className="w-4 h-4 text-[#8a857a]" />
+          {move.name}
+        </h5>
+        
+        {/* Dynamic Move Tabs (Base vs Finisher) */}
+        {move.hasFinisher && (
+          <div className="flex bg-[#14121a] border border-[#2a2418] rounded-sm p-0.5">
+            <button
+              onClick={() => setActiveTab('base')}
+              className={`px-3 py-1 text-[10px] font-mono uppercase tracking-widest transition-all ${
+                activeTab === 'base' 
+                  ? 'bg-[#2a2418] text-[#e6c278]' 
+                  : 'text-[#5c584f] hover:text-[#8a857a]'
+              }`}
+            >
+              Base
+            </button>
+            <button
+              onClick={() => setActiveTab('finisher')}
+              className={`px-3 py-1 text-[10px] font-mono uppercase tracking-widest transition-all ${
+                activeTab === 'finisher' 
+                  ? 'bg-[#2a2418] text-[#e6c278]' 
+                  : 'text-[#5c584f] hover:text-[#8a857a]'
+              }`}
+            >
+              Finisher
+            </button>
+          </div>
+        )}
+      </div>
+
+      <div className="p-4 flex-1 flex flex-col">
+        {/* Unique Video Rendering Placeholder */}
+        <div className="relative aspect-video bg-[#121116] border border-[#2a2418] mb-4 group overflow-hidden flex items-center justify-center">
+          <video 
+            src={activeTab === 'base' ? move.videoSrc : move.finisherVideoSrc} 
+            controls 
+            className="absolute inset-0 w-full h-full object-cover z-10"
+            poster={`INSERT STAND ART HERE/video-poster-placeholder.png`}
+          >
+            Your browser does not support the video tag.
+          </video>
+          {/* Fallback styling just to look nice before the video loads */}
+          <PlayCircle className="w-8 h-8 text-[#3d3423] group-hover:text-[var(--stand-glow)] transition-colors absolute z-0" style={{ ['--stand-glow' as any]: standColor }} />
+        </div>
+
+        <p className="text-sm text-[#c7c2b5] leading-relaxed font-['Zen_Old_Mincho',serif] whitespace-pre-wrap">
+          <span className="text-[#e6c278] mr-2 text-xs font-mono uppercase tracking-wider block mb-2">
+            {activeTab === 'base' ? 'Description:' : 'Finisher Description:'}
+          </span>
+          {activeTab === 'base' ? move.description : move.finisherDescription}
+        </p>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================================
+// STAND DETAIL SCREEN
+// ============================================================================
+
+const InfoField: React.FC<{ label: string; children: React.ReactNode }> = ({ label, children }) => (
+  <div className="p-4">
+    <div className="text-[10px] font-mono uppercase tracking-widest text-[#8a857a] mb-1.5">{label}</div>
+    <div className="text-sm font-bold text-[#e6c278]">{children}</div>
+  </div>
+);
+
+const StandDetailScreen: React.FC<{ stand: Stand; onBack: () => void }> = ({ stand, onBack }) => {
+  // State for toggling between standard and awakening movesets
+  const [moveCategory, setMoveCategory] = useState<'standard' | 'awakening'>('standard');
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [stand.id]);
+
+  const displayedMoves = moveCategory === 'standard' ? stand.moves : stand.awakeningMoves;
+
+  return (
+    <div className="animate-fadeIn">
+      <button
+        onClick={onBack}
+        className="flex items-center gap-2 px-4 py-2 text-xs font-mono uppercase tracking-wider text-[#8a8578] bg-[#09090c] border border-[#1e1b24] hover:text-[#e6c278] hover:border-[#c3a35e] transition-all mb-8"
+      >
+        <ChevronLeft className="w-4 h-4" />
+        Back to Stand Registry
+      </button>
+
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* LEFT COLUMN */}
+        <div className="lg:col-span-8 space-y-6">
+          
+          {/* Individual Status Header Replacing "Pending Reveal" */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 border border-[#2a2418] bg-[#0a0a0d] divide-y sm:divide-y-0 divide-x-0 sm:divide-x divide-[#2a2418]">
+            <InfoField label="Rarity">
+              {stand.rarity ? (
+                stand.rarity
+              ) : (
+                <span className="flex items-center gap-1.5 text-[#8a857a] font-mono text-xs normal-case">
+                  <Lock className="w-3 h-3" /> Pending Reveal
+                </span>
+              )}
+            </InfoField>
+            
+            <InfoField label="Part">{stand.part} — {PART_TITLES[stand.part]}</InfoField>
+            
+            <InfoField label="Stand Type">
+              {stand.standType ? (
+                stand.standType
+              ) : (
+                <span className="flex items-center gap-1.5 text-[#8a857a] font-mono text-xs normal-case">
+                  <Lock className="w-3 h-3" /> Pending Reveal
+                </span>
+              )}
+            </InfoField>
+            
+            <InfoField label="Status">
+              <span className={stand.confirmed ? 'text-[#34d399]' : 'text-[#e6c278]'}>
+                {stand.confirmed ? 'Confirmed' : 'Unconfirmed'}
+              </span>
+            </InfoField>
+          </div>
+
+          <div
+            className="relative bg-[#0a0a0d] border border-[#2a2418] p-6"
+            style={{ borderLeftWidth: 4, borderLeftColor: stand.color }}
+          >
+            <p className="text-xl md:text-2xl font-['Gilda_Display',serif] text-white italic leading-snug mb-3">
+              &ldquo;{stand.quote}&rdquo;
+            </p>
+            <span className="text-xs font-mono text-[#8a857a] uppercase tracking-widest">
+              Signature line — {PART_TITLES[stand.part]} Stand Data
+            </span>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="inline-flex items-center gap-2 bg-[#14121a] border border-[#2a2418] px-3 py-1.5 text-xs font-mono">
+              <span
+                className="w-3 h-3 rounded-full border border-white/20"
+                style={{ background: stand.color }}
+              />
+              <span className="text-[#8a857a] uppercase tracking-wider">Aura Colour</span>
+              <span className="text-[#e6c278]">{stand.color}</span>
+            </span>
+            <span className="bg-[#1c1a24] text-[#e6c278] border border-[#3d3423] text-xs font-mono px-2.5 py-1.5 uppercase tracking-wider">
+              Featured Arc: {PART_TITLES[stand.part]}
+            </span>
+            <span className="bg-[#1c1a24] text-[#e6c278] border border-[#3d3423] text-xs font-mono px-2.5 py-1.5 uppercase tracking-wider">
+              {stand.confirmed ? 'Confirmed Playable' : 'Expected — Not Yet Confirmed'}
+            </span>
+          </div>
+
+          {/* Unique Description Replacing Generalized Note */}
+          <CodexBox title="Stand Overview" badge="CODEX ENTRY">
+            <p className="text-[#c7c2b5] leading-relaxed whitespace-pre-wrap">
+              {stand.description || "Desc Here"}
+            </p>
+          </CodexBox>
+
+          <div className="flex items-start gap-3 bg-[#1c1810] border border-[#3d3423] p-4">
+            <Info className="w-5 h-5 text-[#e6c278] flex-shrink-0 mt-0.5" />
+            <p className="text-sm text-[#c7c2b5] leading-relaxed">
+              <strong className="text-[#e6c278]">{stand.confirmed ? 'Pre-launch note' : 'Unconfirmed note'}:</strong>{' '}
+              {stand.confirmed
+                ? `${stand.name} is confirmed for ${stand.part}, and its official kit data is currently being built into the codex.`
+                : `${stand.name} hasn't been officially confirmed yet — it's expected based on current plans, but details may change before reveal.`}
+            </p>
+          </div>
+
+          {/* MOVESET & ABILITIES SECTION */}
+          {((stand.moves && stand.moves.length > 0) || (stand.awakeningMoves && stand.awakeningMoves.length > 0)) && (
+            <div className="mt-10 animate-fadeIn">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#2a2418] pb-4 mb-6">
+                <h3 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278] flex items-center gap-3">
+                  <Swords className="w-5 h-5" />
+                  Combat Abilities
+                </h3>
+
+                {/* Awakening Tab Navigation (Visible if Awakening Moves exist) */}
+                {stand.awakeningMoves && stand.awakeningMoves.length > 0 && (
+                  <div className="flex border border-[#2a2418] bg-[#0a0a0d] p-1">
+                    <button
+                      onClick={() => setMoveCategory('standard')}
+                      className={`px-4 py-1.5 text-xs font-mono uppercase tracking-wider transition-all ${
+                        moveCategory === 'standard' 
+                          ? 'bg-[#1c1810] text-[#e6c278] border border-[#c3a35e]/30' 
+                          : 'text-[#8a857a] hover:text-[#c7c2b5] border border-transparent'
+                      }`}
+                    >
+                      Standard Kit
+                    </button>
+                    <button
+                      onClick={() => setMoveCategory('awakening')}
+                      className={`px-4 py-1.5 text-xs font-mono uppercase tracking-wider transition-all flex items-center gap-2 ${
+                        moveCategory === 'awakening' 
+                          ? 'bg-[#1c1810] text-[#e6c278] border border-[#c3a35e]/30' 
+                          : 'text-[#8a857a] hover:text-[#c7c2b5] border border-transparent'
+                      }`}
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      Awakening
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Moves Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {displayedMoves && displayedMoves.length > 0 ? (
+                  displayedMoves.map((move) => (
+                    <MoveCard key={move.id} move={move} standColor={stand.color} />
+                  ))
+                ) : (
+                  <div className="col-span-full border border-dashed border-[#2a2418] bg-[#0a0a0d]/60 py-10 text-center">
+                    <p className="font-mono text-xs uppercase tracking-widest text-[#5c584f]">
+                      Moveset currently being documented
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* RIGHT COLUMN — portrait plate */}
+        <div className="lg:col-span-4">
+          <div className="lg:sticky lg:top-6 border border-[#2a2418] bg-[#0a0a0d] overflow-hidden">
+            <div className="flex items-center justify-between px-3 py-2 border-b border-[#2a2418] bg-[#121116]">
+              <span
+                className={`text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 font-bold ${
+                  stand.confirmed ? 'bg-[#c3a35e] text-black' : 'bg-[#2a2418] text-[#e6c278] border border-[#3d3423]'
+                }`}
+              >
+                {stand.confirmed ? 'Confirmed' : 'Unconfirmed'}
+              </span>
+              <span className="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 border border-[#3d3423] text-[#e6c278]">
+                {stand.part}
+              </span>
+            </div>
+
+            <div className="relative aspect-[3/4] flex items-center justify-center bg-[#0d0c10] overflow-hidden">
+              <ScrollBackground
+                className="inset-0 bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:14px_14px]"
+                activeOpacity="opacity-15"
+              />
+              
+              {/* UNIQUE ART PLACEHOLDER - Updates conditionally if individual src is given */}
+              <img 
+                src={stand.fullArtSrc || `INSERT STAND ART HERE/${stand.id}.png`}
+                alt={`${stand.name} Full Art`}
+                className="relative z-10 w-full h-full object-cover"
+              />
+              
+              <div
+                className="absolute bottom-0 left-0 right-0 h-1.5 z-20"
+                style={{ background: stand.color }}
+              />
+            </div>
+
+            <div className="p-4 border-t border-[#2a2418]">
+              <h3 className="text-xl font-['Gilda_Display',serif] text-[#e6c278]">{stand.name}</h3>
+              <span className="text-xs font-mono text-[#8a857a]">{PART_TITLES[stand.part]}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================================
+// STANDS SECTION (grid <-> detail screen)
+// ============================================================================
+
+const StandsSection: React.FC<{ initialStandId?: string | null }> = ({ initialStandId }) => {
+  const standsByPart = useStandsByPart();
+  const [selectedStand, setSelectedStand] = useState<Stand | null>(null);
+
+  // Opens straight to a specific Stand's detail screen when search
+  // navigation hands us a standId (AbilitiesPage forwards it here after
+  // picking up the 'navigate-tab' event / pending payload).
+  useEffect(() => {
+    if (!initialStandId) return;
+    const match = STANDS.find((s) => s.id === initialStandId);
+    if (match) setSelectedStand(match);
+  }, [initialStandId]);
+
+  if (selectedStand) {
+    return <StandDetailScreen stand={selectedStand} onBack={() => setSelectedStand(null)} />;
+  }
+
+  return (
+    <div className="animate-fadeIn">
+      <CodexBox
+        title="Stand Registry"
+        badge="STAND DATA"
+        accentColor="border-l-4 border-l-[#c3a35e] border-[#2a2418]"
+        className="mb-14"
+      >
+        <p className="text-sm sm:text-base text-[#c7c2b5] leading-relaxed">
+          Every Stand featured in Beyond Bizarre, organized by the part it debuts in. Hover a cell to see its
+          Stand aura colour, then click through to its full codex entry. Art is being logged in per-Stand as it's
+          finalized — until then, each slot holds its place in the registry.
+        </p>
+      </CodexBox>
+
+      {PART_ORDER.map((part) => (
+        <PartHexSection key={part} part={part} stands={standsByPart[part]} onSelect={setSelectedStand} />
+      ))}
+    </div>
+  );
+};
+
+// ============================================================================
+// SPECS & WEAPONS SECTIONS
+// ============================================================================
+
+const PlaceholderSection: React.FC<{ title: string; badge: string; icon: React.ReactNode; blurb: string }> = ({
+  title,
+  badge,
+  icon,
+  blurb,
+}) => (
+  <div className="animate-fadeIn">
+    <CodexBox title={title} badge={badge} accentColor="border-l-4 border-l-[#c3a35e] border-[#2a2418]" className="mb-8">
+      <p className="text-sm sm:text-base text-[#c7c2b5] leading-relaxed">{blurb}</p>
+    </CodexBox>
+    <div className="border border-dashed border-[#2a2418] bg-[#0a0a0d]/60 py-20 text-center">
+      <div className="w-12 h-12 mx-auto mb-4 bg-[#14121a] border border-[#3d3322] flex items-center justify-center">
+        {icon}
+      </div>
+      <p className="font-mono text-xs uppercase tracking-widest text-[#5c584f]">
+        Archive Pending — No {title} Logged Yet
+      </p>
+    </div>
+  </div>
+);
+
+// ============================================================================
+// ABILITIES PAGE (default export)
+// ============================================================================
+
+export default function AbilitiesPage() {
+  const [activeTab, setActiveTab] = useState<AbilityTab>('stands');
+  // Set by search navigation when the target result carries a standId
+  // (Abilities > Stands entries). Forwarded to StandsSection so it opens
+  // straight to that Stand's detail screen instead of the registry grid.
+  const [navStandId, setNavStandId] = useState<string | null>(null);
+
+  // Respond to search-driven navigation: SearchModal fires a 'navigate-tab'
+  // window event (and stashes the same payload on window.__pendingSearchNav
+  // in case this component mounts *after* the event fires, e.g. coming from
+  // the Homepage tab). Mirrors the same pattern Combat.tsx uses.
+  useEffect(() => {
+    const applyNav = (detail: any) => {
+      if (!detail || detail.tab !== 'abilities') return;
+      if (detail.subTab) {
+        setActiveTab(detail.subTab as AbilityTab);
+      }
+      setNavStandId(detail.standId || null);
+    };
+
+    const pending = (window as any).__pendingSearchNav;
+    if (pending) {
+      (window as any).__pendingSearchNav = null;
+      applyNav(pending);
+    }
+
+    const handleNavigate = (e: Event) => applyNav((e as CustomEvent).detail);
+    window.addEventListener('navigate-tab', handleNavigate);
+    return () => window.removeEventListener('navigate-tab', handleNavigate);
+  }, []);
+
+  const TAB_CONFIG: { id: AbilityTab; label: string; icon: React.ReactNode }[] = [
+    { id: 'stands', label: 'Stands', icon: <Sparkles className="w-4 h-4" /> },
+    { id: 'specs', label: 'Specs', icon: <Swords className="w-4 h-4" /> },
+    { id: 'weapons', label: 'Weapons', icon: <Wrench className="w-4 h-4" /> },
+  ];
+
+  return (
+    <div className="min-h-screen bg-[#050505] text-[#e0ded8] font-['Zen_Old_Mincho',serif] selection:bg-[#c3a35e] selection:text-black p-4 md:p-10 relative overflow-hidden">
+      <ScrollBackground
+        className="top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#322714]/30 via-[#050505]/95 to-transparent pointer-events-none -z-10"
+        activeOpacity="opacity-100"
+      />
+
+    <header className="max-w-7xl mx-auto mb-4 relative border-b border-[#2a2418]">
+      <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:16px_16px]" />
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 py-4 px-6 border-b border-[#1c1912] bg-[#0a0a0d]">
         <div className="flex items-center space-x-3">
           <span className="w-3 h-3 bg-[#c3a35e] rotate-45 shadow-[0_0_15px_#c3a35e] animate-pulse" />
@@ -889,12 +1225,9 @@ const SiteHeader: React.FC = () => {
           <span className="text-[#c3a35e]">PHASE ZER0 INTERACTIVE</span>
         </div>
       </div>
-
       
-      {/* Top Banner */}
       <div className="relative overflow-hidden bg-[#000000]">
         <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:16px_16px]" />
-        {/* DOT GRID - Scroll Fading applied here */}
         <ScrollBackground className="bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:16px_16px]" activeOpacity="opacity-[0.09]" />
 
         <div className="relative mx-auto max-w-7xl px-6 pb-8 pt-12 md:px-10">
@@ -909,19 +1242,22 @@ const SiteHeader: React.FC = () => {
 
               <FadeScaleIn delay={100}>
                 <h1 className="font-[var(--font-gloock)] text-5xl uppercase tracking-tight text-white md:text-7xl">
-                  Game{" "}
+                  Special{" "}
                   <span className="text-[#c3a35e]">
-                    Mechanics
+                    Abilites
                   </span>
                 </h1>
               </FadeScaleIn>
 
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#8a857a] md:text-base">
-                <TypewriterText text="Master the intricacies of Combat, Movement, Stand Combat, Progression Paths, and advanced mechanics in this complete tactical manual." delay={200} />
+                <FadeScaleIn delay={200}>
+                  <span>
+                    Master the intricacies of Combat, Movement, Stand Combat, Progression Paths, and advanced mechanics in this complete tactical manual.
+                  </span>
+                </FadeScaleIn>
               </p>
             </div>
 
-            {/* PATCH BOX */}
             <FadeScaleIn delay={250}>
               <div className="border border-[#2a2418] bg-[#0b0b0d] p-5 lg:min-w-[270px]">
                 <div className="flex items-center gap-4">
@@ -943,899 +1279,43 @@ const SiteHeader: React.FC = () => {
         </div>
       </div>
     </header>
-  );
-};
 
-const SiteFooter: React.FC = () => {
-  return (
-    <footer className="max-w-7xl mx-auto mt-20 pt-8 pb-12 border-t border-[#2a2418] bg-[#050505] text-[#8a857a] text-xs font-mono">
-      <div className="flex flex-col md:flex-row items-center justify-between gap-6 px-4 md:px-10">
-        <div className="flex items-center space-x-3">
-          <span className="w-2.5 h-2.5 bg-[#c3a35e] rotate-45 shadow-[0_0_15px_#c3a35e] animate-pulse" />
-          <span className="font-['Cormorant_Upright',serif] text-base font-bold uppercase tracking-widest text-[#e6c278]">
-            Beyond Bizarre // Codex Registry
-          </span>
-        </div>
-        <div className="flex items-center space-x-6">
-          <span>SYSTEM ARCHIVE: VOL. I</span>
-          <span>STATUS: SECURE</span>
-          <span className="text-[#e3e3e3]">PHASE ZER0 INTERACTIVE</span>
-        </div>
-      </div>
-    </footer>
-  );
-};
-
-// ============================================================================
-// MAIN PAGE COMPONENT
-// ============================================================================
-
-export default function CombatPage() {
-  const [activeTab, setActiveTab] = useState<SubTab>('combat');
-
-  return (
-    <div className="min-h-screen bg-[#050505] text-[#e0ded8] font-['Zen_Old_Mincho',serif] selection:bg-[#c3a35e] selection:text-black p-4 md:p-10 relative overflow-hidden">
-      {/* Background Radial Glow - Fades in dynamically on scroll */}
-      <ScrollBackground className="top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[600px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#322714]/30 via-[#050505]/95 to-transparent pointer-events-none -z-10" activeOpacity="opacity-100" />
-
-      {/* Site Header */}
-      <SiteHeader />
-
-      {/* SUB-TABS */}
-      <nav className="max-w-6xl mx-auto mb-16 flex flex-col md:flex-row justify-center gap-6">
-        
-        {/* COMBAT SYSTEMS SUB-TAB */}
-        <FadeScaleIn className="w-full md:w-1/3" delay={100}>
+      <nav className="flex flex-wrap gap-2 sm:gap-4 mb-14 pb-2 border-b border-[#2a2418] pt-2 justify-center max-w-7xl mx-auto z-20 relative">
+        {TAB_CONFIG.map((tab) => (
           <button
-            onClick={() => setActiveTab('combat')}
-            className={`relative group overflow-hidden rounded-sm border transition-all duration-500 w-full h-20 md:h-16 shadow-lg bg-gradient-to-br from-[#121116] to-[#070709] ${
-              activeTab === 'combat'
-                ? 'border-[#c3a35e] shadow-[0_0_25px_rgba(195,163,94,0.35)] -translate-y-1'
-                : 'border-[#2a2418] hover:border-[#615c52] hover:-translate-y-0.5'
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center space-x-2 px-6 py-3 text-xs sm:text-sm font-medium uppercase tracking-wider whitespace-nowrap transition-all border ${
+              activeTab === tab.id
+                ? 'bg-[#1c1810] text-[#e6c278] border-[#c3a35e] shadow-[0_0_15px_rgba(195,163,94,0.15)]'
+                : 'bg-[#09090c] text-[#8a8578] border-[#1e1b24] hover:text-[#c7c2b5] hover:border-[#3d3322]'
             }`}
           >
-            <ScrollBackground className="bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:12px_12px]" activeOpacity="opacity-10" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-black/40 to-transparent flex items-center justify-center p-4">
-              <span className={`font-['Cormorant_Upright',serif] text-xl md:text-2xl font-bold uppercase tracking-widest whitespace-nowrap transition-colors duration-300 ${
-                activeTab === 'combat' 
-                  ? 'text-[#e6c278] drop-shadow-[0_0_12px_rgba(230,194,120,0.9)]' 
-                  : 'text-[#8a857a] group-hover:text-[#e0ded8]'
-              }`}>
-                ⚔️ Combat ⚔️
-              </span>
-            </div>
+            {tab.icon}
+            <span>{tab.label}</span>
           </button>
-        </FadeScaleIn>
-
-        {/* MOBILITY & TRAVERSAL SUB-TAB */}
-        <FadeScaleIn className="w-full md:w-1/3" delay={200}>
-          <button
-            onClick={() => setActiveTab('mobility')}
-            className={`relative group overflow-hidden rounded-sm border transition-all duration-500 w-full h-20 md:h-16 shadow-lg bg-gradient-to-br from-[#121116] to-[#070709] ${
-              activeTab === 'mobility'
-                ? 'border-[#c3a35e] shadow-[0_0_25px_rgba(195,163,94,0.35)] -translate-y-1'
-                : 'border-[#2a2418] hover:border-[#615c52] hover:-translate-y-0.5'
-            }`}
-          >
-            <ScrollBackground className="bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:12px_12px]" activeOpacity="opacity-10" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-black/40 to-transparent flex items-center justify-center p-4">
-              <span className={`font-['Cormorant_Upright',serif] text-xl md:text-2xl font-bold uppercase tracking-widest transition-colors duration-300 ${
-                activeTab === 'mobility' 
-                  ? 'text-[#e6c278] drop-shadow-[0_0_12px_rgba(230,194,120,0.9)]' 
-                  : 'text-[#8a857a] group-hover:text-[#e0ded8]'
-              }`}>
-                🏃 Mobility 🏃
-              </span>
-            </div>
-          </button>
-        </FadeScaleIn>
-
-        {/* STAND COMBAT SUB-TAB */}
-        <FadeScaleIn className="w-full md:w-1/3" delay={300}>
-          <button
-            onClick={() => setActiveTab('stand-combat')}
-            className={`relative group overflow-hidden rounded-sm border transition-all duration-500 w-full h-20 md:h-16 shadow-lg bg-gradient-to-br from-[#16111f] to-[#070709] ${
-              activeTab === 'stand-combat'
-                ? 'border-[#c3a35e] shadow-[0_0_25px_rgba(195,163,94,0.35)] -translate-y-1'
-                : 'border-[#2a2418] hover:border-[#615c52] hover:-translate-y-0.5'
-            }`}
-          >
-            <ScrollBackground className="bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:12px_12px]" activeOpacity="opacity-15" />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-black/60 to-[#120a1f]/30 flex items-center justify-center p-4 z-20">
-              <span className={`font-['Cormorant_Upright',serif] text-xl md:text-2xl font-bold uppercase tracking-widest transition-colors duration-300 ${
-                activeTab === 'stand-combat' 
-                  ? 'text-[#e6c278] drop-shadow-[0_0_12px_rgba(230,194,120,0.9)]' 
-                  : 'text-[#8a857a] group-hover:text-[#e0ded8]'
-              }`}>
-                ✨ Stand Combat ✨
-              </span>
-            </div>
-          </button>
-        </FadeScaleIn>
+        ))}
       </nav>
 
-      {/* Main Content Area */}
       <main className="max-w-6xl mx-auto">
-        {/* =========================================================
-            SUBTAB 1: COMBAT
-            ========================================================= */}
-        {activeTab === 'combat' && (
-          <section className="space-y-12">
-            {/* Hero Quote Card */}
-            <CodexBox 
-              title="Mind Over Matter"
-              badge="COMBAT OVERVIEW"
-              accentColor="border-l-4 border-l-[#c3a35e] border-[#2a2418]"
-            >
-              <p className="text-[#c7c2b5] leading-relaxed text-lg md:text-xl">
-                 <TypewriterText text="In this game, you have to utilize a series of Skill, Strategy and Style to overcome opponents, so make sure you know exactly how to utilize and take advantage of your strengths and defend your weak points to become a master at combat. The base combat was designed to help new players learn the semi-complex nature of the games combat, and experienced players to compliment their combos. As stated before, you are rewarded for Precision, not mindless Pressure, Style, not Spam, and Skills, not Slop." delay={200} />
-              </p>
-            </CodexBox>
-
-            {/* Core Pillars */}
-            <div>
-              <FadeScaleIn delay={100}>
-                <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase mb-6 border-b border-[#2a2418] pb-3">
-                  Core Combat Pillars
-                </h3>
-              </FadeScaleIn>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <CodexBox title="1. Precision & Raw Power" badge="OFFENSE">
-                  <p className="text-base text-[#9a9488] leading-relaxed">
-                    <TypewriterText text="Victory is dictated by calculated decision-making rather than stat checks. Every swing has weight, giving your strikes and moves untold power." delay={200} />
-                  </p>
-                </CodexBox>
-                <CodexBox title="2. Momentum & Combat Style" badge="MOVEMENT">
-                  <p className="text-base text-[#9a9488] leading-relaxed">
-                    <TypewriterText text="Custom combo creativity and fluid movement branching build Heat, empowering your Stand abilities and triggering high-damage Overdrive combat states." delay={300} />
-                  </p>
-                </CodexBox>
-                <CodexBox title="3. Endurance & Adaptability" badge="DEFENSE">
-                  <p className="text-base text-[#9a9488] leading-relaxed">
-                    <TypewriterText text="A suite of active defensive options—Parries, Evasive Dodges, and Tech Recoveries—ensures no single offensive meta or infinite string can ever dominate a fight." delay={400} />
-                  </p>
-                </CodexBox>
-              </div>
-            </div>
-
-            {/* Universal Offense Framework */}
-            <div className="space-y-10">
-              <FadeScaleIn delay={100}>
-                <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">
-                  Universal Offense Framework
-                </h3>
-              </FadeScaleIn>
-
-              {/* SECTION 1: LIGHT STRIKES */}
-              <CodexBox 
-                title="1. Light Strike (LMB / M1)" 
-                badge="BASIC OFFENSE"
-              >
-                <p className="text-base md:text-lg text-[#c7c2b5] leading-relaxed mb-6">
-                  <TypewriterText text="Light Strikes form the backbone of neutral interactions, pressure strings, and combo extension. They are designed to feel swift,smooth yet simple, enforcing movement decay to eliminate infinite run-and-strike spamming." delay={200} />
-                </p>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-base my-4">
-                  <CodexBox title="5-Hit Base String">
-                    <p className="text-sm text-[#c7c2b5]">
-                      <TypewriterText text="Fluid strike sequence featuring bespoke martial animations for every active Stand, Weapon, or Fighting Style archetype. The 5th strike deals +50% bonus damage and delivers a 35-stud knockback, resetting neutral." />
-                    </p>
-                  </CodexBox>
-                  <CodexBox title="Pacing & Velocity Decay">
-                    <p className="text-sm text-[#c7c2b5]">
-                      <TypewriterText text="Each M1 swings moves you slightly forward, additionally, with your aerial M1's and your slowed momentum during M1's, this eliminates the classic bunny-hop most Jojo games feature and enforce spacing discipline and correct timing." />
-                    </p>
-                  </CodexBox>
-                  <CodexBox title="Hitstun Decay Curve">
-                    <p className="text-sm text-[#c7c2b5]">
-                      <TypewriterText text="Base hitstun reduces by 5% on each subsequent connection within a single combo string, preventing inescapable infinite loops. And annoying M1 resets" />
-                    </p>
-                  </CodexBox>
-                  <CodexBox title="Non-Stun Based Combat">
-                    <p className="text-sm text-[#c7c2b5]">
-                      <TypewriterText text="M1's are Semi-True, and with the hit-stun decay, your M1's are meant to be poking tools rather than main combo starters like in battleground games." />
-                    </p>
-                  </CodexBox>
-                </div>
-
-                <ul className="list-disc list-inside text-[#c7c2b5] text-base space-y-3 leading-relaxed my-6">
-                  <li><strong className="text-[#e6c278]">Uppercut M1 Branch:</strong> Hold <code className="bg-[#18161f] border border-[#3d3423] px-2 py-0.5 text-[#e6c278] font-mono text-sm">Space</code> during any M1 to launch both yourself and your target into an airborne state, putting your M1 on cooldown, regardless of the sequence.</li>
-                  <li><strong className="text-[#e6c278]">Aerial M1 Branch:</strong> While in the air, you can use M1's to juggle your opponents in the air, allowing for air combos, your falling is paused per M1 keeping you with your opponent manually instead of basic hovering.</li>
-                </ul>
-
-                <VideoPlate 
-                  title="Move Demonstration: 5-Hit Light Strike Chain & Aerial Variant"
-                  inputTag="LMB x5 / LMB x3 while airborne"
-                  badge="M1's"
-                  duration="0:14"
-                  description="Standard 5-hit M1 light string ending with a stronger strike at the 5th chain and it's air borne variant"
-                  stats={[
-                    { label: "Damage Scale", value: "100% each | 150% final strike" },
-                    { label: "Hitstun Decay", value: "-5% per hit" },
-                    { label: "Knockback", value: "35 Studs" }
-                  ]}
-                  videoSrc="/video/test.mp4"
-                  posterSrc="UNIQUE VIDEO HERE"
-                />
-
-                <VideoPlate 
-                  title="Move Demonstration: Light Uppercut"
-                  inputTag="Airborne LMB (Post-Uppercut)"
-                  badge="COMBO EXTENSION"
-                  duration="0:09"
-                  description="Execute an launcher M1 by holding space with your M1, regarudless of which sequence you were on"
-                  stats={[
-                    { label: "Damage Scale", value: "150%" },
-                    { label: "Launch Height", value: "30 Studs" }
-                  ]}
-                  videoSrc="/video/test.mp4"
-                  posterSrc="UNIQUE VIDEO HERE"
-                />
-              </CodexBox>
-
-              {/* SECTION 2: HEAVY STRIKES WITH DYNAMIC VARIANT SWITCHER */}
-              <CodexBox 
-                title="2. Heavy Strike (MMB / M2)"
-                badge="HEAVY SYSTEM"
-              >
-                <div className="mb-6">
-                  <span className="inline-block text-xs font-['Cormorant_Upright',serif] text-[#e6c278] tracking-widest uppercase font-bold bg-[#14121a] px-4 py-2 border border-[#2a2418] mb-4">
-                    Cost: 15 Heat | Cooldown: 5.0 Seconds
-                  </span>
-
-                  <p className="text-base md:text-lg text-[#c7c2b5] leading-relaxed">
-                    <TypewriterText text="Heavy Strikes, or M2's, are meant to be the most versatile move in your kit. For stand off or specs, this move acts as a heavy punch that knocks away people slightly into the air with soft ragdoll. This also does twice your M1 damage and you slightly move forward. However, it will act as a special move that works with the stand's kit, whether it be a grab, counter, stun move, or combo ender of the sorts. Stands, however, have a specialized M2. Use the interactive switcher below to preview all variations:" delay={200} />
-                  </p>
-                </div>
-
-                {/* DYNAMIC HEAVY STRIKE VARIANT SWITCHER */}
-                <DynamicVideoPlate 
-                  title="Heavy Strike (M2) Tactical Variations"
-                  options={heavyStrikeOptions}
-                  defaultOptionId="basic"
-                  sectionBadge="SELECT M2 VARIANT"
-                />
-              </CodexBox>
-            </div>
-
-            {/* Defense & Guard Systems */}
-            <div className="space-y-8">
-              <FadeScaleIn delay={100}>
-                <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">
-                  Guard (F)
-                </h3>
-              </FadeScaleIn>
-
-              <CodexBox title="Defensive Stance Framework" badge="DEFENSIVE SYSTEM">
-                <p className="text-base md:text-lg text-[#c7c2b5] leading-relaxed mb-6">
-                  <TypewriterText text="Your Guard/Block system is your main defense tool that puts the user in a defensive stance. In this state they cannot move, but are impervious to many attacks. However, users must be smart when using this as there are viable counters and ways for opponents to use your blocking stance to their advantage. It is a quite simple mechanic once you get the gist of it." delay={200} />
-                </p>
-
-                {/* Guard Endurance */}
-                <div className="space-y-4 border-t border-[#2a2418] pt-6 my-6">
-                  <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">
-                    Guard Endurance
-                  </h4>
-                  <p className="text-base text-[#c7c2b5]">
-                    <TypewriterText text="The guard endurance is simple, you have a bar that is used to see your guard endurance's health. This automatically recharges while you are outside of your guard stance." />
-                  </p>
-                  <ul className="list-disc list-inside space-y-2 text-base text-[#c7c2b5]">
-                    <li>Blocking attacks will "wear down" that endurance bar, and upon complete depletion you are <strong className="text-[#e6c278]">Guard Broken</strong>.</li>
-                    <li>Blocking without receiving any attacks after 4 seconds will cause that bar to slowly deplete with <strong className="text-[#e6c278]">Guard Decay</strong>.</li>
-                    <li>Upon using moves such as <strong className="text-[#e6c278]">Perfect Guard</strong>, <strong className="text-[#e6c278]">Reflective Guard</strong> and <strong className="text-[#e6c278]">Evasive Guard</strong> you can recharge the bar.</li>
-                  </ul>
-                  <p className="text-base text-[#c7c2b5]">
-                    <TypewriterText text="Should your block bar be full, it can overlap, storing as a golden charged bar. Once filled, this can be used as extra guard points as well, however this is used for something even greater!" />
-                  </p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-base">
-                    <CodexBox title="(BREAK) Guard Break">
-                      <p className="text-sm text-[#c7c2b5]">
-                        <TypewriterText text="The result of your guard bar depleting after either defending a move too strong for your defense, or defending more moves than you can endure. Stun time: 2.5 – 3s. Places offender in Perception Zone." />
-                      </p>
-                    </CodexBox>
-                    <CodexBox title="(DECAY) Guard Decay">
-                      <p className="text-sm text-[#c7c2b5]">
-                        <TypewriterText text="The result of staying in blocking stance for too long without incoming attacks, over-decaying the bar. Stun time: 1.5 – 2s." />
-                      </p>
-                    </CodexBox>
-                  </div>
-
-                  <VideoPlate 
-                    title="Defensive Demonstration: Guard Break & Guard Decay"
-                    inputTag="Hold F Key"
-                    badge="GUARD DEMO"
-                    duration="0:14"
-                    description="Visual reference demonstrating Guard Break stun state (2.5-3s) and Guard Decay over-holding penalty (1.5-2s)."
-                    stats={[
-                      { label: "Break Stun", value: "2.5 - 3.0s" },
-                      { label: "Decay Stun", value: "1.5 - 2.0s" },
-                      { label: "Decay Delay", value: "4.0 Seconds" }
-                    ]}
-                    videoSrc="UNIQUE VIDEO HERE"
-                    posterSrc="UNIQUE VIDEO HERE"
-                  />
-                </div>
-
-                {/* Perfect Guard / Parry */}
-                <div className="space-y-4 border-t border-[#2a2418] pt-6 my-6">
-                  <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">
-                    Perfect Guard / Parry
-                  </h4>
-                  <p className="text-base text-[#c7c2b5]">
-                    <TypewriterText text="Performed up to 0.2s before a parriable attack. Perfect Guards reward a player by stunning the victim in a state known as Perception Zone. This stun lasts 3 seconds, allowing you to freely attack your enemy. Perfect Guards also push the player back while the enemy stays in place." delay={100} />
-                  </p>
-                  <p className="text-base text-[#c7c2b5]">
-                    <TypewriterText text="There are 2 types of parries: Light Parries and Heavy Parries. Light Parries push you back a little, whereas heavy parries push you back a lot while giving more stun in return." delay={100} />
-                  </p>
-
-                  <VideoPlate 
-                    title="Defensive Demonstration: Perfect Guard / Parry"
-                    inputTag="Timed F Key"
-                    badge="PARRY DEMO"
-                    duration="0:16"
-                    description="Frame-perfect parry execution putting attacker into Perception Zone for 3 seconds."
-                    stats={[
-                      { label: "Parry Window", value: "0.20 Seconds" },
-                      { label: "Perception Zone", value: "3.0 Seconds" },
-                      { label: "Types", value: "Light & Heavy" }
-                    ]}
-                    videoSrc="UNIQUE VIDEO HERE"
-                    posterSrc="UNIQUE VIDEO HERE"
-                  />
-                </div>
-
-                {/* Evasive Guard / Dodge */}
-                <div className="space-y-4 border-t border-[#2a2418] pt-6 my-6">
-                  <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">
-                    Evasive Guard / Dodge
-                  </h4>
-                  <p className="text-base text-[#c7c2b5]">
-                    <TypewriterText text="Performed by side dashing while using guard. Perfect for evading attacks without wasting block points, giving time to counter. Doesn't stun enemy, but punishes end lag. Casting outside zone puts dash on 5s CD and deducts 50 guard points. If missed below 2.5% hp explode into a fine red mist." delay={100} />
-                  </p>
-
-                  <VideoPlate 
-                    title="Defensive Demonstration: Evasive Guard / Dodge"
-                    inputTag="Guard + Side Dash"
-                    badge="DODGE DEMO"
-                    duration="0:12"
-                    description="Side-dashing while guarding to evade incoming moves without losing guard points."
-                    stats={[
-                      { label: "Miss Cooldown", value: "5.0 Seconds" },
-                      { label: "Miss Cost", value: "50 Guard Pts" },
-                      { label: "Low HP Penalty", value: "Explosion (<2.5%)" }
-                    ]}
-                    videoSrc="UNIQUE VIDEO HERE"
-                    posterSrc="UNIQUE VIDEO HERE"
-                  />
-                </div>
-
-                {/* Reflective Guard / Reflect */}
-                <div className="space-y-4 border-t border-[#2a2418] pt-6 my-6">
-                  <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">
-                    Reflective Guard / Reflect
-                  </h4>
-                  <p className="text-base text-[#c7c2b5]">
-                    <TypewriterText text="Performed up to 0.3s before a reflectable attack. Reflect works only on projectiles. Unlike perfect parries, it doesn't push the user back, but allows defense against ranged attacks. Reflection speed depends on attack strength, HP, and Block Bar." delay={100} />
-                  </p>
-
-                  <VideoPlate 
-                    title="Defensive Demonstration: Reflective Guard / Reflect"
-                    inputTag="Timed F (vs Projectile)"
-                    badge="REFLECT DEMO"
-                    duration="0:13"
-                    description="Reflecting incoming projectiles with precise timing up to 0.3s before impact."
-                    stats={[
-                      { label: "Reflect Window", value: "0.30 Seconds" },
-                      { label: "Target", value: "Projectiles" },
-                      { label: "Style", value: "Sonic Sway" }
-                    ]}
-                    videoSrc="UNIQUE VIDEO HERE"
-                    posterSrc="UNIQUE VIDEO HERE"
-                  />
-                </div>
-
-                {/* Critical Arts / Critical Strike */}
-                <div className="space-y-4 border-t border-[#2a2418] pt-6 my-6">
-                  <h4 className="text-2xl font-['Gilda_Display',serif] text-[#f21616]">
-                    Critical Arts / Critical Strike
-                  </h4>
-                  <p className="text-base text-[#c7c2b5]">
-                    <TypewriterText text="Critical Arts are activated by using any M1 or any M2 variant while in Perception Zone with a fully supercharged guard bar." delay={100} />
-                  </p>
-                  <p className="text-base text-[#c7c2b5]">
-                    <TypewriterText text="Casting initiates a Quick Time Bar where you must hit the casted keybind again. The closer to center, the more powerful the art. Hitting the thin blue inner zone triggers a MAXIMUM CRITICAL STRIKE for immense damage!" delay={150} />
-                  </p>
-
-                  <ul className="list-disc list-inside space-y-2 text-base text-[#c7c2b5] my-4">
-                    <li>★ M1 leaves opponent stunned; M2 deals Grand Knockback. Additionally, <strong className="text-[#f21616]">[Any M1 or M2 variant (Excluding Flash Rush)]</strong> can be used .</li>
-                    <li>★ Block bar is fully depleted upon use.</li>
-                    <li>★ Places user in <strong className="text-[#1e5eff]">[Overdrive]</strong> state.</li>
-                    <li>★ Damage buff scales directly with <strong className="text-[#fdee4a]">WILL</strong> stat.</li>
-                    <li>★ Applies debuffs to the victim.</li>
-                  </ul>
-
-                  {/* DYNAMIC CRITICAL ART SELECTOR */}
-                  <DynamicVideoPlate 
-                    title="Critical Art Execution Variants"
-                    options={criticalArtOptions}
-                    defaultOptionId="m1-max"
-                    sectionBadge="SELECT ART VARIANT"
-                    variantTheme="red"
-                  />
-                </div>
-
-                {/* COMBAT ADD-ONS */}
-                <div className="space-y-6 border-t border-[#2a2418] pt-6 my-6">
-                  <FadeScaleIn delay={100}>
-                    <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">
-                      Combat Add-Ons
-                    </h3>
-                  </FadeScaleIn>
-
-                  {/* Combat Tag */}
-                  <CodexBox title="Combat Tag System" badge="SYSTEM TAG">
-                    <p className="text-base text-[#c7c2b5] leading-relaxed mb-3">
-                      <TypewriterText text="Fighting places a tag restricting features like wall running, climbing, NPC interaction, and fast travel." />
-                    </p>
-                    <ul className="list-disc list-inside space-y-2 text-sm text-[#a09a8e] leading-relaxed">
-                      <li>Disabled by defeating opponent, dying, or 30 seconds out of combat.</li>
-                      <li>Only landing and receiving damage triggers tag (casting moves alone does not).</li>
-                      <li>Combat logging/resetting applies <strong className="text-[#e6c278]">combat LOCK</strong> (1 min fight lockout + highlight).</li>
-                      <li>Includes a <strong className="text-[#e6c278]">Combat Apology</strong> pop-up to clear tag after accidental hits.</li>
-                    </ul>
-                    <VideoPlate 
-                      title="System Demonstration: Combat Apology Pop-Up"
-                      inputTag="Contextual Pop-Up"
-                      badge="COMBAT TAG"
-                      duration="0:08"
-                      description="Pop-up prompt allowing players to apologize after an accidental hit to immediately exit combat state."
-                      stats={[
-                        { label: "Tag Duration", value: "30 Seconds" },
-                        { label: "Log Penalty", value: "1 Min Lockout" }
-                      ]}
-                      videoSrc="UNIQUE VIDEO HERE"
-                      posterSrc="UNIQUE VIDEO HERE"
-                    />
-                  </CodexBox>
-
-                  {/* Burst */}
-                  <CodexBox title="Burst (Combo Breaker / Anti Team)" badge="COMBO BREAKER">
-                    <div className="mb-3">
-                      <span className="text-xs font-mono text-[#e6c278] bg-[#14121a] px-3 py-1 border border-[#2a2418]">
-                        Cost: 15 Heat [M1] / 15 HP [M2]
-                      </span>
-                    </div>
-                    <p className="text-base text-[#c7c2b5] leading-relaxed mb-3">
-                      <TypewriterText text="Holding M1 or M2 while stunned releases a blast of energy blasting nearby enemies away. Features True Block Bypass, True Stun, and Hyper Armor/Counter Bypass. Stuns for 1.0s and scales damage with current combo length." />
-                    </p>
-                    <VideoPlate 
-                      title="System Demonstration: Stand/Spec Combo Breaker Burst"
-                      inputTag="Hold M1 / M2 during Stun"
-                      badge="COMBO BREAKER"
-                      duration="0:11"
-                      description="Executing a Burst while stunned to blast surrounding enemies away with True Block Bypass and 1.0s AOE stun."
-                      stats={[
-                        { label: "AOE Stun", value: "1.0 Second" },
-                        { label: "Properties", value: "True Bypass" },
-                        { label: "Scaling", value: "Combo Length" }
-                      ]}
-                      videoSrc="UNIQUE VIDEO HERE"
-                      posterSrc="UNIQUE VIDEO HERE"
-                    />
-                  </CodexBox>
-
-                  {/* Finishers & Combo Scaling */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <CodexBox title="Finishers" badge="Executions">
-                      <p className="text-sm text-[#c7c2b5] leading-relaxed">
-                        <TypewriterText text="Gained upon unlocking a new move, finishers offer a style grade bump, heat and more depending on the finisher. Most knockback moves feature universal finishers sending victims flying further. Finishers can also be disabled in the respective move's Move Tab. " />
-                      </p>
-                    </CodexBox>
-
-                    <CodexBox title="Combo Scaling" badge="COMBO BALANCING">
-                      <p className="text-sm text-[#c7c2b5] leading-relaxed">
-                        <TypewriterText text="Longer combos reduce damage output. Moves retain 100% strength up to D Style Rank, then lose 5% damage per subsequent tier. This allows for players in any combo a better chance at survival rather than being competely overwhelmed with damage. This feature is disabled for Boss Fights, Supers and Ultimates. " />
-                      </p>
-                    </CodexBox>
-
-                    <CodexBox title="Buff / De-Buffs Tier Scaling" badge="BALANCING">
-                      <p className="text-sm text-[#c7c2b5] leading-relaxed">
-                        <TypewriterText text="Each buff/de-buff you recieve has different tiers, the higher the tier, the less effective the buff/de-buff, this balances buff/de-buff stacking as it can lead to unwanted circmstances such as basic M1's doing 100 damage or a basic M1 insta killing you because of de-buffs. This works on Stat Buffs/De-buffs, Passive Buffs/De-Buffs, Skill Buffs/De-Buffs & Awakening Buffs/De-buffs. " />
-                      </p>
-                    </CodexBox>
-
-                    <CodexBox title="Pose" badge="MECHANIC">
-                      <p className="text-sm text-[#c7c2b5] leading-relaxed">
-                        <TypewriterText text="Using your P key after any ragdolling move allows you to do a quick pose similar to All Star Battle/R. This resets your Style Rank countdown back to full and rewards you with 15 heat. In the pose, you and your opponent watch the short cutscene and then go back to normal. However, you can be interupted and this does have a short 0.25s window after the move to be done. " />
-                      </p>
-                    </CodexBox>
-
-                    <CodexBox title="Taunt / Aura Farm" badge="MECHANIC">
-                      <p className="text-sm text-[#c7c2b5] leading-relaxed">
-                        <TypewriterText text="Using your P key DURING a move (must be hitting an opponent) allows you to do a quick Aura Farm/ Taunt during the move (especially useful with Stands). This rewards you with Heat and boosts your Style meter. However be careful as this can give an opening to opponents since you're vulnerable during the animation, and getting hit while aurafarming deducts from your Style Bar. " />
-                      </p>
-                    </CodexBox>
-
-                    <CodexBox title="Weapon Switch" badge="TOOL SWITCHER">
-                      <p className="text-sm text-[#c7c2b5] leading-relaxed">
-                        <TypewriterText text="Referenced from the Devil May Cry series, using your Middle Mouse Scroll (MMB Scroll), you can freely switch between any weapon you hva equipped in your inventory, however you do slow down for a second to equip it (some abilities may assist this/shorten this). This is perfect for keeping combos fresh and your Style Bar pumping! " />
-                      </p>
-                    </CodexBox>
-                  </div>
-                    <VideoPlate 
-                      title="System Demonstration: Pose, Aurafarm, Weapon Switcher"
-                      inputTag="P (After Knockback) | P (During Move Casting) | MMB (Scroll) [Must have weapon/s equipped]"
-                      badge="TAUNT/TOOL SYSTEM"
-                      duration="0:25"
-                      description="Demonstrating Pose and Aurafarming system to Taunt enemies for style, and Weapon switch system to utilize multiple weapons in combat, allowing for a spicier combat and sick combos! "
-                      stats={[
-                        { label: "Pose", value: "After Ragdoll" },
-                        { label: "Aura Farm", value: "During Move Casting" },
-                        { label: "Weapon Switch", value: "Scroll with MMB"}
-                      ]}
-                      videoSrc="UNIQUE VIDEO HERE"
-                      posterSrc="UNIQUE VIDEO HERE"
-                    />
-
-                  {/* Targeting Mechanics */}
-                  <CodexBox title="Targeting & Sense Mechanics" badge="TARGETING">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
-                      <div className="p-3 bg-[#0a0a0d] border border-[#1a1820]">
-                        <strong className="text-[#e6c278] block font-['Gilda_Display',serif] text-base mb-1">Target Mark [L]</strong>
-                        Locks onto opponent without facing them, granting auto-aim to projectiles.
-                      </div>
-                      <div className="p-3 bg-[#0a0a0d] border border-[#1a1820]">
-                        <strong className="text-[#e6c278] block font-['Gilda_Display',serif] text-base mb-1">Spiritual Sight [Hold L]</strong>
-                        Reveals inner Will Power auras, sensing stands and Burst users through obstacles.
-                      </div>
-                      <div className="p-3 bg-[#0a0a0d] border border-[#1a1820]">
-                        <strong className="text-[#e6c278] block font-['Gilda_Display',serif] text-base mb-1">Target Re-Lock [Mark + Hold L]</strong>
-                        Re-focuses opponent positions similar to a lock on, ignoring buildings and obstacles with a distance limit based on stat upgrades. 
-                      </div>
-                    </div>
-                    <VideoPlate 
-                      title="System Demonstration: Spiritual Sight, Target Mark & Targer Re-Lock"
-                      inputTag="L | Hold L Key"
-                      badge="TARGET SYSTEM"
-                      duration="0:14"
-                      description="Demonstrating Spiritual Sight aura vision through obstacles and soft auto-aim targeting, and target relocating."
-                      stats={[
-                        { label: "Target Lock", value: "Soft Directional" },
-                        { label: "Obstacle Bypass", value: "Active" }
-                      ]}
-                      videoSrc="UNIQUE VIDEO HERE"
-                      posterSrc="UNIQUE VIDEO HERE"
-                    />
-                  </CodexBox>
-
-                  {/* Joestar's Will */}
-                  <CodexBox title="Joestar’s Will" badge="WILL POWER">
-                    <p className="text-base text-[#c7c2b5] leading-relaxed">
-                      Special mechanic scaling with <strong className="text-[#e6c278]">WILL</strong> stat. Equipping a <strong className="text-[#e6c278]">Joestar’s Mark</strong> grants specialized buffs (e.g. Dark Determination, Burning Passion). Activated via clicking MMB after a Critical Art while in <strong className="text-[#e6c278]">[Overdrive]</strong>.
-                    </p>
-                  </CodexBox>
-                </div>
-
-                {/* GAUGE AND STYLE SYSTEMS */}
-                <div className="space-y-6 border-t border-[#2a2418] pt-6 my-6">
-                  <FadeScaleIn delay={100}>
-                    <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">
-                      Gauge and Style Systems
-                    </h3>
-                  </FadeScaleIn>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-6">
-                    <CodexBox title="Health/Vitality Gauge">
-                      <p className="text-xs text-[#c7c2b5]"><TypewriterText text="Displays HP and remaining damage tolerance before defeat." delay={100}/></p>
-                    </CodexBox>
-                    <CodexBox title="Level / XP Gauge">
-                      <p className="text-xs text-[#c7c2b5]"><TypewriterText text="Tracks overall level and progress toward next node point." delay={150} /></p>
-                    </CodexBox>
-                    <CodexBox title="Heat Gauge (0 - 100)">
-                      <p className="text-xs text-[#c7c2b5]"><TypewriterText text="Divided into 20-point bars. Built via parries, dodges, combos, and low HP scaling." delay={200}/></p>
-                    </CodexBox>
-                  </div>
-
-                  {/* Combo Style Ranks */}
-                  <CodexBox title="Combo Style Ranks (DMC-Inspired)" badge="STYLE SYSTEM">
-                    <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
-                      <TypewriterText text="Built by attacking creatively. Repeating identical moves degrades rank. Inactivity decays rank, but taking damage pauses decay. High ranks reduce cooldowns and windup times!" delay={100} />
-                    </p>
-
-                    <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2 text-center text-xs font-mono">
-                      {styleRanks.map((item, idx) => (
-                        <div key={idx} className={`p-2.5 bg-[#0a0a0d] border ${item.color} transition-transform hover:scale-105`}>
-                          <span className="block text-sm font-bold mb-0.5">{item.rank}</span>
-                          <span className="text-[10px] block truncate">{item.title}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </CodexBox>
-                </div>
-
-                
-                    <VideoPlate 
-                      title="System Demonstration: Gauge and Style Systems Showcase"
-                      inputTag="Passive"
-                      badge="GAUGE SYSTEM"
-                      duration="0:35"
-                      description="Showcasing your Health, Level, Guard, Heat and Style Gauges that players will utilize in their everyday combat. "
-                      stats={[
-                        { label: "Heat", value: "Active" },
-                        { label: "Experience/Level", value: "Active" },
-                        { label: "Guard", value: "Active" },
-                        { label: "Health", value: "Active" },
-                        { label: "Style", value: "Semi-Active" }
-                      ]}
-                      videoSrc="UNIQUE VIDEO HERE"
-                      posterSrc="UNIQUE VIDEO HERE"
-                    />
-
-                {/* STATUS EFFECTS */}
-                <div className="space-y-6 border-t border-[#2a2418] pt-6 my-6">
-                  <FadeScaleIn delay={100}>
-                    <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">
-                      Status Effects
-                    </h3>
-                  </FadeScaleIn>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                    <CodexBox title="[Overwhelmed]" badge="DEBUFF + BUFF">
-                      <p className="text-sm text-[#c7c2b5] leading-relaxed mb-2">
-                        <TypewriterText text="Triggered taking combo damage reaching A Rank. Blurs vision 8%, darkens 6%, adds vignette. Clears after 5s without damage or using Burst." />
-                      </p>
-                    </CodexBox>
-
-                    <CodexBox title="[Overdrive]" badge="BUFF">
-                      <ul className="text-xs text-[#c7c2b5] space-y-1 list-disc list-inside">
-                        <li>+50% damage, endurance, special power, defense</li>
-                        <li>Attacks gain +5% speed per hit (capped at 25%)</li>
-                        <li>Restores max heat bar, 25% HP, resets cooldowns</li>
-                        <li>Cleanses status effects & increases parry windows</li>
-                      </ul>
-                    </CodexBox>
-                  </div>
-
-                  {/* DOT Cards */}
-                  <div className="space-y-4">
-                    <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">DOT Indicators & Body Part Damage</h4>
-                    <p className="text-s text-[#a09a8e]"><TypewriterText text="All DOT (Damage Over Time) effects last 4 seconds. Stacking same tier increases tier (Tier 1 + Tier 1 = Tier 2)." /></p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
-                      <StatusEffectCard
-                        type="bleed"
-                        title="Bleed"
-                        badgeText="INJURED"
-                        duration="DOT"
-                        description="Causes continuous damage over time and reduces overall movement speed and regen speed."
-                        stats="Less Speed + Regen"
-                      />
-                      <StatusEffectCard
-                        type="burn"
-                        title="Burn"
-                        badgeText="SCORCH"
-                        duration="DOT"
-                        description="Sears the victim in flames, hindering defences and reducing max endurance pool."
-                        stats="Less Endurance + Defence"
-                      />
-                      <StatusEffectCard
-                        type="poison"
-                        title="Poison"
-                        badgeText="Toxic"
-                        duration="DOT"
-                        description="Deadly Poisons infect the victim, corroding defensive capabilities while draining endurance over time."
-                        stats="Endurance + Defense"
-                      />
-                      <StatusEffectCard
-                        type="wither"
-                        title="Wither"
-                        badgeText="Curse"
-                        duration="DOT"
-                        description="A deadly curse that severely dampens health regeneration rates and impairs endurance recovery."
-                        stats="Regeneration + Endurance"
-                      />
-                    </div>
-
-                    <CodexBox title="Body Part Damage Breakdown" badge="LOCATIONAL DAMAGE">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-s text-[#c7c2b5]">
-                        <div>• <strong className="text-[#e6c278]">Skull:</strong> Blur + Ringing SFX, Stun increase, Slowness</div>
-                        <div>• <strong className="text-[#e6c278]">Torso:</strong> Reduced endurance & damage resistance</div>
-                        <div>• <strong className="text-[#e6c278]">Legs:</strong> Sprint, jump, and speed nerfed</div>
-                        <div>• <strong className="text-[#e6c278]">Arms:</strong> Block & damage nerfed, ledge grab jump spam</div>
-                      </div>
-                    </CodexBox>
-                  </div>
-                </div>
-
-                {/* ADVANCED COMBAT MECHANICS */}
-                <div className="space-y-6 border-t border-[#2a2418] pt-6 my-6">
-                  <FadeScaleIn delay={100}>
-                    <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">
-                      Advanced Combat Mechanics
-                    </h3>
-                  </FadeScaleIn>
-
-                  <CodexBox title="Dynamic Destruction & Stage Pinning" badge="MAP DESTRUCTION">
-                    <p className="text-s text-[#c7c2b5] leading-relaxed mb-4">
-                      <TypewriterText text="Knocking enemies into walls enables continuous wall-pin combos until wall destruction. Destroying walls grants +15% bonus damage. Select maps support full Stage Destruction!" />
-                    </p>
-                    <VideoPlate 
-                      title="Advanced Demonstration: Dynamic Wall Destruction & Pin"
-                      inputTag="Heavy Knockback to Wall"
-                      badge="DESTRUCTION"
-                      duration="0:16"
-                      description="Knocking an opponent into destructible map walls to initiate a wall-pin combo string until wall collapse."
-                      stats={[
-                        { label: "Wall Damage", value: "+15% Extra" },
-                        { label: "Knockback Range", value: "25 - 75 Studs" }
-                      ]}
-                      videoSrc="UNIQUE VIDEO HERE"
-                      posterSrc="UNIQUE VIDEO HERE"
-                    />
-                  </CodexBox>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <CodexBox title="Long Range & Mixing" badge="NEUTRAL">
-                      <p className="text-s text-[#c7c2b5] leading-relaxed">
-                        <TypewriterText text="Features options like Flash Step approach or ranged projectiles (guns) to maintain style rank without burning close-combat moves." />
-                      </p>
-                    </CodexBox>
-
-                    <CodexBox title="Move Shift Mechanic" badge="VARIANT TECH">
-                      <p className="text-s text-[#c7c2b5] leading-relaxed">
-                        <TypewriterText text="Allows unlocking move variants by executing a move WHILE another action is being performed mid-animation or windup." />
-                      </p>
-                    </CodexBox>
-                  </div>
-
-                    <CodexBox title="THAT'S ALL FOLKS!">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-[#c7c2b5]">
-                      </div>
-                    </CodexBox>
-                </div>
-              </CodexBox>
-            </div>
-          </section>
+        {activeTab === 'stands' && <StandsSection initialStandId={navStandId} />}
+        {activeTab === 'specs' && (
+          <PlaceholderSection
+            title="Specs"
+            badge="CHARACTER SPECS"
+            icon={<Swords className="w-5 h-5 text-[#e6c278]" />}
+            blurb="Character specs — base stats, scaling, and per-archetype breakdowns — will live here once that data is ready to log."
+          />
         )}
-
-        {/* =========================================================
-            SUBTAB 2: MOBILITY
-            ========================================================= */}
-        {activeTab === 'mobility' && (
-          <section className="space-y-12">
-            <CodexBox 
-              title="Combat and Movement are One"
-              badge="MOBILITY OVERVIEW"
-              accentColor="border-l-4 border-l-[#c3a35e] border-[#2a2418]"
-            >
-              <p className="text-[#c7c2b5] leading-relaxed text-lg md:text-xl">
-                <TypewriterText text="Movement in Beyond Bizarre is not merely traversal—it is an offensive and defensive weapon. Positioning, verticality, momentum preservation, and recovery techniques seamlessly connect directly into combat strings. In this game, you have to utilize Speed & Momentum when you’re moving around. However, your mobility also heavily compliments other aspects such as combat and more allowing for stylish gameplay. It's not just knowing how, but also when to move" delay={100} />
-              </p>
-            </CodexBox>
-
-            <div className="grid grid-cols-2 md:grid-cols-1 gap-8">
-              {/* Ground Mobility Suite */}
-              <CodexBox title="MOBILITY: PART 1">
-                <ul className="list-disc list-inside text-base text-[#c7c2b5] space-y-3 leading-relaxed mb-6">
-                  <li><strong className="text-[#e6c278]">Omnidirectional 3 Stage Walk/Run/Sprint (<code className="font-mono text-sm">WASD | CTRL</code>):</strong> In beyond bizarre, you have 3 walk cycles, your standard slow WALK, your faster paced RUN, and your full speed SPRINT, giving 3 levels of speed along with better momentum capabilities.</li>
-                  <li><strong className="text-[#e6c278]">Burst Dash:</strong> Double tap direction while sprinting for explosive acceleration.</li>
-                  <li><strong className="text-[#e6c278]">Flash Step (<code className="font-mono text-sm">Shift + Q</code>):</strong> Short-range instant teleportation auto-orienting relative to target.</li>
-                  <li><strong className="text-[#e6c278]">Momentum Sliding (<code className="font-mono text-sm">C / Crouch while sprinting</code>):</strong> Duck under high projectiles while carrying slope momentum.</li>
-                </ul>
-
-                <VideoPlate 
-                  title="MOBILITY: PHASE ONE"
-                  inputTag="Q + Direction / Shift + Q"
-                  badge="TRAVERSAL"
-                  duration="0:14"
-                  description="Chaining a side dash into a momentum slide under a projectile, ending with a Flash Step behind the opponent."
-                  stats={[
-                    { label: "Dash I-Frames", value: "6 Frames" },
-                    { label: "Slide Speed", value: "+30% Boost" },
-                    { label: "Stamina Cost", value: "15 Stamina" }
-                  ]}
-                  videoSrc="UNIQUE VIDEO HERE"
-                  posterSrc="UNIQUE VIDEO HERE"
-                />
-              </CodexBox>
-
-              {/* Verticality & Environment */}
-              <CodexBox title="Verticality & Traversals" badge="AIR & WALLS">
-                <ul className="list-disc list-inside text-base text-[#c7c2b5] space-y-3 leading-relaxed mb-6">
-                  <li><strong className="text-[#e6c278]">Wall Running & Vaulting:</strong> Sprinting into vertical surfaces scales walls up to stamina limit.</li>
-                  <li><strong className="text-[#e6c278]">Ledge Grabs & Climb Recovery:</strong> Automatic ledge snapping when falling near elevated platforms.</li>
-                  <li><strong className="text-[#e6c278]">Air Recovery / Tech Roll:</strong> Press jump upon touching ground during ragdoll state to instantly recover feet.</li>
-                  <li><strong className="text-[#e6c278]">Stand Launch:</strong> Command Stand to propel you upward for extreme vertical height.</li>
-                </ul>
-
-                <VideoPlate 
-                  title="Mobility Demonstration: Wall Running & Tech Roll Recovery"
-                  inputTag="Jump on Impact / Space at Wall"
-                  badge="RECOVERY"
-                  duration="0:16"
-                  description="Demonstrating a wall run climb to re-engage, followed by a Tech Roll recovery after being knocked down."
-                  stats={[
-                    { label: "Wall Climb Height", value: "30 Studs" },
-                    { label: "Tech Roll Window", value: "0.25 Seconds" },
-                    { label: "Invincibility", value: "On Recovery" }
-                  ]}
-                  videoSrc="UNIQUE VIDEO HERE"
-                  posterSrc="UNIQUE VIDEO HERE"
-                />
-              </CodexBox>
-            </div>
-          </section>
-        )}
-
-        {/* =========================================================
-            SUBTAB 3: STAND COMBAT
-            ========================================================= */}
-        {activeTab === 'stand-combat' && (
-          <section className="space-y-12">
-            <CodexBox 
-              title="Manifestation of the Soul"
-              badge="STAND OVERVIEW"
-              accentColor="border-l-4 border-l-[#c3a35e] border-[#2a2418]"
-            >
-              <p className="text-[#c7c2b5] leading-relaxed text-lg md:text-xl">
-                <TypewriterText text="Stands operate as distinct entity overlays that extend reach, provide independent hurtboxes, and modify core combat properties. Mastering Stand positioning and activation timing is essential to high-level play." delay={100} />
-              </p>
-            </CodexBox>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <CodexBox title="Stand Summoning & Off-Body Combat" badge="STAND BASICS">
-                <ul className="list-disc list-inside text-base text-[#c7c2b5] space-y-3 leading-relaxed mb-6">
-                  <li><strong className="text-[#e6c278]">Stand On/Off (<code className="font-mono text-sm">E</code>):</strong> Toggle Stand manifestation. Boosts reach and unlocks unique move trees.</li>
-                  <li><strong className="text-[#e6c278]">Pilot Mode:</strong> Remote-control Stand away from user body at the cost of shared damage.</li>
-                  <li><strong className="text-[#e6c278]">Stand Barrages:</strong> Rapid multi-hit strike sequences capable of clashing against opposing barrages.</li>
-                </ul>
-
-                <VideoPlate 
-                  title="Stand Demonstration: Stand Summoning & Barrage Clashing"
-                  inputTag="E Key / Hold Special"
-                  badge="STAND DEMO"
-                  duration="0:15"
-                  description="Manifesting Stand during combo neutral, escalating into a full Stand Barrage clash against enemy Stand."
-                  stats={[
-                    { label: "Summon Delay", value: "Instant" },
-                    { label: "Reach Bonus", value: "+40% Range" },
-                    { label: "Clash State", value: "Equal Speed" }
-                  ]}
-                  videoSrc="UNIQUE VIDEO HERE"
-                  posterSrc="UNIQUE VIDEO HERE"
-                />
-              </CodexBox>
-
-              <CodexBox title="Advanced Stand Techniques" badge="ADVANCED TECH">
-                <ul className="list-disc list-inside text-base text-[#c7c2b5] space-y-3 leading-relaxed mb-6">
-                  <li><strong className="text-[#e6c278]">Stand Cancelling:</strong> Desummon Stand mid-animation to eliminate recovery frames and setup mixups.</li>
-                  <li><strong className="text-[#e6c278]">Stand Parrying:</strong> Command Stand to absorb incoming high-damage attacks while user maintains free movement.</li>
-                  <li><strong className="text-[#e6c278]">Stand Jump Boost:</strong> Synchronize Stand punch into ground with Jump for extreme upward launch.</li>
-                </ul>
-
-                <VideoPlate 
-                  title="Stand Demonstration: Stand Animation Cancelling"
-                  inputTag="E (Mid-Animation)"
-                  badge="ADVANCED TECH"
-                  duration="0:12"
-                  description="Cancelling a heavy Stand finisher recovery frames using Stand-Toggle to execute an instant follow-up strike."
-                  stats={[
-                    { label: "Frame Saver", value: "14 Frames" },
-                    { label: "Heat Cost", value: "10 Heat" },
-                    { label: "Difficulty", value: "High" }
-                  ]}
-                  videoSrc="UNIQUE VIDEO HERE"
-                  posterSrc="UNIQUE VIDEO HERE"
-                />
-              </CodexBox>
-            </div>
-          </section>
+        {activeTab === 'weapons' && (
+          <PlaceholderSection
+            title="Weapons"
+            badge="WEAPON REGISTRY"
+            icon={<Wrench className="w-5 h-5 text-[#e6c278]" />}
+            blurb="The weapon registry — melee, ranged, and Stand-augmented gear — will live here once that data is ready to log."
+          />
         )}
       </main>
-
-      {/* Site Footer */}
-      <SiteFooter />
     </div>
   );
 }

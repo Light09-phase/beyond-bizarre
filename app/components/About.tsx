@@ -7,21 +7,97 @@ interface AboutProps {
   setActiveTab: (tab: string) => void;
 }
 
-export default function About({ setActiveTab }: AboutProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  
+interface FeatureRowProps {
+  imageSrc: string;
+  imageAlt: string;
+  badge: string;
+  title: string;
+  description: string;
+  buttonText?: string;
+  onButtonClick?: () => void;
+  reverse?: boolean;
+}
+
+// INDIVIDUAL PARALLAX ROW COMPONENT (Ensures isolated scroll calculation per row)
+function ParallaxRow({
+  imageSrc,
+  imageAlt,
+  badge,
+  title,
+  description,
+  buttonText,
+  onButtonClick,
+  reverse = false,
+}: FeatureRowProps) {
+  const rowRef = useRef<HTMLDivElement>(null);
+
+  // Dedicated scroll tracking per row
   const { scrollYProgress } = useScroll({
-    target: containerRef,
+    target: rowRef,
     offset: ['start end', 'end start'],
   });
-  
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.97, 1.03, 0.97]);
-  
+
+  // Expanded speed differential for a pronounced parallax shift
+  const textY = useTransform(scrollYProgress, [0, 1], [90, -90]);
+  const imageY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
+  const imageScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.96, 1.02, 0.96]);
+
   return (
-    <section
-      ref={containerRef}
-      className="relative z-10 max-w-7xl mx-auto px-6 py-16 bg-[#050505] text-[#e0ded8]"
-    >
+    <div ref={rowRef} className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center py-6">
+      {/* IMAGE CONTAINER */}
+      <motion.div
+        style={{ y: imageY, scale: imageScale }}
+        className={`md:col-span-6 group relative bg-[#121116] border border-[#2a2418] hover:border-[#c3a35e] transition-colors duration-300 overflow-hidden shadow-2xl p-2 ${
+          reverse ? 'order-1 md:order-2' : ''
+        }`}
+      >
+        <div className={`absolute top-0 ${reverse ? 'right-0 border-r-2' : 'left-0 border-l-2'} h-4 w-4 border-t-2 border-[#c3a35e] z-20 pointer-events-none`} />
+        <div className={`absolute bottom-0 ${reverse ? 'left-0 border-l-2' : 'right-0 border-r-2'} h-4 w-4 border-b-2 border-[#c3a35e] z-20 pointer-events-none`} />
+
+        <div className="relative aspect-video overflow-hidden bg-[#050505]">
+          <img
+            src={imageSrc}
+            alt={imageAlt}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+        </div>
+      </motion.div>
+
+      {/* TEXT CONTAINER */}
+      <motion.div
+        style={{ y: textY }}
+        className={`md:col-span-6 space-y-4 p-4 z-10 ${
+          reverse ? 'order-2 md:order-1' : ''
+        }`}
+      >
+        <span className="inline-block bg-[#c3a35e] text-black text-xs font-bold px-2.5 py-1 uppercase tracking-wider font-['Cormorant_Upright',serif]">
+          {badge}
+        </span>
+        <h3 className="text-2xl sm:text-3xl font-['Gilda_Display',serif] text-[#e6c278] leading-snug">
+          {title}
+        </h3>
+        <p className="text-[#b8b3a8] font-['Zen_Old_Mincho',serif] text-base md:text-lg leading-relaxed">
+          {description}
+        </p>
+        {buttonText && onButtonClick && (
+          <div className="pt-2">
+            <button
+              onClick={onButtonClick}
+              className="border border-[#3d3423] bg-[#100f14] px-8 py-3 font-mono text-xs uppercase tracking-widest text-[#e6c278] transition-all hover:border-[#c3a35e] hover:bg-[#c3a35e] hover:text-black shadow-lg"
+            >
+              {buttonText}
+            </button>
+          </div>
+        )}
+      </motion.div>
+    </div>
+  );
+}
+
+export default function About({ setActiveTab }: AboutProps) {
+  return (
+    <section className="relative z-10 max-w-7xl mx-auto px-6 py-16 bg-[#050505] text-[#e0ded8]">
       {/* SECTION HEADER */}
       <div className="mb-10 text-center md:text-left border-b border-[#2a2418] pb-6">
         <p className="text-xs uppercase tracking-[0.4em] text-[#c3a35e] font-mono mb-2">
@@ -83,89 +159,51 @@ export default function About({ setActiveTab }: AboutProps) {
             className="text-[#ff0000] font-semibold inline-block whitespace-nowrap"
           >
             In Development
-
           </motion.span>
         </div>
       </div>
 
-      {/* FEATURE ROWS (ZIG-ZAG LAYOUT WITH BANDAI NAMCO / MY HERO STYLE FRAMES) */}
-      <div className="space-y-16">
-        
-        {/* ROW 1: Image Left, Text Right */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-          <motion.div
-            style={{ scale }}
-            className="md:col-span-6 group relative bg-[#121116] border border-[#2a2418] hover:border-[#c3a35e] transition-all duration-300 overflow-hidden shadow-2xl p-2"
-          >
-            {/* Anime UI Corner Accents */}
-            <div className="absolute top-0 left-0 h-4 w-4 border-t-2 border-l-2 border-[#c3a35e] z-20 pointer-events-none" />
-            <div className="absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2 border-[#c3a35e] z-20 pointer-events-none" />
-            
-            <div className="relative aspect-video overflow-hidden bg-[#050505]">
-              <img
-                src="/about2.jpg"
-                alt="Beyond Bizarre World"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-            </div>
-          </motion.div>
+      {/* FEATURE ROWS */}
+      <div className="space-y-16 overflow-hidden">
+        <ParallaxRow
+          imageSrc="/about2.jpg"
+          imageAlt="Beyond Bizarre World"
+          badge="Overview"
+          title="Welcome to a game where the limits of what you can do is your imagination and WILL!"
+          description="Beyond Bizarre is a massive JoJo-inspired adventure built for Roblox. Explore a living world, discover and fight with powerful Stands, master an expressive combat system, and carve your own path through a bizarre story!"
+        />
 
-          <div className="md:col-span-6 space-y-4 p-4">
-            <span className="bg-[#c3a35e] text-black text-xs font-bold px-2.5 py-1 uppercase tracking-wider font-['Cormorant_Upright',serif]">
-              Overview
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-['Gilda_Display',serif] text-[#e6c278] leading-snug">
-              Welcome to a game where the limits of what you can do is your imagination and WILL!
-            </h3>
-            <p className="text-[#b8b3a8] font-['Zen_Old_Mincho',serif] text-base md:text-lg leading-relaxed">
-              Beyond Bizarre is a massive JoJo-inspired adventure built for Roblox. Explore a living world, discover and fight with powerful Stands, master an expressive combat system, and carve your own path through a bizarre story!
-            </p>
-          </div>
-        </div>
+        <ParallaxRow
+          reverse
+          imageSrc="/about2.jpg"
+          imageAlt="Beyond Bizarre Combat"
+          badge="Freedom & Combat"
+          title="Master the flow of battle with precision, movement, and soul manifestation."
+          description="Every strike carries weight. Combine universal light strings, dynamic heavy movement options, and powerful Stand summons to outplay your opponents in deep, skill-driven encounters."
+          buttonText="Discover More"
+          onButtonClick={() => setActiveTab('combat')}
+        />
 
-        {/* ROW 2: Text Left, Image Right (Flipped for ZIG-ZAG dynamic flow) */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
-          <div className="md:col-span-6 space-y-4 p-4 order-2 md:order-1">
-            <span className="bg-[#c3a35e] text-black text-xs font-bold px-2.5 py-1 uppercase tracking-wider font-['Cormorant_Upright',serif]">
-              Freedom & Combat
-            </span>
-            <h3 className="text-2xl sm:text-3xl font-['Gilda_Display',serif] text-[#e6c278] leading-snug">
-              Master the flow of battle with precision, movement, and soul manifestation.
-            </h3>
-            <p className="text-[#b8b3a8] font-['Zen_Old_Mincho',serif] text-base md:text-lg leading-relaxed">
-              Every strike carries weight. Combine universal light strings, dynamic heavy movement options, and powerful Stand summons to outplay your opponents in deep, skill-driven encounters.
-            </p>
-            <div className="pt-2">
-              {/* DISCOVER MORE BUTTON LINKED TO COMBAT VIEW */}
-              <button 
-                onClick={() => setActiveTab('combat')}
-                className="border border-[#3d3423] bg-[#100f14] px-8 py-3 font-mono text-xs uppercase tracking-widest text-[#e6c278] transition-all hover:border-[#c3a35e] hover:bg-[#c3a35e] hover:text-black shadow-lg"
-              >
-                Discover More
-              </button>
-            </div>
-          </div>
+        <ParallaxRow
+          imageSrc="/about2.jpg"
+          imageAlt="Beyond Bizarre World"
+          badge="Overview"
+          title="Welcome to a game where the limits of what you can do is your imagination and WILL!"
+          description="Beyond Bizarre is a massive JoJo-inspired adventure built for Roblox. Explore a living world, discover and fight with powerful Stands, master an expressive combat system, and carve your own path through a bizarre story!"
+          buttonText="Discover More"
+          onButtonClick={() => setActiveTab('combat')}
+        />
 
-          <motion.div
-            style={{ scale }}
-            className="md:col-span-6 group relative bg-[#121116] border border-[#2a2418] hover:border-[#c3a35e] transition-all duration-300 overflow-hidden shadow-2xl p-2 order-1 md:order-2"
-          >
-            {/* Anime UI Corner Accents */}
-            <div className="absolute top-0 right-0 h-4 w-4 border-t-2 border-r-2 border-[#c3a35e] z-20 pointer-events-none" />
-            <div className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2 border-[#c3a35e] z-20 pointer-events-none" />
-
-            <div className="relative aspect-video overflow-hidden bg-[#050505]">
-              <img
-                src="/about2.jpg"
-                alt="Beyond Bizarre Combat"
-                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-            </div>
-          </motion.div>
-        </div>
-
+        <ParallaxRow
+          reverse
+          imageSrc="/about2.jpg"
+          imageAlt="Beyond Bizarre Combat"
+          badge="Freedom & Combat"
+          title="Master the flow of battle with precision, movement, and soul manifestation."
+          description="Every strike carries weight. Combine universal light strings, dynamic heavy movement options, and powerful Stand summons to outplay your opponents in deep, skill-driven encounters."
+          buttonText="Discover More"
+          onButtonClick={() => setActiveTab('background')}
+        />
       </div>
     </section>
   );

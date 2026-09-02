@@ -145,6 +145,11 @@ interface DynamicVideoPlateProps {
   defaultOptionId?: string;
   sectionBadge?: string;
   variantTheme?: 'gold' | 'red' | 'purple' | 'cyan';
+  // Lets a parent (GameGuide) force this switcher onto a specific option id
+  // after mount — used by search-driven navigation so clicking e.g. "Down
+  // Strike" in search actually flips the switcher to Down Strike instead of
+  // just scrolling to the section and leaving whatever was already selected.
+  externalSelectedId?: string | null;
 }
 
 interface SingleVideoPlateProps {
@@ -166,6 +171,10 @@ interface StatusEffectCardProps {
   duration: string;
   description: string;
   stats: string;
+  // Optional precise scroll target for search navigation — each DOT card
+  // gets its own id (e.g. "status-bleed") instead of relying on the shared
+  // section anchor.
+  id?: string;
 }
 
 interface CodexBoxProps {
@@ -265,14 +274,26 @@ const heavyStrikeOptions: VideoOption[] = [
     posterSrc: "UNIQUE VIDEO HERE"
   },
   {
-    id: "rush",
-    label: "Rush Strike",
-    badge: "MOBILITY STRIKE",
+    id: "step",
+    label: "Step Strike",
+    badge: "FORWARD MOBILITY STRIKE",
     duration: "0:13",
     inputTag: "Forward Dash + M2",
-    description: "While using forward dash and your M2 together, M2's can turn into a Rush Strike, forward dashing strike in a linear path with more mobility.",
+    description: "While using forward dash and your M2 together, M2's can turn into a Step Strike, forward dashing strike in a linear path with more mobility.",
     properties: ["Guardable", "Parriable", "Super Knockback & Ragdoll", "Grand Upper Strike"],
     stats: [{ label: "Strike Type", value: "Grand Upper" }, { label: "Guard Property", value: "Guardable" }, { label: "Cooldown", value: "2.0s" }],
+    videoSrc: "UNIQUE VIDEO HERE",
+    posterSrc: "UNIQUE VIDEO HERE"
+  },
+  {
+    id: "low",
+    label: "Low Strike",
+    badge: "TRIPPING STRIKE",
+    duration: "0:15",
+    inputTag: "Side Step + M2",
+    description: "Instantaneous strike that can surprise opponents with a sudden strike. Effective range is roughly half of flash step range. Can chain into Flash Rush by using your M2 multiple times in succession that end in a Down Strike. [Limit decided by skill tree upgrades].",
+    properties: ["Guardable", "Parriable", "Super Knockback & Ragdoll"],
+    stats: [{ label: "Strike Type", value: "Stun & Down Spike" }, { label: "Effective Range", value: "1/2 Flash-Step Range" }, { label: "Chain Input", value: "M2 After Flash-Step" }, { label: "Guard Property", value: "Light Parriable" }, { label: "Finisher", value: "Down Strike" }, { label: "Cooldown", value: "2.0s & 8.0s" }],
     videoSrc: "UNIQUE VIDEO HERE",
     posterSrc: "UNIQUE VIDEO HERE"
   },
@@ -694,6 +715,99 @@ const CodexBox: React.FC<CodexBoxProps> = ({
 };
 
 // ============================================================================
+// ANIMATED STAT BAR COMPONENT (LOADING & NUMBER COUNT-UP TRANSITION)
+// ============================================================================
+
+const AnimatedStatBar: React.FC<{
+  label: string;
+  value: number;
+  max?: number;
+  icon?: React.ReactNode;
+  bonus?: string;
+  description?: string;
+  unlocks?: string[];
+}> = ({ label, value, max = 100, icon, bonus, description, unlocks }) => {
+  const [ref, isVisible] = useVisibility("-20px 0px");
+  const [currentVal, setCurrentVal] = useState(0);
+
+  useEffect(() => {
+    if (!isVisible) {
+      setCurrentVal(0);
+      return;
+    }
+    let start = 0;
+    const duration = 1500;
+    const steps = 60;
+    const increment = value / steps;
+    const stepTime = duration / steps;
+
+    const timer = setInterval(() => {
+      start += increment;
+      if (start >= value) {
+        setCurrentVal(value);
+        clearInterval(timer);
+      } else {
+        setCurrentVal(Math.floor(start));
+      }
+    }, stepTime);
+
+    return () => clearInterval(timer);
+  }, [isVisible, value]);
+
+  const percentage = Math.min(100, (currentVal / max) * 100);
+
+  return (
+    <div ref={ref} className="bg-[#0a0a0d] border border-[#2a2418] hover:border-[#c3a35e] transition-all duration-300 p-5 rounded-sm group shadow-lg">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center space-x-3">
+          <div className="p-2 bg-[#14121a] border border-[#3d3322] flex items-center justify-center">
+            {icon}
+          </div>
+          <h5 className="text-lg font-['Gilda_Display',serif] text-[#e6c278] group-hover:text-white transition-colors">
+            {label}
+          </h5>
+        </div>
+        <div className="text-xl font-mono font-bold text-[#e6c278]">
+          {currentVal} <span className="text-xs text-[#8a857a]">/ {max}</span>
+        </div>
+      </div>
+
+      <div className="w-full h-2 bg-[#16141c] border border-[#2a2418] rounded-full overflow-hidden mb-4 relative">
+        <div 
+          className="h-full bg-gradient-to-r from-[#8a6f2d] via-[#c3a35e] to-[#ffe28a] transition-all duration-1000 ease-out rounded-full shadow-[0_0_10px_rgba(195,163,94,0.5)]"
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+
+      {bonus && (
+        <div className="text-xs font-mono text-[#34d399] mb-2 bg-[#041f14] border border-[#0d3b28] p-2">
+          {bonus}
+        </div>
+      )}
+
+      {description && (
+        <p className="text-sm text-[#b8b3a8] font-['Zen_Old_Mincho',serif] leading-relaxed mb-3">
+          {description}
+        </p>
+      )}
+
+      {unlocks && unlocks.length > 0 && (
+        <div className="pt-3 border-t border-[#2a2418]">
+          <span className="block text-[10px] font-mono text-[#8a857a] uppercase mb-1.5">Key Unlocks:</span>
+          <div className="flex flex-wrap gap-1.5">
+            {unlocks.map((ulk, idx) => (
+              <span key={idx} className="text-[11px] font-mono text-[#e6c278] bg-[#14121a] border border-[#2a2418] px-2 py-0.5">
+                ✓ {ulk}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================================================
 // VIDEO COMPONENT BOILERPLATES
 // ============================================================================
 
@@ -710,6 +824,9 @@ const VideoPlate: React.FC<SingleVideoPlateProps> = ({
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  // Same placeholder guard as DynamicVideoPlate — "UNIQUE VIDEO HERE" isn't
+  // a real src and shouldn't be requested from the browser.
+  const hasRealVideo = !!videoSrc && videoSrc !== "UNIQUE VIDEO HERE";
 
   const handlePlay = () => {
     if (videoRef.current) {
@@ -738,12 +855,12 @@ const VideoPlate: React.FC<SingleVideoPlateProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-12">
           <div className="md:col-span-5 relative aspect-video bg-[#121216] overflow-hidden flex items-center justify-center border-b md:border-b-0 md:border-r border-[#2a2418]">
             <ScrollBackground className="bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:14px_14px] group-hover:opacity-30 transition-opacity" activeOpacity="opacity-15" />
-            {videoSrc ? (
+            {hasRealVideo ? (
               <>
                 <video
                   ref={videoRef}
                   src={videoSrc}
-                  poster={posterSrc}
+                  poster={posterSrc !== "UNIQUE VIDEO HERE" ? posterSrc : undefined}
                   className="absolute inset-0 w-full h-full object-cover z-10"
                   controls={isPlaying}
                   onPause={() => setIsPlaying(false)}
@@ -818,13 +935,19 @@ const DynamicVideoPlate: React.FC<DynamicVideoPlateProps> = ({
   options,
   defaultOptionId,
   sectionBadge = "INTERACTIVE VARIANT SELECTOR",
-  variantTheme = 'gold'
+  variantTheme = 'gold',
+  externalSelectedId
 }) => {
   const [selectedId, setSelectedId] = useState<string>(defaultOptionId || options[0]?.id || "");
   const [flashId, setFlashId] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const activeOption = options.find((opt) => opt.id === selectedId) || options[0];
+  // "UNIQUE VIDEO HERE" is the placeholder every option still ships with
+  // until real footage is logged in. Treat it as "no video yet" instead of
+  // a real src, otherwise the <video> tag fires a doomed GET for the
+  // literal string on every mount/selection change.
+  const hasRealVideo = !!activeOption.videoSrc && activeOption.videoSrc !== "UNIQUE VIDEO HERE";
   
   useEffect(() => {
     setIsPlaying(false);
@@ -833,6 +956,21 @@ const DynamicVideoPlate: React.FC<DynamicVideoPlateProps> = ({
       videoRef.current.currentTime = 0;
     }
   }, [selectedId]);
+
+  // Search-driven variant selection. GameGuide passes externalSelectedId
+  // down once it hears a 'navigate-tab' event carrying a variantId that
+  // belongs to THIS plate's options. Guarded so it only reacts to ids that
+  // actually exist in this plate's own options array — each page has
+  // several DynamicVideoPlate instances, and the same event fires past
+  // all of them.
+  useEffect(() => {
+    if (!externalSelectedId) return;
+    if (!options.some((opt) => opt.id === externalSelectedId)) return;
+    setSelectedId(externalSelectedId);
+    setFlashId(externalSelectedId);
+    const flashTimer = setTimeout(() => setFlashId(null), 150);
+    return () => clearTimeout(flashTimer);
+  }, [externalSelectedId, options]);
   
   const handleTabClick = (id: string) => {
     setSelectedId(id);
@@ -946,12 +1084,12 @@ const DynamicVideoPlate: React.FC<DynamicVideoPlateProps> = ({
         <div className="grid grid-cols-1 md:grid-cols-12">
           <div className="md:col-span-5 relative aspect-video bg-[#121216] overflow-hidden flex items-center justify-center border-b md:border-b-0 md:border-r border-[#2a2418]">
             <ScrollBackground className={`[background-size:14px_14px] group-hover:opacity-35 transition-opacity ${theme.radial}`} activeOpacity="opacity-20" />
-            {activeOption.videoSrc ? (
+            {hasRealVideo ? (
               <>
                 <video
                   ref={videoRef}
                   src={activeOption.videoSrc}
-                  poster={activeOption.posterSrc}
+                  poster={activeOption.posterSrc !== "UNIQUE VIDEO HERE" ? activeOption.posterSrc : undefined}
                   className="absolute inset-0 w-full h-full object-cover z-10"
                   controls={isPlaying}
                   onPause={() => setIsPlaying(false)}
@@ -1039,7 +1177,8 @@ const StatusEffectCard: React.FC<StatusEffectCardProps> = ({
   badgeText,
   duration,
   description,
-  stats
+  stats,
+  id
 }) => {
   const styles = {
     bleed: {
@@ -1074,7 +1213,8 @@ const StatusEffectCard: React.FC<StatusEffectCardProps> = ({
   return (
     <FadeScaleIn>
       <div
-        className={`relative p-6 bg-gradient-to-br ${styles.gradient} border ${styles.border} transition-all duration-300 transform hover:-translate-y-1.5 hover:scale-[1.03] group rounded-sm overflow-hidden flex flex-col justify-between`}
+        id={id}
+        className={`scroll-mt-24 relative p-6 bg-gradient-to-br ${styles.gradient} border ${styles.border} transition-all duration-300 transform hover:-translate-y-1.5 hover:scale-[1.03] group rounded-sm overflow-hidden flex flex-col justify-between`}
       >
         <div className="flex items-center justify-between mb-4">
           <span
@@ -1209,12 +1349,68 @@ export default function GameGuide() {
   const [activeSubTab, setActiveSubTab] = useState<SubTab>('combat');
   const [selectedStatId, setSelectedStatId] = useState<string>('strength');
   const [activeBranch, setActiveBranch] = useState<'all' | 'combat' | 'stand' | 'survival'>('all');
+  // Set by search navigation when the target search result points at a
+  // specific variant inside one of the DynamicVideoPlate switchers below
+  // (Heavy Strike, Critical Arts, Mobility, Stand Combat). Passed to all
+  // four switchers — each one only reacts if the id actually belongs to
+  // its own options array, so one piece of state is enough.
+  const [navVariantId, setNavVariantId] = useState<string | null>(null);
 
   const selectedStatObj = statAttributesList.find(s => s.id === selectedStatId) || statAttributesList[0];
 
+  // Respond to search-driven navigation: SearchModal fires a 'navigate-tab' window
+  // event (and stashes the same payload on window.__pendingSearchNav in case this
+  // component mounts *after* the event fires, e.g. coming from the Homepage tab).
+  useEffect(() => {
+    const applyNav = (detail: any) => {
+      if (!detail || detail.tab !== 'combat') return;
+      // detail.subTab carries BOTH the top-level tab and (when relevant)
+      // the Core Mechanics inner switcher: 'combat' | 'mobility' |
+      // 'stand-combat' live under Core Mechanics, while 'overview' and
+      // 'progression' are top-level tabs with no inner switcher of their
+      // own. Route each to the right piece of state.
+      if (detail.subTab === 'overview') {
+        setActiveTab('overview');
+      } else if (detail.subTab === 'progression') {
+        setActiveTab('progression');
+      } else if (detail.subTab) {
+        setActiveTab('core-mechanics');
+        setActiveSubTab(detail.subTab);
+      }
+      setNavVariantId(detail.variantId || null);
+
+      // Scrolling has to wait for React to actually mount the target
+      // section (a tab switch + subtab switch can take more than one
+      // render pass), so we retry a few times instead of trusting a
+      // single fixed delay.
+      const id = detail.anchorId || 'tab-navigation';
+      let attempts = 0;
+      const tryScroll = () => {
+        attempts += 1;
+        const el = document.getElementById(id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (attempts < 6) {
+          setTimeout(tryScroll, 150);
+        }
+      };
+      setTimeout(tryScroll, 150);
+    };
+
+    const pending = (window as any).__pendingSearchNav;
+    if (pending) {
+      (window as any).__pendingSearchNav = null;
+      applyNav(pending);
+    }
+
+    const handleNavigate = (e: Event) => applyNav((e as CustomEvent).detail);
+    window.addEventListener('navigate-tab', handleNavigate);
+    return () => window.removeEventListener('navigate-tab', handleNavigate);
+  }, []);
+
   // Navigation Bar
   const MainNav = () => (
-    <nav id="tab-navigation" className="flex space-x-2 sm:space-x-4 mb-10 overflow-x-auto pb-2 border-b border-[#2a2418] pt-2 justify-center max-w-7xl mx-auto z-20 relative">
+    <nav id="tab-navigation" className="scroll-mt-24 flex space-x-2 sm:space-x-4 mb-10 overflow-x-auto pb-2 border-b border-[#2a2418] pt-2 justify-center max-w-7xl mx-auto z-20 relative">
       <button
         onClick={() => setActiveTab('overview')}
         className={`flex items-center space-x-2 px-6 py-3 text-xs sm:text-sm font-medium uppercase tracking-wider whitespace-nowrap transition-all border ${
@@ -1269,17 +1465,18 @@ export default function GameGuide() {
             ========================================================= */}
         {activeTab === 'overview' && (
           <div className="space-y-8 animate-fadeIn">
+            <div id="overview-welcome" className="scroll-mt-24">
             <CodexBox 
-              title="Welcome to Project Bizarre"
+              title="Revolutionizing Combat: Welcome"
               badge="SYSTEM MANUAL"
               accentColor="border-l-4 border-l-[#c3a35e] border-[#2a2418]"
             >
               <p className="text-sm sm:text-base text-[#c7c2b5] leading-relaxed mb-6">
-                 Project Bizarre is an action-driven fighting experience built around precision movement, frame-canceling, and Stand synergy. Whether you are engaging in high-stakes PvP duels or mastering world encounters, understanding the foundational mechanics is key to dominance.
+                 Beyond Bizarre is an action-driven fighting experience built around precision movement, frame-perfect timing, and use of your abilities. Whether you are engaging in high-stakes PvP duels or mastering world encounters, understanding the foundational mechanics is key to power!
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-[#1e1a12] pt-6">
                 <div className="p-3 bg-[#0d0c10] border border-[#1e1b24]">
-                  <div className="text-xs text-[#8a8578] uppercase">Genre</div>
+                  <div className="text-xs text-[#8a8578] uppercase">Combat Genre</div>
                   <div className="text-sm font-bold text-[#e6c278]">Action Fighter / RPG</div>
                 </div>
                 <div className="p-3 bg-[#0d0c10] border border-[#1e1b24]">
@@ -1292,11 +1489,13 @@ export default function GameGuide() {
                 </div>
               </div>
             </CodexBox>
+            </div>
 
             {/* Core Pillar Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               
               <div 
+                id="overview-pillar-combat"
                 onClick={() => { 
                   setActiveTab('core-mechanics'); 
                   setActiveSubTab('combat'); 
@@ -1304,23 +1503,24 @@ export default function GameGuide() {
                     document.getElementById('tab-navigation')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }, 50);
                 }}
-                className="cursor-pointer"
+                className="scroll-mt-24 cursor-pointer"
               >
                 <CodexBox 
                   title="Prioritized Offense" 
                   badge="COMBAT" 
-                  accentColor="border-[#2a2418] hover:border-[#c3a35e]"
+                  accentColor="border-[#2a2418] hover:border-[#e0281f]"
                 >
                   <div className="w-10 h-10 bg-[#14121a] border border-[#3d3322] flex items-center justify-center mb-4">
-                    <Swords className="w-5 h-5 text-[#e6c278]" />
+                    <Swords className="w-5 h-5 text-[#e0281f]" />
                   </div>
                   <p className="text-xs text-[#8a8578] leading-relaxed">
-                    Chain light strikes, heavy punishers, and special moves with tight timing windows. Utilize cancel tech to extend strings or stay safe on block.
+                    Light strikes, heavy attacks, and special defensive and offensive moves with tight timing windows. Utilize cancel tech to extend strings or stay safe on block and dominate foes.
                   </p>
                 </CodexBox>
               </div>
 
               <div 
+                id="overview-pillar-mobility"
                 onClick={() => { 
                   setActiveTab('core-mechanics'); 
                   setActiveSubTab('mobility');
@@ -1328,23 +1528,24 @@ export default function GameGuide() {
                     document.getElementById('tab-navigation')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }, 50);
                 }}
-                className="cursor-pointer"
+                className="scroll-mt-24 cursor-pointer"
               >
                 <CodexBox 
                   title="Dynamic Movement" 
                   badge="MOBILITY" 
-                  accentColor="border-[#2a2418] hover:border-[#c3a35e]"
+                  accentColor="border-[#2a2418] hover:border-[#3879fc]"
                 >
                   <div className="w-10 h-10 bg-[#14121a] border border-[#3d3322] flex items-center justify-center mb-4">
-                    <Activity className="w-5 h-5 text-[#e6c278]" />
+                    <Activity className="w-5 h-5 text-[#3879fc]" />
                   </div>
                   <p className="text-xs text-[#8a8578] leading-relaxed">
-                    Master perfect parries, directional dashes, and stand-blocking to turn defensive moments into punishing counter-offensives.
+                    Master movement, directional dashes, parkour, jumps and special moves to show off your agility and speed to traverse not just around the world, but the battlefeild too.
                   </p>
                 </CodexBox>
               </div>
 
               <div 
+                id="overview-pillar-stands"
                 onClick={() => { 
                   setActiveTab('core-mechanics'); 
                   setActiveSubTab('stand-combat'); 
@@ -1352,18 +1553,18 @@ export default function GameGuide() {
                     document.getElementById('tab-navigation')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                   }, 50);
                 }}
-                className="cursor-pointer"
+                className="scroll-mt-24 cursor-pointer"
               >
                 <CodexBox 
-                  title="Stand Combat Improvements" 
+                  title="Stand Abilities" 
                   badge="STANDS" 
-                  accentColor="border-[#2a2418] hover:border-[#c3a35e]"
+                  accentColor="border-[#2a2418] hover:border-[#b367fa]"
                 >
                   <div className="w-10 h-10 bg-[#14121a] border border-[#3d3322] flex items-center justify-center mb-4">
-                    <Sparkles className="w-5 h-5 text-[#e6c278]" />
+                    <Sparkles className="w-5 h-5 text-[#b367fa]" />
                   </div>
                   <p className="text-xs text-[#8a8578] leading-relaxed">
-                    Summon unique spectral Stand entities to fight alongside you, providing specialized barrage attacks, range extensions, and tactical buffs.
+                    Manifest your stand ability, giving you access to a new moves and abilities that make you feel powerful, agile, and give access to supernatural abilities!
                   </p>
                 </CodexBox>
               </div>
@@ -1373,1069 +1574,1032 @@ export default function GameGuide() {
         )}
 
         {/* =========================================================
-            TAB 2: CORE MECHANICS 
-            ========================================================= */}
-        {activeTab === 'core-mechanics' && (
-          <>
-            {/* CORE MECHANICS SUB-TABS */}
-            <nav className="max-w-6xl mx-auto mb-16 flex flex-col md:flex-row justify-center gap-6">
-  
-            {/* Combat */}
-            <FadeScaleIn className="w-full md:w-1/3" delay={100}>
-                <button
-                onClick={() => setActiveSubTab('combat')}
-                className={`relative group overflow-hidden rounded-sm border transition-all duration-500 w-full h-20 md:h-16 shadow-lg bg-gradient-to-br from-[#121116] to-[#070709] ${
-                    activeSubTab === 'combat'
-                    ? 'border-[#c3a35e] shadow-[0_0_25px_rgba(195,163,94,0.35)] -translate-y-1'
-                    : 'border-[#2a2418] hover:border-[#615c52] hover:-translate-y-0.5'
-                }`}
-                >
-                <ScrollBackground className="bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:12px_12px]" activeOpacity="opacity-10" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-black/40 to-transparent flex items-center justify-center p-4">
-                    <span className={`flex items-center gap-3 font-['Cormorant_Upright',serif] text-xl md:text-2xl font-bold uppercase tracking-widest whitespace-nowrap transition-colors duration-300 ${
-                    activeSubTab === 'combat' 
-                        ? 'text-[#e6c278] drop-shadow-[0_0_12px_rgba(230,194,120,0.9)]' 
-                        : 'text-[#8a857a] group-hover:text-[#e0ded8]'
-                    }`}>
-                    <Swords className="w-5 h-5 md:w-6 md:h-6" />
-                    <span>Combat</span>
-                    <Swords className="w-5 h-5 md:w-6 md:h-6" />
-                    </span>
-                </div>
-                </button>
-            </FadeScaleIn>
-
-            {/* Mobility */}
-            <FadeScaleIn className="w-full md:w-1/3" delay={200}>
-                <button
-                onClick={() => setActiveSubTab('mobility')}
-                className={`relative group overflow-hidden rounded-sm border transition-all duration-500 w-full h-20 md:h-16 shadow-lg bg-gradient-to-br from-[#121116] to-[#070709] ${
-                    activeSubTab === 'mobility'
-                    ? 'border-[#c3a35e] shadow-[0_0_25px_rgba(195,163,94,0.35)] -translate-y-1'
-                    : 'border-[#2a2418] hover:border-[#615c52] hover:-translate-y-0.5'
-                }`}
-                >
-                <ScrollBackground className="bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:12px_12px]" activeOpacity="opacity-10" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-black/40 to-transparent flex items-center justify-center p-4">
-                    <span className={`flex items-center gap-3 font-['Cormorant_Upright',serif] text-xl md:text-2xl font-bold uppercase tracking-widest transition-colors duration-300 ${
-                    activeSubTab === 'mobility' 
-                        ? 'text-[#e6c278] drop-shadow-[0_0_12px_rgba(230,194,120,0.9)]' 
-                        : 'text-[#8a857a] group-hover:text-[#e0ded8]'
-                    }`}>
-                    <Activity className="w-5 h-5 md:w-6 md:h-6" />
-                    <span>Mobility</span>
-                    <Activity className="w-5 h-5 md:w-6 md:h-6" />
-                    </span>
-                </div>
-                </button>
-            </FadeScaleIn>
-
-            {/* Stand Combat */}
-            <FadeScaleIn className="w-full md:w-1/3" delay={300}>
-                <button
-                onClick={() => setActiveSubTab('stand-combat')}
-                className={`relative group overflow-hidden rounded-sm border transition-all duration-500 w-full h-20 md:h-16 shadow-lg bg-gradient-to-br from-[#16111f] to-[#070709] ${
-                    activeSubTab === 'stand-combat'
-                    ? 'border-[#c3a35e] shadow-[0_0_25px_rgba(195,163,94,0.35)] -translate-y-1'
-                    : 'border-[#2a2418] hover:border-[#615c52] hover:-translate-y-0.5'
-                }`}
-                >
-                <ScrollBackground className="bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:12px_12px]" activeOpacity="opacity-15" />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-black/60 to-[#120a1f]/30 flex items-center justify-center p-4 z-20">
-                    <span className={`flex items-center gap-3 font-['Cormorant_Upright',serif] text-xl md:text-2xl font-bold uppercase tracking-widest transition-colors duration-300 ${
-                    activeSubTab === 'stand-combat' 
-                        ? 'text-[#e6c278] drop-shadow-[0_0_12px_rgba(230,194,120,0.9)]' 
-                        : 'text-[#8a857a] group-hover:text-[#e0ded8]'
-                    }`}>
-                    <Sparkles className="w-5 h-5 md:w-6 md:h-6" />
-                    <span>Stand Combat</span>
-                    <Sparkles className="w-5 h-5 md:w-6 md:h-6" />
-                    </span>
-                </div>
-                </button>
-            </FadeScaleIn>
-
-            </nav>
-
-            {/* COMBAT SUBTAB CONTENT */}
-            {activeSubTab === 'combat' && (
-              <section className="space-y-12">
-                <CodexBox 
-                  title="Mind Over Matter"
-                  badge="COMBAT OVERVIEW"
-                  accentColor="border-l-4 border-l-[#c3a35e] border-[#2a2418]"
-                >
-                  <p className="text-[#c7c2b5] leading-relaxed text-lg md:text-xl">
-                    <TypewriterText text="In this game, you have to utilize a series of Skill, Strategy and Style to overcome opponents, so make sure you know exactly how to utilize and take advantage of your strengths and defend your weak points to become a master at combat. The base combat was designed to help new players learn the semi-complex nature of the games combat, and experienced players to compliment their combos. As stated before, you are rewarded for Precision, not mindless Pressure, Style, not Spam, and Skills, not Slop." delay={200} />
-                  </p>
-                </CodexBox>
-
-                <div>
-                  <FadeScaleIn delay={100}>
-                    <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase mb-6 border-b border-[#2a2418] pb-3">
-                      Core Combat Pillars
-                    </h3>
-                  </FadeScaleIn>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <CodexBox title="1. Precision & Raw Power" badge="OFFENSE">
-                      <p className="text-base text-[#9a9488] leading-relaxed">
-                        <TypewriterText text="Victory is dictated by calculated decision-making rather than stat checks. Every swing has weight, giving your strikes and moves untold power." delay={200} />
-                      </p>
-                    </CodexBox>
-                    <CodexBox title="2. Momentum & Combat Style" badge="MOVEMENT">
-                      <p className="text-base text-[#9a9488] leading-relaxed">
-                        <TypewriterText text="Custom combo creativity and fluid movement branching build Heat, empowering your Stand abilities and triggering high-damage Overdrive combat states." delay={300} />
-                      </p>
-                    </CodexBox>
-                    <CodexBox title="3. Endurance & Adaptability" badge="DEFENSE">
-                      <p className="text-base text-[#9a9488] leading-relaxed">
-                        <TypewriterText text="A suite of active defensive options—Parries, Evasive Dodges, and Tech Recoveries—ensures no single offensive meta or infinite string can ever dominate a fight." delay={400} />
-                      </p>
-                    </CodexBox>
-                  </div>
-                </div>
-
-                <div className="space-y-10">
-                  <FadeScaleIn delay={100}>
-                    <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">
-                      Universal Offense Framework
-                    </h3>
-                  </FadeScaleIn>
-
-                  <CodexBox title="1. Light Strike (LMB / M1)" badge="BASIC OFFENSE">
-                    <p className="text-base md:text-lg text-[#c7c2b5] leading-relaxed mb-6">
-                      <TypewriterText text="Light Strikes form the backbone of neutral interactions, pressure strings, and combo extension. They are designed to feel swift, smooth yet simple, enforcing movement decay to eliminate infinite run-and-strike spamming." delay={200} />
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-base my-4">
-                      <CodexBox title="5-Hit Base String">
-                        <p className="text-sm text-[#c7c2b5]"><TypewriterText text="Fluid strike sequence featuring bespoke martial animations for every active Stand, Weapon, or Fighting Style archetype. The 5th strike deals +50% bonus damage and delivers a 35-stud knockback, resetting neutral." /></p>
-                      </CodexBox>
-                      <CodexBox title="Pacing & Velocity Decay">
-                        <p className="text-sm text-[#c7c2b5]"><TypewriterText text="Each M1 swing moves you slightly forward, additionally, with your aerial M1's and your slowed momentum during M1's, this eliminates the classic bunny-hop most Jojo games feature and enforces spacing discipline and correct timing." /></p>
-                      </CodexBox>
-                      <CodexBox title="Hitstun Decay Curve">
-                        <p className="text-sm text-[#c7c2b5]"><TypewriterText text="Base hitstun reduces by 5% on each subsequent connection within a single combo string, preventing inescapable infinite loops and annoying M1 resets." /></p>
-                      </CodexBox>
-                      <CodexBox title="Non-Stun Based Combat">
-                        <p className="text-sm text-[#c7c2b5]"><TypewriterText text="M1's are Semi-True, and with the hit-stun decay, your M1's are meant to be poking tools rather than main combo starters like in battleground games." /></p>
-                      </CodexBox>
-                    </div>
-
-                    <ul className="list-disc list-inside text-[#c7c2b5] text-base space-y-3 leading-relaxed my-6">
-                      <li><strong className="text-[#e6c278]">Uppercut M1 Branch:</strong> Hold <code className="bg-[#18161f] border border-[#3d3423] px-2 py-0.5 text-[#e6c278] font-mono text-sm">Space</code> during any M1 to launch both yourself and your target into an airborne state, putting your M1 on cooldown, regardless of the sequence.</li>
-                      <li><strong className="text-[#e6c278]">Aerial M1 Branch:</strong> While in the air, you can use M1's to juggle your opponents in the air, allowing for air combos, your falling is paused per M1 keeping you with your opponent manually instead of basic hovering.</li>
-                    </ul>
-
-                    <VideoPlate 
-                      title="Move Demonstration: 5-Hit Light Strike Chain & Aerial Variant"
-                      inputTag="LMB x5 / LMB x3 while airborne"
-                      badge="M1's"
-                      duration="0:14"
-                      description="Standard 5-hit M1 light string ending with a stronger strike at the 5th chain and its airborne variant."
-                      stats={[
-                        { label: "Damage Scale", value: "100% each | 150% final strike" },
-                        { label: "Hitstun Decay", value: "-5% per hit" },
-                        { label: "Knockback", value: "35 Studs" }
-                      ]}
-                      videoSrc="/video/test.mp4"
-                      posterSrc="UNIQUE VIDEO HERE"
-                    />
-
-                    <VideoPlate 
-                      title="Move Demonstration: Light Uppercut"
-                      inputTag="Airborne LMB (Post-Uppercut)"
-                      badge="COMBO EXTENSION"
-                      duration="0:09"
-                      description="Execute a launcher M1 by holding space with your M1, regardless of which sequence you were on."
-                      stats={[
-                        { label: "Damage Scale", value: "150%" },
-                        { label: "Launch Height", value: "30 Studs" }
-                      ]}
-                      videoSrc="UNIQUE VIDEO HERE"
-                      posterSrc="UNIQUE VIDEO HERE"
-                    />
-                  </CodexBox>
-
-                  <CodexBox title="2. Heavy Strike (MMB / M2)" badge="HEAVY SYSTEM">
-                    <div className="mb-6">
-                      <span className="inline-block text-xs font-['Cormorant_Upright',serif] text-[#e6c278] tracking-widest uppercase font-bold bg-[#14121a] px-4 py-2 border border-[#2a2418] mb-4">
-                        Cost: 15 Heat | Cooldown: 5.0 Seconds
-                      </span>
-                      <p className="text-base md:text-lg text-[#c7c2b5] leading-relaxed">
-                        <TypewriterText text="Heavy Strikes, or M2's, are meant to be the most versatile move in your kit. For stand off or specs, this move acts as a heavy punch that knocks away people slightly into the air with soft ragdoll. This also does twice your M1 damage and you slightly move forward. However, it will act as a special move that works with the stand's kit, whether it be a grab, counter, stun move, or combo ender of the sorts. Stands, however, have a specialized M2. Use the interactive switcher below to preview all variations:" delay={200} />
-                      </p>
-                    </div>
-                    <DynamicVideoPlate 
-                      title="Heavy Strike (M2) Tactical Variations"
-                      options={heavyStrikeOptions}
-                      defaultOptionId="basic"
-                      sectionBadge="SELECT M2 VARIANT"
-                    />
-                  </CodexBox>
-                </div>
-
-                <div className="space-y-8">
-                  <FadeScaleIn delay={100}>
-                    <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">
-                      Guard (F)
-                    </h3>
-                  </FadeScaleIn>
-                  <CodexBox title="Defensive Stance Framework" badge="DEFENSIVE SYSTEM">
-                    <p className="text-base md:text-lg text-[#c7c2b5] leading-relaxed mb-6">
-                      <TypewriterText text="Your Guard/Block system is your main defense tool that puts the user in a defensive stance. In this state they cannot move, but are impervious to many attacks. However, users must be smart when using this as there are viable counters and ways for opponents to use your blocking stance to their advantage. It is a quite simple mechanic once you get the gist of it." delay={200} />
-                    </p>
-
-                    <div className="space-y-4 border-t border-[#2a2418] pt-6 my-6">
-                      <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">Guard Endurance</h4>
-                      <p className="text-base text-[#c7c2b5]"><TypewriterText text="The guard endurance is simple, you have a bar that is used to see your guard endurance's health. This automatically recharges while you are outside of your guard stance." /></p>
-                      <ul className="list-disc list-inside space-y-2 text-base text-[#c7c2b5]">
-                        <li>Blocking attacks will 'wear down' that endurance bar, and upon complete depletion you are <strong className="text-[#e6c278]">Guard Broken</strong>.</li>
-                        <li>Blocking without receiving any attacks after 4 seconds will cause that bar to slowly deplete with <strong className="text-[#e6c278]">Guard Decay</strong>.</li>
-                        <li>Upon using moves such as <strong className="text-[#e6c278]">Perfect Guard</strong>, <strong className="text-[#e6c278]">Reflective Guard</strong> and <strong className="text-[#e6c278]">Evasive Guard</strong> you can recharge the bar.</li>
-                      </ul>
-                      <p className="text-base text-[#c7c2b5]">
-                        <TypewriterText text="Should your block bar be full, it can overlap, storing as a golden charged bar. Once filled, this can be used as extra guard points as well, however this is used for something even greater!" />
-                      </p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-base">
-                        <CodexBox title="(BREAK) Guard Break">
-                          <p className="text-sm text-[#c7c2b5]"><TypewriterText text="The result of your guard bar depleting after either defending a move too strong for your defense, or defending more moves than you can endure. Stun time: 2.5 – 3s. Places offender in Perception Zone." /></p>
-                        </CodexBox>
-                        <CodexBox title="(DECAY) Guard Decay">
-                          <p className="text-sm text-[#c7c2b5]"><TypewriterText text="The result of staying in blocking stance for too long without incoming attacks, over-decaying the bar. Stun time: 1.5 – 2s." /></p>
-                        </CodexBox>
-                      </div>
-                      <VideoPlate 
-                        title="Defensive Demonstration: Guard Break & Guard Decay"
-                        inputTag="Hold F Key"
-                        badge="GUARD DEMO"
-                        duration="0:14"
-                        description="Visual reference demonstrating Guard Break stun state (2.5-3s) and Guard Decay over-holding penalty (1.5-2s)."
-                        stats={[
-                          { label: "Break Stun", value: "2.5 - 3.0s" },
-                          { label: "Decay Stun", value: "1.5 - 2.0s" },
-                          { label: "Decay Delay", value: "4.0 Seconds" }
-                        ]}
-                        videoSrc="UNIQUE VIDEO HERE"
-                        posterSrc="UNIQUE VIDEO HERE"
-                      />
-                    </div>
-
-                    <div className="space-y-4 border-t border-[#2a2418] pt-6 my-6">
-                      <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">Perfect Guard / Parry</h4>
-                      <p className="text-base text-[#c7c2b5]"><TypewriterText text="Performed up to 0.2s before a parriable attack. Perfect Guards reward a player by stunning the victim in a state known as Perception Zone. This stun lasts 3 seconds, allowing you to freely attack your enemy. Perfect Guards also push the player back while the enemy stays in place." delay={100} /></p>
-                      <p className="text-base text-[#c7c2b5]"><TypewriterText text="There are 2 types of parries: Light Parries and Heavy Parries. Light Parries push you back a little, whereas heavy parries push you back a lot while giving more stun in return." delay={100} /></p>
-                      <VideoPlate 
-                        title="Defensive Demonstration: Perfect Guard / Parry"
-                        inputTag="Timed F Key"
-                        badge="PARRY DEMO"
-                        duration="0:16"
-                        description="Frame-perfect parry execution putting attacker into Perception Zone for 3 seconds."
-                        stats={[
-                          { label: "Parry Window", value: "0.20 Seconds" },
-                          { label: "Perception Zone", value: "3.0 Seconds" },
-                          { label: "Types", value: "Light & Heavy" }
-                        ]}
-                        videoSrc="UNIQUE VIDEO HERE"
-                        posterSrc="UNIQUE VIDEO HERE"
-                      />
-                    </div>
-
-                    <div className="space-y-4 border-t border-[#2a2418] pt-6 my-6">
-                      <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">Evasive Guard / Dodge</h4>
-                      <p className="text-base text-[#c7c2b5]"><TypewriterText text="Performed by side dashing while using guard. Perfect for evading attacks without wasting block points, giving time to counter. Doesn't stun enemy, but punishes end lag. Casting outside zone puts dash on 5s CD and deducts 50 guard points. If missed below 2.5% hp explode into a fine red mist." delay={100} /></p>
-                      <VideoPlate 
-                        title="Defensive Demonstration: Evasive Guard / Dodge"
-                        inputTag="Guard + Side Dash"
-                        badge="DODGE DEMO"
-                        duration="0:12"
-                        description="Side-dashing while guarding to evade incoming moves without losing guard points."
-                        stats={[
-                          { label: "Miss Cooldown", value: "5.0 Seconds" },
-                          { label: "Miss Cost", value: "50 Guard Pts" },
-                          { label: "Low HP Penalty", value: "Explosion (<2.5%)" }
-                        ]}
-                        videoSrc="UNIQUE VIDEO HERE"
-                        posterSrc="UNIQUE VIDEO HERE"
-                      />
-                    </div>
-
-                    <div className="space-y-4 border-t border-[#2a2418] pt-6 my-6">
-                      <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">Reflective Guard / Reflect</h4>
-                      <p className="text-base text-[#c7c2b5]"><TypewriterText text="Performed up to 0.3s before a reflectable attack. Reflect works only on projectiles. Unlike perfect parries, it doesn't push the user back, but allows defense against ranged attacks. Reflection speed depends on attack strength, HP, and Block Bar." delay={100} /></p>
-                      <VideoPlate 
-                        title="Defensive Demonstration: Reflective Guard / Reflect"
-                        inputTag="Timed F (vs Projectile)"
-                        badge="REFLECT DEMO"
-                        duration="0:13"
-                        description="Reflecting incoming projectiles with precise timing up to 0.3s before impact."
-                        stats={[
-                          { label: "Reflect Window", value: "0.30 Seconds" },
-                          { label: "Target", value: "Projectiles" },
-                          { label: "Style", value: "Sonic Sway" }
-                        ]}
-                        videoSrc="UNIQUE VIDEO HERE"
-                        posterSrc="UNIQUE VIDEO HERE"
-                      />
-                    </div>
-
-                    <div className="space-y-4 border-t border-[#2a2418] pt-6 my-6">
-                      <h4 className="text-2xl font-['Gilda_Display',serif] text-[#f21616]">Critical Arts / Critical Strike</h4>
-                      <p className="text-base text-[#c7c2b5]"><TypewriterText text="Critical Arts are activated by using any M1 or any M2 variant while in Perception Zone with a fully supercharged guard bar." delay={100} /></p>
-                      <p className="text-base text-[#c7c2b5]"><TypewriterText text="Casting initiates a Quick Time Bar where you must hit the casted keybind again. The closer to center, the more powerful the art. Hitting the thin blue inner zone triggers a MAXIMUM CRITICAL STRIKE for immense damage!" delay={150} /></p>
-                      <ul className="list-disc list-inside space-y-2 text-base text-[#c7c2b5] my-4">
-                        <li>★ M1 leaves opponent stunned; M2 deals Grand Knockback. Additionally, <strong className="text-[#f21616]">[Any M1 or M2 variant (Excluding Flash Rush)]</strong> can be used.</li>
-                        <li>★ Block bar is fully depleted upon use.</li>
-                        <li>★ Places user in <strong className="text-[#1e5eff]">[Overdrive]</strong> state.</li>
-                        <li>★ Damage buff scales directly with <strong className="text-[#fdee4a]">WILL</strong> stat.</li>
-                        <li>★ Applies debuffs to the victim.</li>
-                      </ul>
-                      <DynamicVideoPlate 
-                        title="Critical Art Execution Variants"
-                        options={criticalArtOptions}
-                        defaultOptionId="m1-max"
-                        sectionBadge="SELECT ART VARIANT"
-                        variantTheme="red"
-                      />
-                    </div>
-
-                    <div className="space-y-6 border-t border-[#2a2418] pt-6 my-6">
-                      <FadeScaleIn delay={100}>
-                        <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">Combat Add-Ons</h3>
-                      </FadeScaleIn>
-                      <CodexBox title="Combat Tag System" badge="SYSTEM TAG">
-                        <p className="text-base text-[#c7c2b5] leading-relaxed mb-3"><TypewriterText text="Fighting places a tag restricting features like wall running, climbing, NPC interaction, and fast travel." /></p>
-                        <ul className="list-disc list-inside space-y-2 text-sm text-[#a09a8e] leading-relaxed">
-                          <li>Disabled by defeating opponent, dying, or 30 seconds out of combat.</li>
-                          <li>Only landing and receiving damage triggers tag (casting moves alone does not).</li>
-                          <li>Combat logging/resetting applies <strong className="text-[#e6c278]">combat LOCK</strong> (1 min fight lockout + highlight).</li>
-                          <li>Includes a <strong className="text-[#e6c278]">Combat Apology</strong> pop-up to clear tag after accidental hits.</li>
-                        </ul>
-                        <VideoPlate 
-                          title="System Demonstration: Combat Apology Pop-Up"
-                          inputTag="Contextual Pop-Up"
-                          badge="COMBAT TAG"
-                          duration="0:08"
-                          description="Pop-up prompt allowing players to apologize after an accidental hit to immediately exit combat state."
-                          stats={[
-                            { label: "Tag Duration", value: "30 Seconds" },
-                            { label: "Log Penalty", value: "1 Min Lockout" }
-                          ]}
-                          videoSrc="UNIQUE VIDEO HERE"
-                          posterSrc="UNIQUE VIDEO HERE"
-                        />
-                      </CodexBox>
-
-                      <CodexBox title="Burst (Combo Breaker / Anti Team)" badge="COMBO BREAKER">
-                        <div className="mb-3">
-                          <span className="text-xs font-mono text-[#e6c278] bg-[#14121a] px-3 py-1 border border-[#2a2418]">
-                            Cost: 15 Heat [M1] / 15 HP [M2]
-                          </span>
+                    TAB 2: CORE MECHANICS 
+                    ========================================================= */}
+                {activeTab === 'core-mechanics' && (
+                  <>
+                    {/* CORE MECHANICS SUB-TABS */}
+                    <nav className="max-w-6xl mx-auto mb-16 flex flex-col md:flex-row justify-center gap-6">
+          
+                    {/* Combat */}
+                    <FadeScaleIn className="w-full md:w-1/3" delay={100}>
+                        <button
+                        onClick={() => setActiveSubTab('combat')}
+                        className={`relative group overflow-hidden rounded-sm border transition-all duration-500 w-full h-20 md:h-16 shadow-lg bg-gradient-to-br from-[#121116] to-[#070709] ${
+                            activeSubTab === 'combat'
+                            ? 'border-[#c3a35e] shadow-[0_0_25px_rgba(195,163,94,0.35)] -translate-y-1'
+                            : 'border-[#2a2418] hover:border-[#615c52] hover:-translate-y-0.5'
+                        }`}
+                        >
+                        <ScrollBackground className="bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:12px_12px]" activeOpacity="opacity-10" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-black/40 to-transparent flex items-center justify-center p-4">
+                            <span className={`flex items-center gap-3 font-['Cormorant_Upright',serif] text-xl md:text-2xl font-bold uppercase tracking-widest whitespace-nowrap transition-colors duration-300 ${
+                            activeSubTab === 'combat' 
+                                ? 'text-[#e6c278] drop-shadow-[0_0_12px_rgba(230,194,120,0.9)]' 
+                                : 'text-[#8a857a] group-hover:text-[#e0ded8]'
+                            }`}>
+                            <Swords className="w-5 h-5 md:w-6 md:h-6" />
+                            <span>Combat</span>
+                            <Swords className="w-5 h-5 md:w-6 md:h-6" />
+                            </span>
                         </div>
-                        <p className="text-base text-[#c7c2b5] leading-relaxed mb-3">
-                          <TypewriterText text="Holding M1 or M2 while stunned releases a blast of energy blasting nearby enemies away. Features True Block Bypass, True Stun, and Hyper Armor/Counter Bypass. Stuns for 1.0s and scales damage with current combo length." />
-                        </p>
-                        <VideoPlate 
-                          title="System Demonstration: Stand/Spec Combo Breaker Burst"
-                          inputTag="Hold M1 / M2 during Stun"
-                          badge="COMBO BREAKER"
-                          duration="0:11"
-                          description="Executing a Burst while stunned to blast surrounding enemies away with True Block Bypass and 1.0s AOE stun."
-                          stats={[
-                            { label: "AOE Stun", value: "1.0 Second" },
-                            { label: "Properties", value: "True Bypass" },
-                            { label: "Scaling", value: "Combo Length" }
-                          ]}
-                          videoSrc="UNIQUE VIDEO HERE"
-                          posterSrc="UNIQUE VIDEO HERE"
-                        />
-                      </CodexBox>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <CodexBox title="Finishers" badge="Executions">
-                          <p className="text-sm text-[#c7c2b5] leading-relaxed"><TypewriterText text="Gained upon unlocking a new move, finishers offer a style grade bump, heat and more depending on the finisher. Most knockback moves feature universal finishers sending victims flying further. Finishers can also be disabled in the respective move's Move Tab." /></p>
+                        </button>
+                    </FadeScaleIn>
+        
+                    {/* Mobility */}
+                    <FadeScaleIn className="w-full md:w-1/3" delay={200}>
+                        <button
+                        onClick={() => setActiveSubTab('mobility')}
+                        className={`relative group overflow-hidden rounded-sm border transition-all duration-500 w-full h-20 md:h-16 shadow-lg bg-gradient-to-br from-[#121116] to-[#070709] ${
+                            activeSubTab === 'mobility'
+                            ? 'border-[#c3a35e] shadow-[0_0_25px_rgba(195,163,94,0.35)] -translate-y-1'
+                            : 'border-[#2a2418] hover:border-[#615c52] hover:-translate-y-0.5'
+                        }`}
+                        >
+                        <ScrollBackground className="bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:12px_12px]" activeOpacity="opacity-10" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-black/40 to-transparent flex items-center justify-center p-4">
+                            <span className={`flex items-center gap-3 font-['Cormorant_Upright',serif] text-xl md:text-2xl font-bold uppercase tracking-widest transition-colors duration-300 ${
+                            activeSubTab === 'mobility' 
+                                ? 'text-[#e6c278] drop-shadow-[0_0_12px_rgba(230,194,120,0.9)]' 
+                                : 'text-[#8a857a] group-hover:text-[#e0ded8]'
+                            }`}>
+                            <Activity className="w-5 h-5 md:w-6 md:h-6" />
+                            <span>Mobility</span>
+                            <Activity className="w-5 h-5 md:w-6 md:h-6" />
+                            </span>
+                        </div>
+                        </button>
+                    </FadeScaleIn>
+        
+                    {/* Stand Combat */}
+                    <FadeScaleIn className="w-full md:w-1/3" delay={300}>
+                        <button
+                        onClick={() => setActiveSubTab('stand-combat')}
+                        className={`relative group overflow-hidden rounded-sm border transition-all duration-500 w-full h-20 md:h-16 shadow-lg bg-gradient-to-br from-[#16111f] to-[#070709] ${
+                            activeSubTab === 'stand-combat'
+                            ? 'border-[#c3a35e] shadow-[0_0_25px_rgba(195,163,94,0.35)] -translate-y-1'
+                            : 'border-[#2a2418] hover:border-[#615c52] hover:-translate-y-0.5'
+                        }`}
+                        >
+                        <ScrollBackground className="bg-[radial-gradient(#c3a35e_1px,transparent_1px)] [background-size:12px_12px]" activeOpacity="opacity-15" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-black/60 to-[#120a1f]/30 flex items-center justify-center p-4 z-20">
+                            <span className={`flex items-center gap-3 font-['Cormorant_Upright',serif] text-xl md:text-2xl font-bold uppercase tracking-widest transition-colors duration-300 ${
+                            activeSubTab === 'stand-combat' 
+                                ? 'text-[#e6c278] drop-shadow-[0_0_12px_rgba(230,194,120,0.9)]' 
+                                : 'text-[#8a857a] group-hover:text-[#e0ded8]'
+                            }`}>
+                            <Sparkles className="w-5 h-5 md:w-6 md:h-6" />
+                            <span>Stand Combat</span>
+                            <Sparkles className="w-5 h-5 md:w-6 md:h-6" />
+                            </span>
+                        </div>
+                        </button>
+                    </FadeScaleIn>
+        
+                    </nav>
+        
+                    {/* COMBAT SUBTAB CONTENT */}
+                    {activeSubTab === 'combat' && (
+                      <section className="scroll-mt-24 space-y-12" id="prioritized-offense">
+                        <CodexBox 
+                          title="Mind Over Matter"
+                          badge="COMBAT OVERVIEW"
+                          accentColor="border-l-4 border-l-[#c3a35e] border-[#2a2418]"
+                        >
+                          <p className="text-[#c7c2b5] leading-relaxed text-lg md:text-xl">
+                            <TypewriterText text="In this game, you have to utilize a series of Skill, Strategy and Style to overcome opponents, so make sure you know exactly how to utilize and take advantage of your strengths and defend your weak points to become a master at combat. The base combat was designed to help new players learn the semi-complex nature of the games combat, and experienced players to compliment their combos. As stated before, you are rewarded for Precision, not mindless Pressure, Style, not Spam, and Skills, not Slop." delay={200} />
+                          </p>
                         </CodexBox>
-                        <CodexBox title="Combo Scaling" badge="COMBO BALANCING">
-                          <p className="text-sm text-[#c7c2b5] leading-relaxed"><TypewriterText text="Longer combos reduce damage output. Moves retain 100% strength up to D Style Rank, then lose 5% damage per subsequent tier. This allows for players in any combo a better chance at survival rather than being completely overwhelmed with damage. This feature is disabled for Boss Fights, Supers and Ultimates." /></p>
-                        </CodexBox>
-                        <CodexBox title="Buff / De-Buffs Tier Scaling" badge="BALANCING">
-                          <p className="text-sm text-[#c7c2b5] leading-relaxed"><TypewriterText text="Each buff/de-buff you receive has different tiers, the higher the tier, the less effective the buff/de-buff, this balances buff/de-buff stacking as it can lead to unwanted circumstances such as basic M1's doing 100 damage or a basic M1 insta killing you because of de-buffs. This works on Stat Buffs/De-buffs, Passive Buffs/De-Buffs, Skill Buffs/De-Buffs & Awakening Buffs/De-buffs." /></p>
-                        </CodexBox>
-                        <CodexBox title="Pose" badge="MECHANIC">
-                          <p className="text-sm text-[#c7c2b5] leading-relaxed"><TypewriterText text="Using your P key after any ragdolling move allows you to do a quick pose similar to All Star Battle/R. This resets your Style Rank countdown back to full and rewards you with 15 heat. In the pose, you and your opponent watch the short cutscene and then go back to normal. However, you can be interrupted and this does have a short 0.25s window after the move to be done." /></p>
-                        </CodexBox>
-                        <CodexBox title="Taunt / Aura Farm" badge="MECHANIC">
-                          <p className="text-sm text-[#c7c2b5] leading-relaxed"><TypewriterText text="Using your P key DURING a move (must be hitting an opponent) allows you to do a quick Aura Farm/ Taunt during the move (especially useful with Stands). This rewards you with Heat and boosts your Style meter. However be careful as this can give an opening to opponents since you're vulnerable during the animation, and getting hit while aurafarming deducts from your Style Bar." /></p>
-                        </CodexBox>
-                        <CodexBox title="Weapon Switch" badge="TOOL SWITCHER">
-                          <p className="text-sm text-[#c7c2b5] leading-relaxed"><TypewriterText text="Referenced from the Devil May Cry series, using your Middle Mouse Scroll (MMB Scroll), you can freely switch between any weapon you have equipped in your inventory, however you do slow down for a second to equip it (some abilities may assist this/shorten this). This is perfect for keeping combos fresh and your Style Bar pumping!" /></p>
-                        </CodexBox>
-                      </div>
-
-                      <VideoPlate 
-                        title="System Demonstration: Pose, Aurafarm, Weapon Switcher"
-                        inputTag="P | MMB"
-                        badge="TAUNT/TOOL SYSTEM"
-                        duration="0:25"
-                        description="Demonstrating Pose and Aurafarming system to Taunt enemies for style, and Weapon switch system to utilize multiple weapons in combat."
-                        stats={[
-                          { label: "Pose", value: "After Ragdoll" },
-                          { label: "Aura Farm", value: "During Move Casting" },
-                          { label: "Weapon Switch", value: "Scroll with MMB"}
-                        ]}
-                        videoSrc="UNIQUE VIDEO HERE"
-                        posterSrc="UNIQUE VIDEO HERE"
-                      />
-
-                      <CodexBox title="Targeting & Sense Mechanics" badge="TARGETING">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
-                          <div className="p-3 bg-[#0a0a0d] border border-[#1a1820]">
-                            <strong className="text-[#e6c278] block font-['Gilda_Display',serif] text-base mb-1">Target Mark [L]</strong>
-                            Locks onto opponent without facing them, granting auto-aim to projectiles.
-                          </div>
-                          <div className="p-3 bg-[#0a0a0d] border border-[#1a1820]">
-                            <strong className="text-[#e6c278] block font-['Gilda_Display',serif] text-base mb-1">Spiritual Sight [Hold L]</strong>
-                            Reveals inner Will Power auras, sensing stands and Burst users through obstacles.
-                          </div>
-                          <div className="p-3 bg-[#0a0a0d] border border-[#1a1820]">
-                            <strong className="text-[#e6c278] block font-['Gilda_Display',serif] text-base mb-1">Target Re-Lock [Mark + Hold L]</strong>
-                            Re-focuses opponent positions similar to a lock on, ignoring buildings and obstacles with a distance limit based on stat upgrades.
+        
+                        <div>
+                          <FadeScaleIn delay={100}>
+                            <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase mb-6 border-b border-[#2a2418] pb-3">
+                              Core Combat Pillars
+                            </h3>
+                          </FadeScaleIn>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <CodexBox title="1. Precision & Raw Power" badge="OFFENSE">
+                              <p className="text-base text-[#9a9488] leading-relaxed">
+                                <TypewriterText text="Victory is dictated by calculated decision-making rather than stat checks. Every swing has weight, giving your strikes and moves untold power." delay={200} />
+                              </p>
+                            </CodexBox>
+                            <CodexBox title="2. Momentum & Combat Style" badge="MOVEMENT">
+                              <p className="text-base text-[#9a9488] leading-relaxed">
+                                <TypewriterText text="Custom combo creativity and fluid movement branching build Heat, empowering your Stand abilities and triggering high-damage Overdrive combat states." delay={300} />
+                              </p>
+                            </CodexBox>
+                            <CodexBox title="3. Endurance & Adaptability" badge="DEFENSE">
+                              <p className="text-base text-[#9a9488] leading-relaxed">
+                                <TypewriterText text="A suite of active defensive options—Parries, Evasive Dodges, and Tech Recoveries—ensures no single offensive meta or infinite string can ever dominate a fight." delay={400} />
+                              </p>
+                            </CodexBox>
                           </div>
                         </div>
-                        <VideoPlate 
-                          title="System Demonstration: Spiritual Sight, Target Mark & Target Re-Lock"
-                          inputTag="L | Hold L Key"
-                          badge="TARGET SYSTEM"
-                          duration="0:14"
-                          description="Demonstrating Spiritual Sight aura vision through obstacles and soft auto-aim targeting, and target relocating."
-                          stats={[
-                            { label: "Target Lock", value: "Soft Directional" },
-                            { label: "Obstacle Bypass", value: "Active" }
-                          ]}
-                          videoSrc="UNIQUE VIDEO HERE"
-                          posterSrc="UNIQUE VIDEO HERE"
-                        />
-                      </CodexBox>
-
-                      <CodexBox title="Joestar’s Will" badge="WILL POWER">
-                        <p className="text-base text-[#c7c2b5] leading-relaxed">
-                          Special mechanic scaling with <strong className="text-[#e6c278]">WILL</strong> stat. Equipping a <strong className="text-[#e6c278]">Joestar’s Mark</strong> grants specialized buffs (e.g. Dark Determination, Burning Passion). Activated via clicking MMB after a Critical Art while in <strong className="text-[#e6c278]">[Overdrive]</strong>.
-                        </p>
-                      </CodexBox>
-                    </div>
-
-                    <div className="space-y-6 border-t border-[#2a2418] pt-6 my-6">
-                      <FadeScaleIn delay={100}>
-                        <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">Gauge and Style Systems</h3>
-                      </FadeScaleIn>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-6">
-                        <CodexBox title="Health/Vitality Gauge">
-                          <p className="text-xs text-[#c7c2b5]"><TypewriterText text="Displays HP and remaining damage tolerance before defeat." delay={100}/></p>
-                        </CodexBox>
-                        <CodexBox title="Level / XP Gauge">
-                          <p className="text-xs text-[#c7c2b5]"><TypewriterText text="Tracks overall level and progress toward next node point." delay={150} /></p>
-                        </CodexBox>
-                        <CodexBox title="Heat Gauge (0 - 100)">
-                          <p className="text-xs text-[#c7c2b5]"><TypewriterText text="Divided into 20-point bars. Built via parries, dodges, combos, and low HP scaling." delay={200}/></p>
-                        </CodexBox>
-                      </div>
-
-                      <CodexBox title="Combo Style Ranks (DMC-Inspired)" badge="STYLE SYSTEM">
-                        <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
-                          <TypewriterText text="Built by attacking creatively. Repeating identical moves degrades rank. Inactivity decays rank, but taking damage pauses decay. High ranks reduce cooldowns and windup times!" delay={100} />
-                        </p>
-                        <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2 text-center text-xs font-mono">
-                          {styleRanks.map((item, idx) => (
-                            <div key={idx} className={`p-2.5 bg-[#0a0a0d] border ${item.color} transition-transform hover:scale-105`}>
-                              <span className="block text-sm font-bold mb-0.5">{item.rank}</span>
-                              <span className="text-[10px] block truncate">{item.title}</span>
+        
+                        <div className="space-y-10">
+                          <FadeScaleIn delay={100}>
+                            <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">
+                              Universal Offense Framework
+                            </h3>
+                          </FadeScaleIn>
+        
+                          <CodexBox title="1. Light Strike (LMB / M1)" badge="BASIC OFFENSE">
+                            <p className="text-base md:text-lg text-[#c7c2b5] leading-relaxed mb-6">
+                              <TypewriterText text="Light Strikes form the backbone of neutral interactions, pressure strings, and combo extension. They are designed to feel swift, smooth yet simple, enforcing movement decay to eliminate infinite run-and-strike spamming." delay={200} />
+                            </p>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-base my-4">
+                              <CodexBox title="5-Hit Base String">
+                                <p className="text-sm text-[#c7c2b5]"><TypewriterText text="Fluid strike sequence featuring bespoke martial animations for every active Stand, Weapon, or Fighting Style archetype. The 5th strike deals +50% bonus damage and delivers a 35-stud knockback, resetting neutral." /></p>
+                              </CodexBox>
+                              <CodexBox title="Pacing & Velocity Decay">
+                                <p className="text-sm text-[#c7c2b5]"><TypewriterText text="Each M1 swing moves you slightly forward, additionally, with your aerial M1's and your slowed momentum during M1's, this eliminates the classic bunny-hop most Jojo games feature and enforces spacing discipline and correct timing." /></p>
+                              </CodexBox>
+                              <CodexBox title="Hitstun Decay Curve">
+                                <p className="text-sm text-[#c7c2b5]"><TypewriterText text="Base hitstun reduces by 5% on each subsequent connection within a single combo string, preventing inescapable infinite loops and annoying M1 resets." /></p>
+                              </CodexBox>
+                              <CodexBox title="Non-Stun Based Combat">
+                                <p className="text-sm text-[#c7c2b5]"><TypewriterText text="M1's are Semi-True, and with the hit-stun decay, your M1's are meant to be poking tools rather than main combo starters like in battleground games." /></p>
+                              </CodexBox>
                             </div>
-                          ))}
-                        </div>
-                      </CodexBox>
-                    </div>
-
-                    <VideoPlate 
-                      title="System Demonstration: Gauge and Style Systems Showcase"
-                      inputTag="Passive"
-                      badge="GAUGE SYSTEM"
-                      duration="0:35"
-                      description="Showcasing your Health, Level, Guard, Heat and Style Gauges that players will utilize in their everyday combat."
-                      stats={[
-                        { label: "Heat", value: "Active" },
-                        { label: "Experience/Level", value: "Active" },
-                        { label: "Guard", value: "Active" },
-                        { label: "Health", value: "Active" },
-                        { label: "Style", value: "Semi-Active" }
-                      ]}
-                      videoSrc="UNIQUE VIDEO HERE"
-                      posterSrc="UNIQUE VIDEO HERE"
-                    />
-
-                    <div className="space-y-6 border-t border-[#2a2418] pt-6 my-6">
-                      <FadeScaleIn delay={100}>
-                        <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">Status Effects</h3>
-                      </FadeScaleIn>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                        <CodexBox title="[Overwhelmed]" badge="DEBUFF + BUFF">
-                          <p className="text-sm text-[#c7c2b5] leading-relaxed mb-2">
-                            <TypewriterText text="Triggered taking combo damage reaching A Rank. Blurs vision 8%, darkens 6%, adds vignette. Clears after 5s without damage or using Burst." />
-                          </p>
-                        </CodexBox>
-
-                        <CodexBox title="[Overdrive]" badge="BUFF">
-                          <ul className="text-xs text-[#c7c2b5] space-y-1 list-disc list-inside">
-                            <li>+50% damage, endurance, special power, defense</li>
-                            <li>Attacks gain +5% speed per hit (capped at 25%)</li>
-                            <li>Restores max heat bar, 25% HP, resets cooldowns</li>
-                            <li>Cleanses status effects & increases parry windows</li>
-                          </ul>
-                        </CodexBox>
-                      </div>
-
-                      <div className="space-y-4">
-                        <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">DOT Indicators & Body Part Damage</h4>
-                        <p className="text-s text-[#a09a8e]"><TypewriterText text="All DOT (Damage Over Time) effects last 4 seconds. Stacking same tier increases tier (Tier 1 + Tier 1 = Tier 2)." /></p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
-                          <StatusEffectCard type="bleed" title="Bleed" badgeText="INJURED" duration="DOT" description="Causes continuous damage over time and reduces overall movement speed and regen speed." stats="Less Speed + Regen" />
-                          <StatusEffectCard type="burn" title="Burn" badgeText="SCORCH" duration="DOT" description="Sears the victim in flames, hindering defences and reducing max endurance pool." stats="Less Endurance + Defence" />
-                          <StatusEffectCard type="poison" title="Poison" badgeText="Toxic" duration="DOT" description="Deadly Poisons infect the victim, corroding defensive capabilities while draining endurance over time." stats="Endurance + Defense" />
-                          <StatusEffectCard type="wither" title="Wither" badgeText="Curse" duration="DOT" description="A deadly curse that severely dampens health regeneration rates and impairs endurance recovery." stats="Regeneration + Endurance" />
-                        </div>
-
-                        <CodexBox title="Body Part Damage Breakdown" badge="LOCATIONAL DAMAGE">
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-s text-[#c7c2b5]">
-                            <div>• <strong className="text-[#e6c278]">Skull:</strong> Blur + Ringing SFX, Stun increase, Slowness</div>
-                            <div>• <strong className="text-[#e6c278]">Torso:</strong> Reduced endurance & damage resistance</div>
-                            <div>• <strong className="text-[#e6c278]">Legs:</strong> Sprint, jump, and speed nerfed</div>
-                            <div>• <strong className="text-[#e6c278]">Arms:</strong> Block & damage nerfed, ledge grab jump spam</div>
+        
+                            <ul className="list-disc list-inside text-[#c7c2b5] text-base space-y-3 leading-relaxed my-6">
+                              <li><strong className="text-[#e6c278]">Uppercut M1 Branch:</strong> Hold <code className="bg-[#18161f] border border-[#3d3423] px-2 py-0.5 text-[#e6c278] font-mono text-sm">Space</code> during any M1 to launch both yourself and your target into an airborne state, putting your M1 on cooldown, regardless of the sequence.</li>
+                              <li><strong className="text-[#e6c278]">Aerial M1 Branch:</strong> While in the air, you can use M1's to juggle your opponents in the air, allowing for air combos, your falling is paused per M1 keeping you with your opponent manually instead of basic hovering.</li>
+                            </ul>
+        
+                            <VideoPlate 
+                              title="Move Demonstration: 5-Hit Light Strike Chain & Aerial Variant"
+                              inputTag="LMB x5 / LMB x3 while airborne"
+                              badge="M1's"
+                              duration="0:14"
+                              description="Standard 5-hit M1 light string ending with a stronger strike at the 5th chain and its airborne variant."
+                              stats={[
+                                { label: "Damage Scale", value: "100% each | 150% final strike" },
+                                { label: "Hitstun Decay", value: "-5% per hit" },
+                                { label: "Knockback", value: "35 Studs" }
+                              ]}
+                              videoSrc="/video/test.mp4"
+                              posterSrc="/public/about2.jpg"
+                            />
+        
+                            <VideoPlate 
+                              title="Move Demonstration: Light Uppercut"
+                              inputTag="Airborne LMB (Post-Uppercut)"
+                              badge="COMBO EXTENSION"
+                              duration="0:09"
+                              description="Execute a launcher M1 by holding space with your M1, regardless of which sequence you were on."
+                              stats={[
+                                { label: "Damage Scale", value: "150%" },
+                                { label: "Launch Height", value: "30 Studs" }
+                              ]}
+                              videoSrc="UNIQUE VIDEO HERE"
+                              posterSrc="UNIQUE VIDEO HERE"
+                            />
+                          </CodexBox>
+        
+                          <div id="heavy-strike" className="scroll-mt-24">
+                          <CodexBox title="2. Heavy Strike (MMB / M2)" badge="HEAVY SYSTEM">
+                            <div className="mb-6">
+                              <span className="inline-block text-xs font-['Cormorant_Upright',serif] text-[#e6c278] tracking-widest uppercase font-bold bg-[#14121a] px-4 py-2 border border-[#2a2418] mb-4">
+                                Cost: 15 Heat | Cooldown: 5.0 Seconds
+                              </span>
+                              <p className="text-base md:text-lg text-[#c7c2b5] leading-relaxed">
+                                <TypewriterText text="Heavy Strikes, or M2's, are meant to be the most versatile move in your kit. For stand off or specs, this move acts as a heavy punch that knocks away people slightly into the air with soft ragdoll. This also does twice your M1 damage and you slightly move forward. However, it will act as a special move that works with the stand's kit, whether it be a grab, counter, stun move, or combo ender of the sorts. Stands, however, have a specialized M2. Use the interactive switcher below to preview all variations:" delay={200} />
+                              </p>
+                            </div>
+                            <DynamicVideoPlate 
+                              title="Heavy Strike (M2) Tactical Variations"
+                              options={heavyStrikeOptions}
+                              defaultOptionId="basic"
+                              sectionBadge="SELECT M2 VARIANT"
+                              externalSelectedId={navVariantId}
+                            />
+                          </CodexBox>
                           </div>
-                        </CodexBox>
-                      </div>
-                    </div>
-
-                    <div className="space-y-6 border-t border-[#2a2418] pt-6 my-6">
-                      <FadeScaleIn delay={100}>
-                        <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">Advanced Combat Mechanics</h3>
-                      </FadeScaleIn>
-
-                      <CodexBox title="Dynamic Destruction & Stage Pinning" badge="MAP DESTRUCTION">
-                        <p className="text-s text-[#c7c2b5] leading-relaxed mb-4">
-                          <TypewriterText text="Knocking enemies into walls enables continuous wall-pin combos until wall destruction. Destroying walls grants +15% bonus damage. Select maps support full Stage Destruction!" />
-                        </p>
-                        <VideoPlate 
-                          title="Advanced Demonstration: Dynamic Wall Destruction & Pin"
-                          inputTag="Heavy Knockback to Wall"
-                          badge="DESTRUCTION"
-                          duration="0:16"
-                          description="Knocking an opponent into destructible map walls to initiate a wall-pin combo string until wall collapse."
-                          stats={[
-                            { label: "Wall Damage", value: "+15% Extra" },
-                            { label: "Knockback Range", value: "25 - 75 Studs" }
-                          ]}
-                          videoSrc="UNIQUE VIDEO HERE"
-                          posterSrc="UNIQUE VIDEO HERE"
-                        />
-                      </CodexBox>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <CodexBox title="Long Range & Mixing" badge="NEUTRAL">
-                          <p className="text-s text-[#c7c2b5] leading-relaxed">
-                            <TypewriterText text="Features options like Flash Step approach or ranged projectiles (guns) to maintain style rank without burning close-combat moves." />
+                        </div>
+        
+                        <div className="space-y-8">
+                          <FadeScaleIn delay={100}>
+                            <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">
+                              Guard (F)
+                            </h3>
+                          </FadeScaleIn>
+                          <CodexBox title="Defensive Stance Framework" badge="DEFENSIVE SYSTEM">
+                            <p className="text-base md:text-lg text-[#c7c2b5] leading-relaxed mb-6">
+                              <TypewriterText text="Your Guard/Block system is your main defense tool that puts the user in a defensive stance. In this state they cannot move, but are impervious to many attacks. However, users must be smart when using this as there are viable counters and ways for opponents to use your blocking stance to their advantage. It is a quite simple mechanic once you get the gist of it." delay={200} />
+                            </p>
+        
+                            <div className="scroll-mt-24 space-y-4 border-t border-[#2a2418] pt-6 my-6" id="guard-endurance">
+                              <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">Guard Endurance</h4>
+                              <p className="text-base text-[#c7c2b5]"><TypewriterText text="The guard endurance is simple, you have a bar that is used to see your guard endurance's health. This automatically recharges while you are outside of your guard stance." /></p>
+                              <ul className="list-disc list-inside space-y-2 text-base text-[#c7c2b5]">
+                                <li>Blocking attacks will 'wear down' that endurance bar, and upon complete depletion you are <strong className="text-[#e6c278]">Guard Broken</strong>.</li>
+                                <li>Blocking without receiving any attacks after 4 seconds will cause that bar to slowly deplete with <strong className="text-[#e6c278]">Guard Decay</strong>.</li>
+                                <li>Upon using moves such as <strong className="text-[#e6c278]">Perfect Guard</strong>, <strong className="text-[#e6c278]">Reflective Guard</strong> and <strong className="text-[#e6c278]">Evasive Guard</strong> you can recharge the bar.</li>
+                              </ul>
+                              <p className="text-base text-[#c7c2b5]">
+                                <TypewriterText text="Should your block bar be full, it can overlap, storing as a golden charged bar. Once filled, this can be used as extra guard points as well, however this is used for something even greater!" />
+                              </p>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 text-base">
+                                <CodexBox title="(BREAK) Guard Break">
+                                  <p className="text-sm text-[#c7c2b5]"><TypewriterText text="The result of your guard bar depleting after either defending a move too strong for your defense, or defending more moves than you can endure. Stun time: 2.5 – 3s. Places offender in Perception Zone." /></p>
+                                </CodexBox>
+                                <CodexBox title="(DECAY) Guard Decay">
+                                  <p className="text-sm text-[#c7c2b5]"><TypewriterText text="The result of staying in blocking stance for too long without incoming attacks, over-decaying the bar. Stun time: 1.5 – 2s." /></p>
+                                </CodexBox>
+                              </div>
+                              <VideoPlate 
+                                title="Defensive Demonstration: Guard Break & Guard Decay"
+                                inputTag="Hold F Key"
+                                badge="GUARD DEMO"
+                                duration="0:14"
+                                description="Visual reference demonstrating Guard Break stun state (2.5-3s) and Guard Decay over-holding penalty (1.5-2s)."
+                                stats={[
+                                  { label: "Break Stun", value: "2.5 - 3.0s" },
+                                  { label: "Decay Stun", value: "1.5 - 2.0s" },
+                                  { label: "Decay Delay", value: "4.0 Seconds" }
+                                ]}
+                                videoSrc="UNIQUE VIDEO HERE"
+                                posterSrc="UNIQUE VIDEO HERE"
+                              />
+                            </div>
+        
+                            <div className="scroll-mt-24 space-y-4 border-t border-[#2a2418] pt-6 my-6" id="perfect-guard">
+                              <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">Perfect Guard / Parry</h4>
+                              <p className="text-base text-[#c7c2b5]"><TypewriterText text="Performed up to 0.2s before a parriable attack. Perfect Guards reward a player by stunning the victim in a state known as Perception Zone. This stun lasts 3 seconds, allowing you to freely attack your enemy. Perfect Guards also push the player back while the enemy stays in place." delay={100} /></p>
+                              <p className="text-base text-[#c7c2b5]"><TypewriterText text="There are 2 types of parries: Light Parries and Heavy Parries. Light Parries push you back a little, whereas heavy parries push you back a lot while giving more stun in return." delay={100} /></p>
+                              <VideoPlate 
+                                title="Defensive Demonstration: Perfect Guard / Parry"
+                                inputTag="Timed F Key"
+                                badge="PARRY DEMO"
+                                duration="0:16"
+                                description="Frame-perfect parry execution putting attacker into Perception Zone for 3 seconds."
+                                stats={[
+                                  { label: "Parry Window", value: "0.20 Seconds" },
+                                  { label: "Perception Zone", value: "3.0 Seconds" },
+                                  { label: "Types", value: "Light & Heavy" }
+                                ]}
+                                videoSrc="UNIQUE VIDEO HERE"
+                                posterSrc="UNIQUE VIDEO HERE"
+                              />
+                            </div>
+        
+                            <div className="scroll-mt-24 space-y-4 border-t border-[#2a2418] pt-6 my-6" id="evasive-guard">
+                              <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">Evasive Guard / Dodge</h4>
+                              <p className="text-base text-[#c7c2b5]"><TypewriterText text="Performed by side dashing while using guard. Perfect for evading attacks without wasting block points, giving time to counter. Doesn't stun enemy, but punishes end lag. Casting outside zone puts dash on 5s CD and deducts 50 guard points. If missed below 2.5% hp explode into a fine red mist." delay={100} /></p>
+                              <VideoPlate 
+                                title="Defensive Demonstration: Evasive Guard / Dodge"
+                                inputTag="Guard + Side Dash"
+                                badge="DODGE DEMO"
+                                duration="0:12"
+                                description="Side-dashing while guarding to evade incoming moves without losing guard points."
+                                stats={[
+                                  { label: "Miss Cooldown", value: "5.0 Seconds" },
+                                  { label: "Miss Cost", value: "50 Guard Pts" },
+                                  { label: "Low HP Penalty", value: "Explosion (<2.5%)" }
+                                ]}
+                                videoSrc="UNIQUE VIDEO HERE"
+                                posterSrc="UNIQUE VIDEO HERE"
+                              />
+                            </div>
+        
+                            <div className="scroll-mt-24 space-y-4 border-t border-[#2a2418] pt-6 my-6" id="reflective-guard">
+                              <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">Reflective Guard / Reflect</h4>
+                              <p className="text-base text-[#c7c2b5]"><TypewriterText text="Performed up to 0.3s before a reflectable attack. Reflect works only on projectiles. Unlike perfect parries, it doesn't push the user back, but allows defense against ranged attacks. Reflection speed depends on attack strength, HP, and Block Bar." delay={100} /></p>
+                              <VideoPlate 
+                                title="Defensive Demonstration: Reflective Guard / Reflect"
+                                inputTag="Timed F (vs Projectile)"
+                                badge="REFLECT DEMO"
+                                duration="0:13"
+                                description="Reflecting incoming projectiles with precise timing up to 0.3s before impact."
+                                stats={[
+                                  { label: "Reflect Window", value: "0.30 Seconds" },
+                                  { label: "Target", value: "Projectiles" },
+                                  { label: "Style", value: "Sonic Sway" }
+                                ]}
+                                videoSrc="UNIQUE VIDEO HERE"
+                                posterSrc="UNIQUE VIDEO HERE"
+                              />
+                            </div>
+        
+                            <div className="scroll-mt-24 space-y-4 border-t border-[#2a2418] pt-6 my-6" id="critical-arts">
+                              <h4 className="text-2xl font-['Gilda_Display',serif] text-[#f21616]">Critical Arts / Critical Strike</h4>
+                              <p className="text-base text-[#c7c2b5]"><TypewriterText text="Critical Arts are activated by using any M1 or any M2 variant while in Perception Zone with a fully supercharged guard bar." delay={100} /></p>
+                              <p className="text-base text-[#c7c2b5]"><TypewriterText text="Casting initiates a Quick Time Bar where you must hit the casted keybind again. The closer to center, the more powerful the art. Hitting the thin blue inner zone triggers a MAXIMUM CRITICAL STRIKE for immense damage!" delay={150} /></p>
+                              <ul className="list-disc list-inside space-y-2 text-base text-[#c7c2b5] my-4">
+                                <li>★ M1 leaves opponent stunned; M2 deals Grand Knockback. Additionally, <strong className="text-[#f21616]">[Any M1 or M2 variant (Excluding Flash Rush)]</strong> can be used.</li>
+                                <li>★ Block bar is fully depleted upon use.</li>
+                                <li>★ Places user in <strong className="text-[#1e5eff]">[Overdrive]</strong> state.</li>
+                                <li>★ Damage buff scales directly with <strong className="text-[#fdee4a]">WILL</strong> stat.</li>
+                                <li>★ Applies debuffs to the victim.</li>
+                              </ul>
+                              <DynamicVideoPlate 
+                                title="Critical Art Execution Variants"
+                                options={criticalArtOptions}
+                                defaultOptionId="m1-max"
+                                sectionBadge="SELECT ART VARIANT"
+                                variantTheme="red"
+                                externalSelectedId={navVariantId}
+                              />
+                            </div>
+        
+                            <div className="space-y-6 border-t border-[#2a2418] pt-6 my-6">
+                              <FadeScaleIn delay={100}>
+                                <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">Combat Add-Ons</h3>
+                              </FadeScaleIn>
+                              <div id="combat-tag-system" className="scroll-mt-24">
+                              <CodexBox title="Combat Tag System" badge="SYSTEM TAG">
+                                <p className="text-base text-[#c7c2b5] leading-relaxed mb-3"><TypewriterText text="Fighting places a tag restricting features like wall running, climbing, NPC interaction, and fast travel." /></p>
+                                <ul className="list-disc list-inside space-y-2 text-sm text-[#a09a8e] leading-relaxed">
+                                  <li>Disabled by defeating opponent, dying, or 30 seconds out of combat.</li>
+                                  <li>Only landing and receiving damage triggers tag (casting moves alone does not).</li>
+                                  <li>Combat logging/resetting applies <strong className="text-[#e6c278]">combat LOCK</strong> (1 min fight lockout + highlight).</li>
+                                  <li>Includes a <strong className="text-[#e6c278]">Combat Apology</strong> pop-up to clear tag after accidental hits.</li>
+                                </ul>
+                                <VideoPlate 
+                                  title="System Demonstration: Combat Apology Pop-Up"
+                                  inputTag="Contextual Pop-Up"
+                                  badge="COMBAT TAG"
+                                  duration="0:08"
+                                  description="Pop-up prompt allowing players to apologize after an accidental hit to immediately exit combat state."
+                                  stats={[
+                                    { label: "Tag Duration", value: "30 Seconds" },
+                                    { label: "Log Penalty", value: "1 Min Lockout" }
+                                  ]}
+                                  videoSrc="UNIQUE VIDEO HERE"
+                                  posterSrc="UNIQUE VIDEO HERE"
+                                />
+                              </CodexBox>
+                              </div>
+        
+                              <div id="combat-burst" className="scroll-mt-24">
+                              <CodexBox title="Burst (Combo Breaker / Anti Team)" badge="COMBO BREAKER">
+                                <div className="mb-3">
+                                  <span className="text-xs font-mono text-[#e6c278] bg-[#14121a] px-3 py-1 border border-[#2a2418]">
+                                    Cost: 15 Heat [M1] / 15 HP [M2]
+                                  </span>
+                                </div>
+                                <p className="text-base text-[#c7c2b5] leading-relaxed mb-3">
+                                  <TypewriterText text="Holding M1 or M2 while stunned releases a blast of energy blasting nearby enemies away. Features True Block Bypass, True Stun, and Hyper Armor/Counter Bypass. Stuns for 1.0s and scales damage with current combo length." />
+                                </p>
+                                <VideoPlate 
+                                  title="System Demonstration: Stand/Spec Combo Breaker Burst"
+                                  inputTag="Hold M1 / M2 during Stun"
+                                  badge="COMBO BREAKER"
+                                  duration="0:11"
+                                  description="Executing a Burst while stunned to blast surrounding enemies away with True Block Bypass and 1.0s AOE stun."
+                                  stats={[
+                                    { label: "AOE Stun", value: "1.0 Second" },
+                                    { label: "Properties", value: "True Bypass" },
+                                    { label: "Scaling", value: "Combo Length" }
+                                  ]}
+                                  videoSrc="UNIQUE VIDEO HERE"
+                                  posterSrc="UNIQUE VIDEO HERE"
+                                />
+                              </CodexBox>
+                              </div>
+        
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <CodexBox title="Finishers" badge="Executions">
+                                  <p className="text-sm text-[#c7c2b5] leading-relaxed"><TypewriterText text="Gained upon unlocking a new move, finishers offer a style grade bump, heat and more depending on the finisher. Most knockback moves feature universal finishers sending victims flying further. Finishers can also be disabled in the respective move's Move Tab." /></p>
+                                </CodexBox>
+                                <CodexBox title="Combo Scaling" badge="COMBO BALANCING">
+                                  <p className="text-sm text-[#c7c2b5] leading-relaxed"><TypewriterText text="Longer combos reduce damage output. Moves retain 100% strength up to D Style Rank, then lose 5% damage per subsequent tier. This allows for players in any combo a better chance at survival rather than being completely overwhelmed with damage. This feature is disabled for Boss Fights, Supers and Ultimates." /></p>
+                                </CodexBox>
+                                <CodexBox title="Buff / De-Buffs Tier Scaling" badge="BALANCING">
+                                  <p className="text-sm text-[#c7c2b5] leading-relaxed"><TypewriterText text="Each buff/de-buff you receive has different tiers, the higher the tier, the less effective the buff/de-buff, this balances buff/de-buff stacking as it can lead to unwanted circumstances such as basic M1's doing 100 damage or a basic M1 insta killing you because of de-buffs. This works on Stat Buffs/De-buffs, Passive Buffs/De-Buffs, Skill Buffs/De-Buffs & Awakening Buffs/De-buffs." /></p>
+                                </CodexBox>
+                                <CodexBox title="Pose" badge="MECHANIC">
+                                  <p className="text-sm text-[#c7c2b5] leading-relaxed"><TypewriterText text="Using your P key after any ragdolling move allows you to do a quick pose similar to All Star Battle/R. This resets your Style Rank countdown back to full and rewards you with 15 heat. In the pose, you and your opponent watch the short cutscene and then go back to normal. However, you can be interrupted and this does have a short 0.25s window after the move to be done." /></p>
+                                </CodexBox>
+                                <CodexBox title="Taunt / Aura Farm" badge="MECHANIC">
+                                  <p className="text-sm text-[#c7c2b5] leading-relaxed"><TypewriterText text="Using your P key DURING a move (must be hitting an opponent) allows you to do a quick Aura Farm/ Taunt during the move (especially useful with Stands). This rewards you with Heat and boosts your Style meter. However be careful as this can give an opening to opponents since you're vulnerable during the animation, and getting hit while aurafarming deducts from your Style Bar." /></p>
+                                </CodexBox>
+                                <CodexBox title="Weapon Switch" badge="TOOL SWITCHER">
+                                  <p className="text-sm text-[#c7c2b5] leading-relaxed"><TypewriterText text="Referenced from the Devil May Cry series, using your Middle Mouse Scroll (MMB Scroll), you can freely switch between any weapon you have equipped in your inventory, however you do slow down for a second to equip it (some abilities may assist this/shorten this). This is perfect for keeping combos fresh and your Style Bar pumping!" /></p>
+                                </CodexBox>
+                              </div>
+        
+                              <VideoPlate 
+                                title="System Demonstration: Pose, Aurafarm, Weapon Switcher"
+                                inputTag="P | MMB"
+                                badge="TAUNT/TOOL SYSTEM"
+                                duration="0:25"
+                                description="Demonstrating Pose and Aurafarming system to Taunt enemies for style, and Weapon switch system to utilize multiple weapons in combat."
+                                stats={[
+                                  { label: "Pose", value: "After Ragdoll" },
+                                  { label: "Aura Farm", value: "During Move Casting" },
+                                  { label: "Weapon Switch", value: "Scroll with MMB"}
+                                ]}
+                                videoSrc="UNIQUE VIDEO HERE"
+                                posterSrc="UNIQUE VIDEO HERE"
+                              />
+        
+                              <div id="targeting-sense" className="scroll-mt-24">
+                              <CodexBox title="Targeting & Sense Mechanics" badge="TARGETING">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-4">
+                                  <div className="p-3 bg-[#0a0a0d] border border-[#1a1820]">
+                                    <strong className="text-[#e6c278] block font-['Gilda_Display',serif] text-base mb-1">Target Mark [L]</strong>
+                                    Locks onto opponent without facing them, granting auto-aim to projectiles.
+                                  </div>
+                                  <div className="p-3 bg-[#0a0a0d] border border-[#1a1820]">
+                                    <strong className="text-[#e6c278] block font-['Gilda_Display',serif] text-base mb-1">Spiritual Sight [Hold L]</strong>
+                                    Reveals inner Will Power auras, sensing stands and Burst users through obstacles.
+                                  </div>
+                                  <div className="p-3 bg-[#0a0a0d] border border-[#1a1820]">
+                                    <strong className="text-[#e6c278] block font-['Gilda_Display',serif] text-base mb-1">Target Re-Lock [Mark + Hold L]</strong>
+                                    Re-focuses opponent positions similar to a lock on, ignoring buildings and obstacles with a distance limit based on stat upgrades.
+                                  </div>
+                                </div>
+                                <VideoPlate 
+                                  title="System Demonstration: Spiritual Sight, Target Mark & Target Re-Lock"
+                                  inputTag="L | Hold L Key"
+                                  badge="TARGET SYSTEM"
+                                  duration="0:14"
+                                  description="Demonstrating Spiritual Sight aura vision through obstacles and soft auto-aim targeting, and target relocating."
+                                  stats={[
+                                    { label: "Target Lock", value: "Soft Directional" },
+                                    { label: "Obstacle Bypass", value: "Active" }
+                                  ]}
+                                  videoSrc="UNIQUE VIDEO HERE"
+                                  posterSrc="UNIQUE VIDEO HERE"
+                                />
+                              </CodexBox>
+                              </div>
+        
+                              <div id="joestars-will" className="scroll-mt-24">
+                              <CodexBox title="Joestar’s Will" badge="WILL POWER">
+                                <p className="text-base text-[#c7c2b5] leading-relaxed">
+                                  Special mechanic scaling with <strong className="text-[#e6c278]">WILL</strong> stat. Equipping a <strong className="text-[#e6c278]">Joestar’s Mark</strong> grants specialized buffs (e.g. Dark Determination, Burning Passion). Activated via clicking MMB after a Critical Art while in <strong className="text-[#e6c278]">[Overdrive]</strong>.
+                                </p>
+                              </CodexBox>
+                              </div>
+                            </div>
+        
+                            <div className="space-y-6 border-t border-[#2a2418] pt-6 my-6">
+                              <FadeScaleIn delay={100}>
+                                <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">Gauge and Style Systems</h3>
+                              </FadeScaleIn>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm mb-6">
+                                <CodexBox title="Health/Vitality Gauge">
+                                  <p className="text-xs text-[#c7c2b5]"><TypewriterText text="Displays HP and remaining damage tolerance before defeat." delay={100}/></p>
+                                </CodexBox>
+                                <CodexBox title="Level / XP Gauge">
+                                  <p className="text-xs text-[#c7c2b5]"><TypewriterText text="Tracks overall level and progress toward next node point." delay={150} /></p>
+                                </CodexBox>
+                                <CodexBox title="Heat Gauge (0 - 100)">
+                                  <p className="text-xs text-[#c7c2b5]"><TypewriterText text="Divided into 20-point bars. Built via parries, dodges, combos, and low HP scaling." delay={200}/></p>
+                                </CodexBox>
+                              </div>
+        
+                              <div id="style-ranks" className="scroll-mt-24">
+                              <CodexBox title="Combo Style Ranks (DMC-Inspired)" badge="STYLE SYSTEM">
+                                <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
+                                  <TypewriterText text="Built by attacking creatively. Repeating identical moves degrades rank. Inactivity decays rank, but taking damage pauses decay. High ranks reduce cooldowns and windup times!" delay={100} />
+                                </p>
+                                <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-2 text-center text-xs font-mono">
+                                  {styleRanks.map((item, idx) => (
+                                    <div key={idx} className={`p-2.5 bg-[#0a0a0d] border ${item.color} transition-transform hover:scale-105`}>
+                                      <span className="block text-sm font-bold mb-0.5">{item.rank}</span>
+                                      <span className="text-[10px] block truncate">{item.title}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </CodexBox>
+                              </div>
+                            </div>
+        
+                            <VideoPlate 
+                              title="System Demonstration: Gauge and Style Systems Showcase"
+                              inputTag="Passive"
+                              badge="GAUGE SYSTEM"
+                              duration="0:35"
+                              description="Showcasing your Health, Level, Guard, Heat and Style Gauges that players will utilize in their everyday combat."
+                              stats={[
+                                { label: "Heat", value: "Active" },
+                                { label: "Experience/Level", value: "Active" },
+                                { label: "Guard", value: "Active" },
+                                { label: "Health", value: "Active" },
+                                { label: "Style", value: "Semi-Active" }
+                              ]}
+                              videoSrc="UNIQUE VIDEO HERE"
+                              posterSrc="UNIQUE VIDEO HERE"
+                            />
+        
+                            <div className="space-y-6 border-t border-[#2a2418] pt-6 my-6">
+                              <FadeScaleIn delay={100}>
+                                <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">Status Effects</h3>
+                              </FadeScaleIn>
+        
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <div id="status-overwhelmed" className="scroll-mt-24">
+                                  <CodexBox title="[Overwhelmed]" badge="DEBUFF + BUFF">
+                                    <p className="text-sm text-[#c7c2b5] leading-relaxed mb-2">
+                                      <TypewriterText text="Triggered taking combo damage reaching A Rank. Blurs vision 8%, darkens 6%, adds vignette. Clears after 5s without damage or using Burst." />
+                                    </p>
+                                  </CodexBox>
+                                </div>
+        
+                                <div id="status-overdrive" className="scroll-mt-24">
+                                  <CodexBox title="[Overdrive]" badge="BUFF">
+                                    <ul className="text-xs text-[#c7c2b5] space-y-1 list-disc list-inside">
+                                      <li>+50% damage, endurance, special power, defense</li>
+                                      <li>Attacks gain +5% speed per hit (capped at 25%)</li>
+                                      <li>Restores max heat bar, 25% HP, resets cooldowns</li>
+                                      <li>Cleanses status effects & increases parry windows</li>
+                                    </ul>
+                                  </CodexBox>
+                                </div>
+                              </div>
+        
+                              <div className="scroll-mt-24 space-y-4" id="dot-effects">
+                                <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">DOT Indicators & Body Part Damage</h4>
+                                <p className="text-s text-[#a09a8e]"><TypewriterText text="All DOT (Damage Over Time) effects last 4 seconds. Stacking same tier increases tier (Tier 1 + Tier 1 = Tier 2)." /></p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
+                                  <StatusEffectCard id="status-bleed" type="bleed" title="Bleed" badgeText="INJURED" duration="DOT" description="Causes continuous damage over time and reduces overall movement speed and regen speed." stats="Less Speed + Regen" />
+                                  <StatusEffectCard id="status-burn" type="burn" title="Burn" badgeText="SCORCH" duration="DOT" description="Sears the victim in flames, hindering defences and reducing max endurance pool." stats="Less Endurance + Defence" />
+                                  <StatusEffectCard id="status-poison" type="poison" title="Poison" badgeText="Toxic" duration="DOT" description="Deadly Poisons infect the victim, corroding defensive capabilities while draining endurance over time." stats="Endurance + Defense" />
+                                  <StatusEffectCard id="status-wither" type="wither" title="Wither" badgeText="Curse" duration="DOT" description="A deadly curse that severely dampens health regeneration rates and impairs endurance recovery." stats="Regeneration + Endurance" />
+                                </div>
+        
+                                <div id="body-part-damage" className="scroll-mt-24">
+                                  <CodexBox title="Body Part Damage Breakdown" badge="LOCATIONAL DAMAGE">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-s text-[#c7c2b5]">
+                                      <div>• <strong className="text-[#e6c278]">Skull:</strong> Blur + Ringing SFX, Stun increase, Slowness</div>
+                                      <div>• <strong className="text-[#e6c278]">Torso:</strong> Reduced endurance & damage resistance</div>
+                                      <div>• <strong className="text-[#e6c278]">Legs:</strong> Sprint, jump, and speed nerfed</div>
+                                      <div>• <strong className="text-[#e6c278]">Arms:</strong> Block & damage nerfed, ledge grab jump spam</div>
+                                    </div>
+                                  </CodexBox>
+                                </div>
+                              </div>
+                            </div>
+        
+                            <div className="space-y-6 border-t border-[#2a2418] pt-6 my-6">
+                              <FadeScaleIn delay={100}>
+                                <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">Advanced Combat Mechanics</h3>
+                              </FadeScaleIn>
+        
+                              <div id="dynamic-destruction" className="scroll-mt-24">
+                              <CodexBox title="Dynamic Destruction & Stage Pinning" badge="MAP DESTRUCTION">
+                                <p className="text-s text-[#c7c2b5] leading-relaxed mb-4">
+                                  <TypewriterText text="Knocking enemies into walls enables continuous wall-pin combos until wall destruction. Destroying walls grants +15% bonus damage. Select maps support full Stage Destruction!" />
+                                </p>
+                                <VideoPlate 
+                                  title="Advanced Demonstration: Dynamic Wall Destruction & Pin"
+                                  inputTag="Heavy Knockback to Wall"
+                                  badge="DESTRUCTION"
+                                  duration="0:16"
+                                  description="Knocking an opponent into destructible map walls to initiate a wall-pin combo string until wall collapse."
+                                  stats={[
+                                    { label: "Wall Damage", value: "+15% Extra" },
+                                    { label: "Knockback Range", value: "25 - 75 Studs" }
+                                  ]}
+                                  videoSrc="UNIQUE VIDEO HERE"
+                                  posterSrc="UNIQUE VIDEO HERE"
+                                />
+                              </CodexBox>
+                              </div>
+        
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div id="long-range-mixing" className="scroll-mt-24">
+                                <CodexBox title="Long Range & Mixing" badge="NEUTRAL">
+                                  <p className="text-s text-[#c7c2b5] leading-relaxed">
+                                    <TypewriterText text="Features options like Flash Step approach or ranged projectiles (guns) to maintain style rank without burning close-combat moves." />
+                                  </p>
+                                </CodexBox>
+                                </div>
+                                <div id="move-shift" className="scroll-mt-24">
+                                <CodexBox title="Move Shift Mechanic" badge="VARIANT TECH">
+                                  <p className="text-s text-[#c7c2b5] leading-relaxed">
+                                    <TypewriterText text="Allows unlocking move variants by executing a move WHILE another action is being performed mid-animation or windup." />
+                                  </p>
+                                </CodexBox>
+                                </div>
+                              </div>
+                            </div>
+                          </CodexBox>
+                        </div>
+                      </section>
+                    )}
+        
+                    {/* MOBILITY SUBTAB CONTENT */}
+                    {activeSubTab === 'mobility' && (
+                      <section className="scroll-mt-24 space-y-12" id="dynamic-mobility">
+                        <CodexBox 
+                          title="Combat and Movement are One"
+                          badge="MOBILITY OVERVIEW"
+                          accentColor="border-l-4 border-l-[#c3a35e] border-[#2a2418]"
+                        >
+                          <p className="text-[#c7c2b5] leading-relaxed text-lg md:text-xl">
+                            <TypewriterText text="Movement in Beyond Bizarre is not merely traversal—it is an offensive and defensive weapon. Positioning, verticality, momentum preservation, and recovery techniques seamlessly connect directly into combat strings. In this game, you have to utilize Speed & Momentum when you’re moving around. However, your mobility also heavily compliments other aspects such as combat and more allowing for stylish gameplay. It's not just knowing how, but also when to move." delay={100} />
                           </p>
                         </CodexBox>
-                        <CodexBox title="Move Shift Mechanic" badge="VARIANT TECH">
-                          <p className="text-s text-[#c7c2b5] leading-relaxed">
-                            <TypewriterText text="Allows unlocking move variants by executing a move WHILE another action is being performed mid-animation or windup." />
+        
+                        <div id="mobility-switcher" className="scroll-mt-24">
+                          <FadeScaleIn delay={100}>
+                            <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase mb-6 border-b border-[#2a2418] pb-3">
+                              Interactive Mobility Mechanics
+                            </h3>
+                          </FadeScaleIn>
+                          <DynamicVideoPlate 
+                            title="Mobility & Traversal Demonstrations"
+                            options={mobilityOptions}
+                            defaultOptionId="walk-sprint"
+                            sectionBadge="SELECT MOBILITY TECH"
+                            variantTheme="cyan"
+                            externalSelectedId={navVariantId}
+                          />
+                        </div>
+        
+                        <div className="space-y-8">
+                          <FadeScaleIn delay={100}>
+                            <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">
+                              Advanced Traversal & Recovery Mechanics
+                            </h3>
+                          </FadeScaleIn>
+        
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div id="ground-movement" className="scroll-mt-24">
+                            <CodexBox title="1. Ground Movement & Velocity Tiers" badge="WASD + SHIFT/CTRL">
+                              <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
+                                <TypewriterText text="3 distinct speed modes govern your ground footwork. Transitioning smoothly between Walk, Combat Run, and Sprint allows for precise spacing outside enemy melee reach while managing stamina decay." />
+                              </p>
+                              <div className="p-3 bg-[#0d0c10] border border-[#1e1b24] text-xs font-mono space-y-1">
+                                <div className="text-[#e6c278] font-bold">• Walk (12 Studs/s): Perfect Guard mobility</div>
+                                <div className="text-[#e6c278] font-bold">• Run (22 Studs/s): Standard combat neutral</div>
+                                <div className="text-[#e6c278] font-bold">• Sprint (36 Studs/s): High-speed rushdowns</div>
+                              </div>
+                            </CodexBox>
+                            </div>
+        
+                            <div id="flash-step" className="scroll-mt-24">
+                            <CodexBox title="2. Flash Step & Directional Dashes" badge="BURST DASH [Q]">
+                              <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
+                                <TypewriterText text="Flash Step grants instant 28-stud spatial relocation with 0.18s invincibility frames. Can be executed omnidirectionally to side-step projectiles or cancel attack recovery." />
+                              </p>
+                              <div className="p-3 bg-[#0d0c10] border border-[#1e1b24] text-xs font-mono space-y-1">
+                                <div className="text-[#38bdf8]">• Cooldown: 3.5 Seconds</div>
+                                <div className="text-[#38bdf8]">• Cancel Tech: Usable during light attack startup</div>
+                                <div className="text-[#38bdf8]">• M2 Synergy: Extends into Flash Rush chain</div>
+                              </div>
+                            </CodexBox>
+                            </div>
+        
+                            <div id="wall-running" className="scroll-mt-24">
+                            <CodexBox title="3. Verticality & Wall Running" badge="ENVIRONMENT TECH">
+                              <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
+                                <TypewriterText text="Holding Jump against vertical architecture initiates vertical wall runs for up to 3 seconds. Wall kicking off surfaces launches your character forward with 45 studs of kinetic momentum." />
+                              </p>
+                              <div className="p-3 bg-[#0d0c10] border border-[#1e1b24] text-xs font-mono space-y-1">
+                                <div className="text-[#e6c278]">• Wall Run Max: 3.0 Seconds</div>
+                                <div className="text-[#e6c278]">• Ledge Snap: Auto-vaults onto walkable ledges</div>
+                                <div className="text-[#e6c278]">• Aerial Reset: Wall kick restores air dash</div>
+                              </div>
+                            </CodexBox>
+                            </div>
+        
+                            <div id="tech-recovery" className="scroll-mt-24">
+                            <CodexBox title="4. Tech Recovery & Air Teching" badge="ANTI-PRESSURE">
+                              <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
+                                <TypewriterText text="Bypass hard knockdown wakeups by timing jump upon surface impact. Air Teching consumes 10 Heat to immediately neutralize ragdoll momentum and regain full air control." />
+                              </p>
+                              <div className="p-3 bg-[#0d0c10] border border-[#1e1b24] text-xs font-mono space-y-1">
+                                <div className="text-[#38bdf8]">• Timing Window: 0.25 Seconds</div>
+                                <div className="text-[#38bdf8]">• Heat Cost: 10 Heat (Air Tech)</div>
+                                <div className="text-[#38bdf8]">• Invulnerability: 0.3s post-roll</div>
+                              </div>
+                            </CodexBox>
+                            </div>
+                          </div>
+        
+                          <VideoPlate 
+                            title="Traversal Showcase: Wall Running, Tech Recovery & Slide Canceling"
+                            inputTag="Space / Crouch / Q"
+                            badge="TRAVERSAL REEL"
+                            duration="0:24"
+                            description="Comprehensive demonstration of fluid wall running, airborne tech recovery after ragdoll hits, and sprint slide canceling."
+                            stats={[
+                              { label: "Wall Run", value: "3.0s Limit" },
+                              { label: "Tech Roll", value: "0.25s Window" },
+                              { label: "Slide Speed", value: "115% Base" }
+                            ]}
+                            videoSrc="UNIQUE VIDEO HERE"
+                            posterSrc="UNIQUE VIDEO HERE"
+                          />
+                        </div>
+                      </section>
+                    )}
+        
+                    {/* STAND COMBAT SUBTAB CONTENT */}
+                    {activeSubTab === 'stand-combat' && (
+                      <section className="scroll-mt-24 space-y-12" id="stand-combat">
+                        <CodexBox 
+                          title="Spectral Manifestation & Dual Fighting System"
+                          badge="STAND COMBAT OVERVIEW"
+                          accentColor="border-l-4 border-l-[#a855f7] border-[#2a2418]"
+                        >
+                          <p className="text-[#c7c2b5] leading-relaxed text-lg md:text-xl">
+                            <TypewriterText text="Stands represent physical manifestations of psychological willpower. In Beyond Bizarre, Stand combat introduces a dual fighting layer where toggling your Stand (E) alters your frame data, extends hitboxes, enables remote pilot maneuvering, and unlocks high-frequency barrage clashes." delay={100} />
                           </p>
                         </CodexBox>
-                      </div>
-                    </div>
-                  </CodexBox>
-                </div>
-              </section>
-            )}
-
-            {/* MOBILITY SUBTAB CONTENT */}
-            {activeSubTab === 'mobility' && (
-              <section className="space-y-12">
-                <CodexBox 
-                  title="Combat and Movement are One"
-                  badge="MOBILITY OVERVIEW"
-                  accentColor="border-l-4 border-l-[#c3a35e] border-[#2a2418]"
-                >
-                  <p className="text-[#c7c2b5] leading-relaxed text-lg md:text-xl">
-                    <TypewriterText text="Movement in Beyond Bizarre is not merely traversal—it is an offensive and defensive weapon. Positioning, verticality, momentum preservation, and recovery techniques seamlessly connect directly into combat strings. In this game, you have to utilize Speed & Momentum when you’re moving around. However, your mobility also heavily compliments other aspects such as combat and more allowing for stylish gameplay. It's not just knowing how, but also when to move." delay={100} />
-                  </p>
-                </CodexBox>
-
-                <div>
-                  <FadeScaleIn delay={100}>
-                    <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase mb-6 border-b border-[#2a2418] pb-3">
-                      Interactive Mobility Mechanics
-                    </h3>
-                  </FadeScaleIn>
-                  <DynamicVideoPlate 
-                    title="Mobility & Traversal Demonstrations"
-                    options={mobilityOptions}
-                    defaultOptionId="walk-sprint"
-                    sectionBadge="SELECT MOBILITY TECH"
-                    variantTheme="cyan"
-                  />
-                </div>
-
-                <div className="space-y-8">
-                  <FadeScaleIn delay={100}>
-                    <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">
-                      Advanced Traversal & Recovery Mechanics
-                    </h3>
-                  </FadeScaleIn>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <CodexBox title="1. Ground Movement & Velocity Tiers" badge="WASD + SHIFT/CTRL">
-                      <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
-                        <TypewriterText text="3 distinct speed modes govern your ground footwork. Transitioning smoothly between Walk, Combat Run, and Sprint allows for precise spacing outside enemy melee reach while managing stamina decay." />
-                      </p>
-                      <div className="p-3 bg-[#0d0c10] border border-[#1e1b24] text-xs font-mono space-y-1">
-                        <div className="text-[#e6c278] font-bold">• Walk (12 Studs/s): Perfect Guard mobility</div>
-                        <div className="text-[#e6c278] font-bold">• Run (22 Studs/s): Standard combat neutral</div>
-                        <div className="text-[#e6c278] font-bold">• Sprint (36 Studs/s): High-speed rushdowns</div>
-                      </div>
-                    </CodexBox>
-
-                    <CodexBox title="2. Flash Step & Directional Dashes" badge="BURST DASH [Q]">
-                      <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
-                        <TypewriterText text="Flash Step grants instant 28-stud spatial relocation with 0.18s invincibility frames. Can be executed omnidirectionally to side-step projectiles or cancel attack recovery." />
-                      </p>
-                      <div className="p-3 bg-[#0d0c10] border border-[#1e1b24] text-xs font-mono space-y-1">
-                        <div className="text-[#38bdf8]">• Cooldown: 3.5 Seconds</div>
-                        <div className="text-[#38bdf8]">• Cancel Tech: Usable during light attack startup</div>
-                        <div className="text-[#38bdf8]">• M2 Synergy: Extends into Flash Rush chain</div>
-                      </div>
-                    </CodexBox>
-
-                    <CodexBox title="3. Verticality & Wall Running" badge="ENVIRONMENT TECH">
-                      <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
-                        <TypewriterText text="Holding Jump against vertical architecture initiates vertical wall runs for up to 3 seconds. Wall kicking off surfaces launches your character forward with 45 studs of kinetic momentum." />
-                      </p>
-                      <div className="p-3 bg-[#0d0c10] border border-[#1e1b24] text-xs font-mono space-y-1">
-                        <div className="text-[#e6c278]">• Wall Run Max: 3.0 Seconds</div>
-                        <div className="text-[#e6c278]">• Ledge Snap: Auto-vaults onto walkable ledges</div>
-                        <div className="text-[#e6c278]">• Aerial Reset: Wall kick restores air dash</div>
-                      </div>
-                    </CodexBox>
-
-                    <CodexBox title="4. Tech Recovery & Air Teching" badge="ANTI-PRESSURE">
-                      <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
-                        <TypewriterText text="Bypass hard knockdown wakeups by timing jump upon surface impact. Air Teching consumes 10 Heat to immediately neutralize ragdoll momentum and regain full air control." />
-                      </p>
-                      <div className="p-3 bg-[#0d0c10] border border-[#1e1b24] text-xs font-mono space-y-1">
-                        <div className="text-[#38bdf8]">• Timing Window: 0.25 Seconds</div>
-                        <div className="text-[#38bdf8]">• Heat Cost: 10 Heat (Air Tech)</div>
-                        <div className="text-[#38bdf8]">• Invulnerability: 0.3s post-roll</div>
-                      </div>
-                    </CodexBox>
-                  </div>
-
-                  <VideoPlate 
-                    title="Traversal Showcase: Wall Running, Tech Recovery & Slide Canceling"
-                    inputTag="Space / Crouch / Q"
-                    badge="TRAVERSAL REEL"
-                    duration="0:24"
-                    description="Comprehensive demonstration of fluid wall running, airborne tech recovery after ragdoll hits, and sprint slide canceling."
-                    stats={[
-                      { label: "Wall Run", value: "3.0s Limit" },
-                      { label: "Tech Roll", value: "0.25s Window" },
-                      { label: "Slide Speed", value: "115% Base" }
-                    ]}
-                    videoSrc="UNIQUE VIDEO HERE"
-                    posterSrc="UNIQUE VIDEO HERE"
-                  />
-                </div>
-              </section>
-            )}
-
-            {/* STAND COMBAT SUBTAB CONTENT */}
-            {activeSubTab === 'stand-combat' && (
-              <section className="space-y-12">
-                <CodexBox 
-                  title="Spectral Manifestation & Dual Fighting System"
-                  badge="STAND COMBAT OVERVIEW"
-                  accentColor="border-l-4 border-l-[#a855f7] border-[#2a2418]"
-                >
-                  <p className="text-[#c7c2b5] leading-relaxed text-lg md:text-xl">
-                    <TypewriterText text="Stands represent physical manifestations of psychological willpower. In Beyond Bizarre, Stand combat introduces a dual fighting layer where toggling your Stand (E) alters your frame data, extends hitboxes, enables remote pilot maneuvering, and unlocks high-frequency barrage clashes." delay={100} />
-                  </p>
-                </CodexBox>
-
-                <div>
-                  <FadeScaleIn delay={100}>
-                    <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#c084fc] tracking-widest uppercase mb-6 border-b border-[#2a2418] pb-3">
-                      Interactive Stand Combat Variations
-                    </h3>
-                  </FadeScaleIn>
-                  <DynamicVideoPlate 
-                    title="Stand Combat Mechanics & Abilities"
-                    options={standCombatOptions}
-                    defaultOptionId="stand-summon"
-                    sectionBadge="SELECT STAND TECH"
-                    variantTheme="purple"
-                  />
-                </div>
-
-                <div className="space-y-8">
-                  <FadeScaleIn delay={100}>
-                    <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#c084fc] tracking-widest uppercase border-b border-[#2a2418] pb-3">
-                      Deep Stand Mechanics Breakdown
-                    </h3>
-                  </FadeScaleIn>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <CodexBox title="1. Stand-On vs Stand-Off Modes" badge="STANCE SYSTEM">
-                      <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
-                        <TypewriterText text="Toggling your Stand (E) switches between nimble human strikes and heavy spectral attacks. Stand-On grants extra range and armor, while Stand-Off boosts raw movement speed." />
-                      </p>
-                      <div className="p-3 bg-[#13091c] border border-[#2e1840] text-xs font-mono space-y-1">
-                        <div className="text-[#c084fc]">• Summon Startup: 0.15s</div>
-                        <div className="text-[#c084fc]">• Reach Multiplier: +3.5 Studs</div>
-                        <div className="text-[#c084fc]">• Guard Cap: +30% Resilience</div>
-                      </div>
-                    </CodexBox>
-
-                    <CodexBox title="2. Barrages & Clash Dynamics" badge="BARRAGE SYSTEM">
-                      <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
-                        <TypewriterText text="Unleash rapid multi-punch strings. When two barrages hit simultaneously, a high-intensity Barrage Clash begins, requiring QTE inputs to overpower opponent Heat." />
-                      </p>
-                      <div className="p-3 bg-[#13091c] border border-[#2e1840] text-xs font-mono space-y-1">
-                        <div className="text-[#c084fc]">• Hit Rate: 18 Strikes / second</div>
-                        <div className="text-[#c084fc]">• Heat Generation: +1.5 per hit</div>
-                        <div className="text-[#c084fc]">• Clash Drain: Equalized Heat</div>
-                      </div>
-                    </CodexBox>
-
-                    <CodexBox title="3. Remote Pilot Mode" badge="LONG-RANGE PROJECTION">
-                      <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
-                        <TypewriterText text="Detach your Stand to fly up to 120 studs away. Ideal for ambushes and scouting, but leaves your physical user body defenseless against counter-attacks." />
-                      </p>
-                      <div className="p-3 bg-[#13091c] border border-[#2e1840] text-xs font-mono space-y-1">
-                        <div className="text-[#c084fc]">• Max Radius: 120 Studs</div>
-                        <div className="text-[#c084fc]">• Pilot Speed: 32 Studs/s</div>
-                        <div className="text-[#c084fc]">• Damage Share: 100% to User</div>
-                      </div>
-                    </CodexBox>
-
-                    <CodexBox title="4. Stand Awakenings & Requiem" badge="ULTIMATE FORM">
-                      <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
-                        <TypewriterText text="Reaching 100% Heat during max Overdrive activates Stand Awakening. Grants massive spectral aura, removes barrage cooldowns, and increases global damage by +35%." />
-                      </p>
-                      <div className="p-3 bg-[#13091c] border border-[#2e1840] text-xs font-mono space-y-1">
-                        <div className="text-[#c084fc]">• Duration: 15.0 Seconds</div>
-                        <div className="text-[#c084fc]">• Cooldown Reduct: 50% Global</div>
-                        <div className="text-[#c084fc]">• Immunity: Frame Invulnerability</div>
-                      </div>
-                    </CodexBox>
-                  </div>
-
-                  <VideoPlate 
-                    title="Stand Showcase: Barrage Clash, Pilot Mode & Spectral Awakenings"
-                    inputTag="E / R / Shift+E / G"
-                    badge="STAND REEL"
-                    duration="0:30"
-                    description="Visual breakdown of Stand summoning, high-frequency Barrage Clashing, remote pilot detachment, and Requiem Overdrive states."
-                    stats={[
-                      { label: "Barrage Speed", value: "18 Hits/s" },
-                      { label: "Pilot Range", value: "120 Studs" },
-                      { label: "Awakening", value: "+35% Damage" }
-                    ]}
-                    videoSrc="UNIQUE VIDEO HERE"
-                    posterSrc="UNIQUE VIDEO HERE"
-                  />
-                </div>
-              </section>
-            )}
-          </>
-        )}
+        
+                        <div id="stand-combat-switcher" className="scroll-mt-24">
+                          <FadeScaleIn delay={100}>
+                            <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#c084fc] tracking-widest uppercase mb-6 border-b border-[#2a2418] pb-3">
+                              Interactive Stand Combat Variations
+                            </h3>
+                          </FadeScaleIn>
+                          <DynamicVideoPlate 
+                            title="Stand Combat Mechanics & Abilities"
+                            options={standCombatOptions}
+                            defaultOptionId="stand-summon"
+                            sectionBadge="SELECT STAND TECH"
+                            variantTheme="purple"
+                            externalSelectedId={navVariantId}
+                          />
+                        </div>
+        
+                        <div className="space-y-8">
+                          <FadeScaleIn delay={100}>
+                            <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#c084fc] tracking-widest uppercase border-b border-[#2a2418] pb-3">
+                              Deep Stand Mechanics Breakdown
+                            </h3>
+                          </FadeScaleIn>
+        
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div id="stand-on-off" className="scroll-mt-24">
+                            <CodexBox title="1. Stand-On vs Stand-Off Modes" badge="STANCE SYSTEM">
+                              <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
+                                <TypewriterText text="Toggling your Stand (E) switches between nimble human strikes and heavy spectral attacks. Stand-On grants extra range and armor, while Stand-Off boosts raw movement speed." />
+                              </p>
+                              <div className="p-3 bg-[#13091c] border border-[#2e1840] text-xs font-mono space-y-1">
+                                <div className="text-[#c084fc]">• Summon Startup: 0.15s</div>
+                                <div className="text-[#c084fc]">• Reach Multiplier: +3.5 Studs</div>
+                                <div className="text-[#c084fc]">• Guard Cap: +30% Resilience</div>
+                              </div>
+                            </CodexBox>
+                            </div>
+        
+                            <div id="barrage-clash" className="scroll-mt-24">
+                            <CodexBox title="2. Barrages & Clash Dynamics" badge="BARRAGE SYSTEM">
+                              <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
+                                <TypewriterText text="Unleash rapid multi-punch strings. When two barrages hit simultaneously, a high-intensity Barrage Clash begins, requiring QTE inputs to overpower opponent Heat." />
+                              </p>
+                              <div className="p-3 bg-[#13091c] border border-[#2e1840] text-xs font-mono space-y-1">
+                                <div className="text-[#c084fc]">• Hit Rate: 18 Strikes / second</div>
+                                <div className="text-[#c084fc]">• Heat Generation: +1.5 per hit</div>
+                                <div className="text-[#c084fc]">• Clash Drain: Equalized Heat</div>
+                              </div>
+                            </CodexBox>
+                            </div>
+        
+                            <div id="remote-pilot" className="scroll-mt-24">
+                            <CodexBox title="3. Remote Pilot Mode" badge="LONG-RANGE PROJECTION">
+                              <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
+                                <TypewriterText text="Detach your Stand to fly up to 120 studs away. Ideal for ambushes and scouting, but leaves your physical user body defenseless against counter-attacks." />
+                              </p>
+                              <div className="p-3 bg-[#13091c] border border-[#2e1840] text-xs font-mono space-y-1">
+                                <div className="text-[#c084fc]">• Max Radius: 120 Studs</div>
+                                <div className="text-[#c084fc]">• Pilot Speed: 32 Studs/s</div>
+                                <div className="text-[#c084fc]">• Damage Share: 100% to User</div>
+                              </div>
+                            </CodexBox>
+                            </div>
+        
+                            <div id="stand-awakening" className="scroll-mt-24">
+                            <CodexBox title="4. Stand Awakenings & Requiem" badge="ULTIMATE FORM">
+                              <p className="text-sm text-[#c7c2b5] leading-relaxed mb-4">
+                                <TypewriterText text="Reaching 100% Heat during max Overdrive activates Stand Awakening. Grants massive spectral aura, removes barrage cooldowns, and increases global damage by +35%." />
+                              </p>
+                              <div className="p-3 bg-[#13091c] border border-[#2e1840] text-xs font-mono space-y-1">
+                                <div className="text-[#c084fc]">• Duration: 15.0 Seconds</div>
+                                <div className="text-[#c084fc]">• Cooldown Reduct: 50% Global</div>
+                                <div className="text-[#c084fc]">• Immunity: Frame Invulnerability</div>
+                              </div>
+                            </CodexBox>
+                            </div>
+                          </div>
+        
+                          <VideoPlate 
+                            title="Stand Showcase: Barrage Clash, Pilot Mode & Spectral Awakenings"
+                            inputTag="E / R / Shift+E / G"
+                            badge="STAND REEL"
+                            duration="0:30"
+                            description="Visual breakdown of Stand summoning, high-frequency Barrage Clashing, remote pilot detachment, and Requiem Overdrive states."
+                            stats={[
+                              { label: "Barrage Speed", value: "18 Hits/s" },
+                              { label: "Pilot Range", value: "120 Studs" },
+                              { label: "Awakening", value: "+35% Damage" }
+                            ]}
+                            videoSrc="UNIQUE VIDEO HERE"
+                            posterSrc="UNIQUE VIDEO HERE"
+                          />
+                        </div>
+                      </section>
+                    )}
+                  </>
+                )}
 
         {/* =========================================================
-            TAB 3: CHARACTER PROGRESSION (UPDATED UI)
+            TAB 3: PROGRESSION 
             ========================================================= */}
         {activeTab === 'progression' && (
           <div className="space-y-12 animate-fadeIn">
-            
-            {/* Progression Hero Box */}
+            <div id="progression-overview" className="scroll-mt-24">
             <CodexBox 
-              title="Path of Mastery & Character Growth"
-              badge="PROGRESSION SYSTEM"
-              accentColor="border-l-4 border-l-[#c3a35e] border-[#2a2418]"
+              title="Ascension & Growth"
+              badge="PROGRESSION OVERVIEW"
+              accentColor="border-l-4 border-l-[#34d399] border-[#2a2418]"
             >
-              <p className="text-[#c7c2b5] leading-relaxed text-base md:text-lg mb-6">
-                <TypewriterText text="Forge your combat legacy through meticulous stat allocation, specialized skill node branches, and breakthrough prestige tiers. Customizing your attributes alters your combo limits, critical timings, and Stand capabilities." delay={100} />
+              <p className="text-[#c7c2b5] leading-relaxed text-lg md:text-xl">
+                <TypewriterText text="True power is earned. Shape your combat style by investing in core attributes and unlocking specialized nodes in the skill tree. Your build dictates your survivability, damage output, and the utility of your Stand." delay={200} />
               </p>
-              
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-[#1e1a12]">
-                <div className="bg-[#0d0c10] p-3 border border-[#2a2418]">
-                  <span className="text-[10px] font-mono text-[#8a857a] uppercase block">Max Level Cap</span>
-                  <span className="text-xl font-bold text-[#e6c278] font-mono">Level 100</span>
-                </div>
-                <div className="bg-[#0d0c10] p-3 border border-[#2a2418]">
-                  <span className="text-[10px] font-mono text-[#8a857a] uppercase block">Total Stat Points</span>
-                  <span className="text-xl font-bold text-[#e6c278] font-mono">500 Points</span>
-                </div>
-                <div className="bg-[#0d0c10] p-3 border border-[#2a2418]">
-                  <span className="text-[10px] font-mono text-[#8a857a] uppercase block">Prestige Breakthroughs</span>
-                  <span className="text-xl font-bold text-[#e6c278] font-mono">5 Tiers</span>
-                </div>
-                <div className="bg-[#0d0c10] p-3 border border-[#2a2418]">
-                  <span className="text-[10px] font-mono text-[#8a857a] uppercase block">Mastery Nodes</span>
-                  <span className="text-xl font-bold text-[#e6c278] font-mono">36 Nodes</span>
-                </div>
-              </div>
             </CodexBox>
+            </div>
 
-            {/* SECTION 1: STAT ALLOCATION MATRIX */}
-            <div className="space-y-6">
-              <FadeScaleIn delay={100}>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-[#2a2418] pb-3 gap-2">
-                  <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase">
-                    Attribute Matrix & Stat Allocations
-                  </h3>
-                  <span className="text-xs font-mono text-[#8a857a] bg-[#121116] px-3 py-1 border border-[#2a2418]">
-                    Click Stat Card to Preview Bonuses
-                  </span>
-                </div>
-              </FadeScaleIn>
-
-              {/* Stat Selection Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {statAttributesList.map((stat) => {
-                  const isSelected = selectedStatId === stat.id;
-                  return (
-                    <div
-                      key={stat.id}
-                      onClick={() => setSelectedStatId(stat.id)}
-                      className={`cursor-pointer p-4 transition-all duration-300 border rounded-sm relative overflow-hidden ${
-                        isSelected
-                          ? 'bg-[#181510] border-[#c3a35e] shadow-[0_0_20px_rgba(195,163,94,0.2)] -translate-y-1'
-                          : 'bg-[#0a0a0d] border-[#2a2418] hover:border-[#615c52] hover:bg-[#0e0d12]'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center space-x-3">
-                          <div className={`p-2 border ${isSelected ? 'border-[#c3a35e] bg-[#211b12]' : 'border-[#2a2418] bg-[#121116]'}`}>
-                            {stat.icon}
-                          </div>
-                          <div>
-                            <h4 className={`font-['Gilda_Display',serif] text-base ${isSelected ? 'text-[#e6c278]' : 'text-[#c7c2b5]'}`}>
-                              {stat.name}
-                            </h4>
-                            <span className="text-[10px] font-mono text-[#8a857a]">
-                              {stat.scalingBonus}
-                            </span>
-                          </div>
-                        </div>
+            <div id="progression-attributes" className="scroll-mt-24 grid grid-cols-1 lg:grid-cols-12 gap-8">
+              {/* Stat Selection Column */}
+              <div className="lg:col-span-4 space-y-4">
+                <h3 className="text-xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase mb-4">
+                  Core Attributes
+                </h3>
+                {statAttributesList.map((stat) => (
+                  <button
+                    key={stat.id}
+                    onClick={() => setSelectedStatId(stat.id)}
+                    className={`w-full text-left p-4 border transition-all duration-300 flex items-center justify-between group ${
+                      selectedStatId === stat.id 
+                        ? 'bg-[#1c1a24] border-[#c3a35e] shadow-[0_0_15px_rgba(195,163,94,0.15)]' 
+                        : 'bg-[#0a0a0d] border-[#2a2418] hover:border-[#3d3423]'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className={`p-2 border transition-colors ${selectedStatId === stat.id ? 'bg-[#c3a35e] text-black border-[#c3a35e]' : 'bg-[#14121a] border-[#3d3322] text-[#e6c278] group-hover:text-white'}`}>
+                        {stat.icon}
                       </div>
-
-                      {/* Stat Progress Bar */}
-                      <div className="space-y-1">
-                        <div className="flex justify-between text-xs font-mono">
-                          <span className="text-[#8a857a]">Allocated:</span>
-                          <span className="text-[#e6c278] font-bold">{stat.currentValue} / {stat.maxValue}</span>
-                        </div>
-                        <div className="w-full bg-[#14121a] h-2 border border-[#2a2418] overflow-hidden">
-                          <div 
-                            className="bg-gradient-to-r from-[#8e733b] to-[#e6c278] h-full transition-all duration-500"
-                            style={{ width: `${(stat.currentValue / stat.maxValue) * 100}%` }}
-                          />
-                        </div>
-                      </div>
+                      <span className={`font-['Gilda_Display',serif] text-lg transition-colors ${selectedStatId === stat.id ? 'text-[#c3a35e]' : 'text-[#8a857a] group-hover:text-[#c7c2b5]'}`}>
+                        {stat.name}
+                      </span>
                     </div>
-                  );
-                })}
+                    <ChevronRight className={`w-4 h-4 transition-transform ${selectedStatId === stat.id ? 'text-[#c3a35e] translate-x-1' : 'text-[#3d3322]'}`} />
+                  </button>
+                ))}
               </div>
 
-              {/* Selected Stat Detail Panel */}
-              {selectedStatObj && (
-                <FadeScaleIn key={selectedStatObj.id} delay={150}>
-                  <div className="bg-[#0e0d12] border border-[#c3a35e]/60 p-6 rounded-sm relative overflow-hidden shadow-2xl">
-                    <div className="absolute top-0 right-0 p-4 opacity-10">
-                      {selectedStatObj.icon}
-                    </div>
-                    
-                    <div className="flex items-center space-x-3 mb-3">
-                      <span className="p-2 bg-[#1c1810] border border-[#c3a35e]">
-                        {selectedStatObj.icon}
-                      </span>
-                      <div>
-                        <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">
-                          {selectedStatObj.name} Breakdown
-                        </h4>
-                        <span className="text-xs font-mono text-[#c3a35e]">
-                          Scaling Bonus: {selectedStatObj.scalingBonus}
-                        </span>
-                      </div>
-                    </div>
+              {/* Stat Details Column */}
+              <div className="lg:col-span-8">
+                <AnimatedStatBar 
+                  label={selectedStatObj.name}
+                  value={selectedStatObj.currentValue}
+                  max={selectedStatObj.maxValue}
+                  icon={selectedStatObj.icon}
+                  bonus={selectedStatObj.scalingBonus}
+                  description={selectedStatObj.description}
+                  unlocks={selectedStatObj.keyUnlocks}
+                />               
 
-                    <p className="text-sm md:text-base text-[#b8b3a8] leading-relaxed mb-6">
-                      {selectedStatObj.description}
-                    </p>
+              </div>
 
-                    <div className="border-t border-[#2a2418] pt-4">
-                      <span className="text-xs font-mono text-[#8a857a] uppercase tracking-wider block mb-3">
-                        Key Milestone Unlocks at Max Tier:
-                      </span>
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                        {selectedStatObj.keyUnlocks.map((unlock, idx) => (
-                          <div key={idx} className="bg-[#050505] p-3 border border-[#2a2418] flex items-center space-x-2">
-                            <CheckCircle2 className="w-4 h-4 text-[#e6c278] shrink-0" />
-                            <span className="text-xs font-mono text-[#c7c2b5]">{unlock}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </FadeScaleIn>
-              )}
+              
             </div>
 
             {/* SECTION 2: SKILL TREE BRANCHES */}
-            <div className="space-y-6">
-              <FadeScaleIn delay={100}>
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-[#2a2418] pb-3 gap-4">
-                  <div>
-                    <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase">
-                      Skill Tree & Node Mastery
-                    </h3>
-                    <p className="text-xs font-mono text-[#8a857a]">
-                      Unlock combat perks and move variations by spending Skill Points earned per level.
-                    </p>
-                  </div>
-
-                  {/* Filter Buttons */}
-                  <div className="flex flex-wrap gap-2">
-                    {(['all', 'combat', 'stand', 'survival'] as const).map((branch) => (
-                      <button
-                        key={branch}
-                        onClick={() => setActiveBranch(branch)}
-                        className={`px-3 py-1.5 text-xs font-mono uppercase tracking-wider border transition-all ${
-                          activeBranch === branch
-                            ? 'bg-[#1c1810] text-[#e6c278] border-[#c3a35e]'
-                            : 'bg-[#09090c] text-[#716c62] border-[#221e15] hover:text-[#a09a8e]'
-                        }`}
-                      >
-                        {branch}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </FadeScaleIn>
-
-              {/* Skill Nodes Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {skillTreeNodesList
-                  .filter(node => activeBranch === 'all' || node.treeBranch === activeBranch)
-                  .map((node) => (
-                    <CodexBox 
-                      key={node.id} 
-                      title={node.title} 
-                      subtitle={`Tier ${node.tier} Node | Cost: ${node.cost} SP`}
-                      badge={node.unlocked ? "UNLOCKED" : "LOCKED"}
-                      accentColor={node.unlocked ? "border-[#c3a35e]/50 hover:border-[#c3a35e]" : "border-[#2a2418] opacity-75"}
-                    >
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-[10px] font-mono uppercase px-2 py-0.5 bg-[#14121a] border border-[#2a2418] text-[#e6c278]">
-                          Branch: {node.treeBranch}
-                        </span>
-                        {node.unlocked ? (
-                          <Unlock className="w-4 h-4 text-[#e6c278]" />
-                        ) : (
-                          <Lock className="w-4 h-4 text-[#8a857a]" />
-                        )}
-                      </div>
-
-                      <p className="text-xs text-[#b8b3a8] leading-relaxed mb-4">
-                        {node.description}
-                      </p>
-
-                      <div className="border-t border-[#2a2418] pt-3 space-y-1">
-                        <span className="text-[10px] font-mono text-[#8a857a] uppercase block">Passive Benefits:</span>
-                        {node.perks.map((perk, idx) => (
-                          <div key={idx} className="text-xs font-mono text-[#c7c2b5] flex items-center space-x-1.5">
-                            <span className="text-[#e6c278]">•</span>
-                            <span>{perk}</span>
+                        <div id="progression-skill-tree" className="scroll-mt-24 space-y-6">
+                          <FadeScaleIn delay={100}>
+                            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-[#2a2418] pb-3 gap-4">
+                              <div>
+                                <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase">
+                                  Skill Tree & Node Mastery
+                                </h3>
+                                <p className="text-xs font-mono text-[#8a857a]">
+                                  Unlock combat perks and move variations by spending Skill Points earned per level.
+                                </p>
+                              </div>
+            
+                              {/* Filter Buttons */}
+                              <div className="flex flex-wrap gap-2">
+                                {(['all', 'combat', 'stand', 'survival'] as const).map((branch) => (
+                                  <button
+                                    key={branch}
+                                    onClick={() => setActiveBranch(branch)}
+                                    className={`px-3 py-1.5 text-xs font-mono uppercase tracking-wider border transition-all ${
+                                      activeBranch === branch
+                                        ? 'bg-[#1c1810] text-[#e6c278] border-[#c3a35e]'
+                                        : 'bg-[#09090c] text-[#716c62] border-[#221e15] hover:text-[#a09a8e]'
+                                    }`}
+                                  >
+                                    {branch}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </FadeScaleIn>
+            
+                          {/* Skill Nodes Grid */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {skillTreeNodesList
+                              .filter(node => activeBranch === 'all' || node.treeBranch === activeBranch)
+                              .map((node) => (
+                                <CodexBox 
+                                  key={node.id} 
+                                  title={node.title} 
+                                  subtitle={`Tier ${node.tier} Node | Cost: ${node.cost} SP`}
+                                  badge={node.unlocked ? "UNLOCKED" : "LOCKED"}
+                                  accentColor={node.unlocked ? "border-[#c3a35e]/50 hover:border-[#c3a35e]" : "border-[#2a2418] opacity-75"}
+                                >
+                                  <div className="flex items-center justify-between mb-3">
+                                    <span className="text-[10px] font-mono uppercase px-2 py-0.5 bg-[#14121a] border border-[#2a2418] text-[#e6c278]">
+                                      Branch: {node.treeBranch}
+                                    </span>
+                                    {node.unlocked ? (
+                                      <Unlock className="w-4 h-4 text-[#e6c278]" />
+                                    ) : (
+                                      <Lock className="w-4 h-4 text-[#8a857a]" />
+                                    )}
+                                  </div>
+            
+                                  <p className="text-xs text-[#b8b3a8] leading-relaxed mb-4">
+                                    {node.description}
+                                  </p>
+            
+                                  <div className="border-t border-[#2a2418] pt-3 space-y-1">
+                                    <span className="text-[10px] font-mono text-[#8a857a] uppercase block">Passive Benefits:</span>
+                                    {node.perks.map((perk, idx) => (
+                                      <div key={idx} className="text-xs font-mono text-[#c7c2b5] flex items-center space-x-1.5">
+                                        <span className="text-[#e6c278]">•</span>
+                                        <span>{perk}</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </CodexBox>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    </CodexBox>
-                ))}
-              </div>
-            </div>
-
-            {/* SECTION 3: PRESTIGE & BREAKTHROUGH SYSTEM */}
-            <div className="space-y-6 border-t border-[#2a2418] pt-8">
-              <FadeScaleIn delay={100}>
-                <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">
-                  Prestige Breakthrough Tiers
-                </h3>
-              </FadeScaleIn>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <CodexBox title="Prestige I: Awakened Spirit" badge="TIER I">
-                  <div className="space-y-3">
-                    <p className="text-xs text-[#b8b3a8] leading-relaxed">
-                      Resets character level from 100 to 1, raising stat cap per attribute from 100 to 110. Unlocks Golden Critical Arts.
-                    </p>
-                    <div className="bg-[#0a0a0d] p-2.5 border border-[#2a2418] text-xs font-mono text-[#e6c278]">
-                      +10 Stat Cap Increase | Golden QTE
-                    </div>
-                  </div>
-                </CodexBox>
-
-                <CodexBox title="Prestige III: Requiem Bond" badge="TIER III">
-                  <div className="space-y-3">
-                    <p className="text-xs text-[#b8b3a8] leading-relaxed">
-                      Deepens spiritual sync with your Stand. Increases Stand Barrage clash power by +25% and grants instant Heat regeneration on Parry.
-                    </p>
-                    <div className="bg-[#0a0a0d] p-2.5 border border-[#2a2418] text-xs font-mono text-[#e6c278]">
-                      +25% Clash Power | Parry Heat Regen
-                    </div>
-                  </div>
-                </CodexBox>
-
-                <CodexBox title="Prestige V: Overdrive Zenith" badge="MAX TIER">
-                  <div className="space-y-3">
-                    <p className="text-xs text-[#b8b3a8] leading-relaxed">
-                      The pinnacle of martial mastery. Permanently unlocks the Joestar's Determination passive trait and grants 100% status immunity in Overdrive.
-                    </p>
-                    <div className="bg-[#0a0a0d] p-2.5 border border-[#2a2418] text-xs font-mono text-[#e6c278]">
-                      Status Immunity | Zenith Title & Aura
-                    </div>
-                  </div>
-                </CodexBox>
-              </div>
-            </div>
-
-            {/* Visual Screenshot Replica Plate */}
-            <VideoPlate 
-              title="System Showcase: Character Progression & Mastery Matrix"
-              inputTag="P / Tab Menu"
-              badge="PROGRESSION REEL"
-              duration="0:28"
-              description="Visual walkthrough of the in-game progression UI showing level up milestones, stat allocations, and node skill trees."
-              stats={[
-                { label: "Level Cap", value: "Level 100" },
-                { label: "Prestige Tiers", value: "5 Max" },
-                { label: "Skill Nodes", value: "36 Nodes" }
-              ]}
-              videoSrc="UNIQUE VIDEO HERE"
-              posterSrc="UNIQUE VIDEO HERE"
-            />
-
+                        </div>
+            
+                        {/* SECTION 3: PRESTIGE & BREAKTHROUGH SYSTEM */}
+                        <div id="progression-prestige" className="scroll-mt-24 space-y-6 border-t border-[#2a2418] pt-8">
+                          <FadeScaleIn delay={100}>
+                            <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">
+                              Prestige Breakthrough Tiers
+                            </h3>
+                          </FadeScaleIn>
+            
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <CodexBox title="Prestige I: Awakened Spirit" badge="TIER I">
+                              <div className="space-y-3">
+                                <p className="text-xs text-[#b8b3a8] leading-relaxed">
+                                  Resets character level from 100 to 1, raising stat cap per attribute from 100 to 110. Unlocks Golden Critical Arts.
+                                </p>
+                                <div className="bg-[#0a0a0d] p-2.5 border border-[#2a2418] text-xs font-mono text-[#e6c278]">
+                                  +10 Stat Cap Increase | Golden QTE
+                                </div>
+                              </div>
+                            </CodexBox>
+            
+                            <CodexBox title="Prestige III: Requiem Bond" badge="TIER III">
+                              <div className="space-y-3">
+                                <p className="text-xs text-[#b8b3a8] leading-relaxed">
+                                  Deepens spiritual sync with your Stand. Increases Stand Barrage clash power by +25% and grants instant Heat regeneration on Parry.
+                                </p>
+                                <div className="bg-[#0a0a0d] p-2.5 border border-[#2a2418] text-xs font-mono text-[#e6c278]">
+                                  +25% Clash Power | Parry Heat Regen
+                                </div>
+                              </div>
+                            </CodexBox>
+            
+                            <CodexBox title="Prestige V: Overdrive Zenith" badge="MAX TIER">
+                              <div className="space-y-3">
+                                <p className="text-xs text-[#b8b3a8] leading-relaxed">
+                                  The pinnacle of martial mastery. Permanently unlocks the Joestar's Determination passive trait and grants 100% status immunity in Overdrive.
+                                </p>
+                                <div className="bg-[#0a0a0d] p-2.5 border border-[#2a2418] text-xs font-mono text-[#e6c278]">
+                                  Status Immunity | Zenith Title & Aura
+                                </div>
+                              </div>
+                            </CodexBox>
+                          </div>
+                        </div>
+            
+                        {/* Visual Screenshot Replica Plate */}
+                        <VideoPlate 
+                          title="System Showcase: Character Progression & Mastery Matrix"
+                          inputTag="P / Tab Menu"
+                          badge="PROGRESSION REEL"
+                          duration="0:28"
+                          description="Visual walkthrough of the in-game progression UI showing level up milestones, stat allocations, and node skill trees."
+                          stats={[
+                            { label: "Level Cap", value: "Level 100" },
+                            { label: "Prestige Tiers", value: "5 Max" },
+                            { label: "Skill Nodes", value: "36 Nodes" }
+                          ]}
+                          videoSrc="UNIQUE VIDEO HERE"
+                          posterSrc="UNIQUE VIDEO HERE"
+                        />
           </div>
         )}
-
       </main>
 
-      {/* Global Footer */}
       <SiteFooter />
     </div>
   );
