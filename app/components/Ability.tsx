@@ -656,7 +656,7 @@ function useStandsByPart(stands: Stand[]): Record<StandPart, Stand[]> {
 // DATA LOADING + EDIT MODE
 // Viewers: stands load from /data/stands.json (falls back to the built-in
 // STANDS array above if that file is missing).
-// Owner: visit any page URL with ?edit=1 once (?edit=0 turns it off). Edits are
+// Owner: visit any page URL with ?edit=1 and enter the password once (?edit=0 turns it off). Edits are
 // kept as a draft in this browser only; "Export stands.json" downloads the file
 // you then upload to public/data/stands.json in the repo to publish.
 // ============================================================================
@@ -664,11 +664,18 @@ function useStandsByPart(stands: Stand[]): Record<StandPart, Stand[]> {
 const DRAFT_KEY = 'bb-stands-draft-v1';
 const EDIT_FLAG_KEY = 'bb-edit-mode';
 
+// CHANGE THIS before you push. It keeps casual visitors out of edit mode, but it
+// sits in the page code, so it is a lock on the door, not real security.
+const EDIT_PASSWORD = '#Light@09*';
+
 function readEditFlag(): boolean {
   try {
     const q = new URLSearchParams(window.location.search).get('edit');
-    if (q === '1') localStorage.setItem(EDIT_FLAG_KEY, '1');
     if (q === '0') localStorage.removeItem(EDIT_FLAG_KEY);
+    if (q === '1' && localStorage.getItem(EDIT_FLAG_KEY) !== '1') {
+      const attempt = window.prompt('Edit mode password:');
+      if (attempt !== null && attempt === EDIT_PASSWORD) localStorage.setItem(EDIT_FLAG_KEY, '1');
+    }
     return localStorage.getItem(EDIT_FLAG_KEY) === '1';
   } catch {
     return false;
