@@ -92,6 +92,8 @@ interface Move {
   parryable?: boolean;  // optional override (default: derived from Tags)
   armor?: string;       // optional override, e.g. 'Hyper Armor' (default: derived from Tags)
   blockExtras?: string[]; // optional override of the extra block properties (default: derived from Tags)
+  hasVariant?: boolean; // this move has variants (e.g. M2/LMB [🧱]) shown as tabs on the same card
+  variants?: Move[];    // each variant is a full Move with its own description, video and optional finisher
 }
 
 interface Stand {
@@ -721,7 +723,7 @@ function useStandsData() {
           /* ignore corrupt draft */
         }
       }
-      if (!cancelled) setStandsState(base);
+      if (!cancelled) setStandsState(groupStandsVariants(base));
     })();
     return () => {
       cancelled = true;
@@ -1126,6 +1128,53 @@ function deriveProps(tags: string[], move: Move, useOverrides: boolean) {
   };
 }
 
+// ----------------------------------------------------------------------------
+// Variant grouping
+// A "variant" is a move whose input has the same key as a plain move plus a
+// modifier, e.g. "M2/LMB [🧱] - [You Bastard!]" under "M2/LMB - [Brute Force]".
+// Different key combos (E+Y, X+T, ...) are never merged. Idempotent: moves that
+// are already nested are left alone.
+// ----------------------------------------------------------------------------
+function groupMoveVariants(moves?: Move[]): Move[] | undefined {
+  if (!moves) return moves;
+  const idOf = (m: Move) => {
+    const h = parseMoveName(m.name);
+    return { gid: h.key ? `${h.stance || ''}|${h.key}` : '', mods: h.mods.length };
+  };
+  const bases = new Map<string, Move>();
+  const out: Move[] = [];
+  for (const m of moves) {
+    const { gid, mods } = idOf(m);
+    if (gid && mods === 0 && !bases.has(gid)) {
+      const copy: Move = { ...m };
+      bases.set(gid, copy);
+      out.push(copy);
+    } else {
+      out.push(m);
+    }
+  }
+  const result: Move[] = [];
+  for (const m of out) {
+    const { gid, mods } = idOf(m);
+    const base = bases.get(gid);
+    if (gid && mods > 0 && base && base !== m) {
+      base.variants = [...(base.variants || []), { ...m }];
+      base.hasVariant = true;
+    } else {
+      result.push(m);
+    }
+  }
+  return result;
+}
+
+function groupStandsVariants(stands: Stand[]): Stand[] {
+  return stands.map((s) => ({
+    ...s,
+    moves: groupMoveVariants(s.moves),
+    awakeningMoves: groupMoveVariants(s.awakeningMoves),
+  }));
+}
+
 const CardLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <span className="block font-mono text-[9px] uppercase tracking-[0.25em] text-[#7d8794] mb-1.5">{children}</span>
 );
@@ -1144,23 +1193,121 @@ const PropPill: React.FC<{ label: string; on: boolean }> = ({ label, on }) => (
 const triSelectVal = (v?: boolean) => (v === undefined ? 'auto' : v ? 'yes' : 'no');
 const triSelectParse = (v: string) => (v === 'auto' ? undefined : v === 'yes');
 
+const SegRow: React.FC<{
+  options: { id: string; label: string; title?: string }[];
+  value: string;
+  onChange: (id: string) => void;
+}> = ({ options, value, onChange }) => (
+  <div className="flex divide-x divide-[#2a2418]">
+    {options.map((o) => (
+      <button
+        key={o.id}
+        type="button"
+        title={o.title}
+        onClick={() => onChange(o.id)}
+        className={`flex-1 px-4 py-1.5 text-sm font-['Zen_Old_Mincho',serif] whitespace-nowrap transition-colors ${
+          value === o.id ? 'bg-[#2a2418] text-[#e6c278]' : 'text-[#8a857a] hover:text-[#c7c2b5]'
+        }`}
+      >
+        {o.label}
+      </button>
+    ))}
+  </div>
+);
+
+// Editor for one move's own fields (used for the base move and for each variant).
+const MoveFieldsEditor: React.FC<{ move: Move; onChange: (m: Move) => void }> = ({ move, onChange }) => {
+  const currentExtras = deriveProps(parseMoveBody(move.description).tags, move, true).extras;
+  const toggleExtra = (n: string) =>
+    onChange({
+      ...move,
+      blockExtras: currentExtras.includes(n) ? currentExtras.filter((x) => x !== n) : [...currentExtras, n],
+    });
+  return (
+    <div className="space-y-3">
+      <EditField label="Move name (format: KEY [mods] - [Title] 🔴)">
+        <input className={inputCls} value={move.name} onChange={(e) => onChange({ ...move, name: e.target.value })} />
+      </EditField>
+      <EditField label="Description (prose, then Damage/CD/Tags/Heat lines)">
+        <textarea rows={7} className={inputCls} value={move.description} onChange={(e) => onChange({ ...move, description: e.target.value })} />
+      </EditField>
+      <EditField label="Video path (e.g. /videos/star-platinum/barrage.mp4)">
+        <input className={inputCls} value={move.videoSrc} onChange={(e) => onChange({ ...move, videoSrc: e.target.value })} />
+      </EditField>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <EditField label="Blockable">
+          <select className={inputCls} value={triSelectVal(move.blockable)} onChange={(e) => onChange({ ...move, blockable: triSelectParse(e.target.value) })}>
+            <option value="auto">Auto (from tags)</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </EditField>
+        <EditField label="Parryable">
+          <select className={inputCls} value={triSelectVal(move.parryable)} onChange={(e) => onChange({ ...move, parryable: triSelectParse(e.target.value) })}>
+            <option value="auto">Auto (from tags)</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+          </select>
+        </EditField>
+        <EditField label="Armor (blank = auto)">
+          <input className={inputCls} value={move.armor || ''} onChange={(e) => onChange({ ...move, armor: e.target.value || undefined })} />
+        </EditField>
+      </div>
+      <EditField label="Extra block properties">
+        <div className="flex flex-wrap gap-x-4 gap-y-2">
+          {EXTRA_BLOCK_PROPS.map((n) => (
+            <label key={n} className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">
+              <input type="checkbox" checked={currentExtras.includes(n)} onChange={() => toggleExtra(n)} />
+              {n}
+            </label>
+          ))}
+          {move.blockExtras && (
+            <button type="button" className={smallBtnCls} onClick={() => onChange({ ...move, blockExtras: undefined })}>
+              Reset to auto
+            </button>
+          )}
+        </div>
+      </EditField>
+      <label className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">
+        <input type="checkbox" checked={!!move.hasFinisher} onChange={(e) => onChange({ ...move, hasFinisher: e.target.checked })} />
+        Has finisher
+      </label>
+      {move.hasFinisher && (
+        <>
+          <EditField label="Finisher description (format: KEY - [Title] 🔴: text, then stat lines)">
+            <textarea rows={5} className={inputCls} value={move.finisherDescription || ''} onChange={(e) => onChange({ ...move, finisherDescription: e.target.value })} />
+          </EditField>
+          <EditField label="Finisher video path">
+            <input className={inputCls} value={move.finisherVideoSrc || ''} onChange={(e) => onChange({ ...move, finisherVideoSrc: e.target.value })} />
+          </EditField>
+        </>
+      )}
+    </div>
+  );
+};
+
 const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandlers }> = ({ move, standColor, edit }) => {
+  const [variantIdx, setVariantIdx] = useState(0); // 0 = base move, 1.. = variants
   const [activeTab, setActiveTab] = useState<'base' | 'finisher'>('base');
-  const shownTab = move.hasFinisher ? activeTab : 'base';
+
+  const variants = move.hasVariant ? move.variants || [] : [];
+  const safeIdx = variantIdx <= variants.length ? variantIdx : 0;
+  const cur: Move = safeIdx === 0 ? move : variants[safeIdx - 1];
+  const shownTab = cur.hasFinisher ? activeTab : 'base';
 
   const view = useMemo(() => {
-    if (shownTab === 'finisher' && move.finisherDescription) {
-      const fd = stripCites(move.finisherDescription);
+    if (shownTab === 'finisher' && cur.finisherDescription) {
+      const fd = stripCites(cur.finisherDescription);
       // Finisher text looks like: "E+M2 - [Barrage Finisher] 🔴: description..."
       const m = fd.match(/^(.{1,120}? - .{1,100}?):\s+([\s\S]*)$/);
       if (m) return { head: parseMoveName(m[1]), body: parseMoveBody(m[2]) };
-      return { head: parseMoveName(move.name), body: parseMoveBody(fd) };
+      return { head: parseMoveName(cur.name), body: parseMoveBody(fd) };
     }
-    return { head: parseMoveName(move.name), body: parseMoveBody(move.description) };
-  }, [shownTab, move.name, move.description, move.finisherDescription]);
+    return { head: parseMoveName(cur.name), body: parseMoveBody(cur.description) };
+  }, [shownTab, cur.name, cur.description, cur.finisherDescription]);
 
   const { head, body } = view;
-  const props = deriveProps(body.tags, move, shownTab === 'base');
+  const props = deriveProps(body.tags, cur, shownTab === 'base');
 
   const costEntry =
     body.stats.find(([k]) => /^heat cost$/i.test(k)) || body.stats.find(([k]) => /^heat requirement$/i.test(k));
@@ -1169,7 +1316,29 @@ const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandle
     .filter((s) => s !== costEntry)
     .map(([k, v]) => [/^cd$/i.test(k) ? 'Cooldown' : k, v] as [string, string]);
 
-  const videoSrc = shownTab === 'base' ? move.videoSrc : move.finisherVideoSrc;
+  const videoSrc = shownTab === 'base' ? cur.videoSrc : cur.finisherVideoSrc;
+
+  const variantOptions = variants.map((v, i) => {
+    const h = parseMoveName(v.name);
+    return {
+      id: String(i + 1),
+      label: variants.length === 1 ? 'Variant' : h.mods.join(' ') || h.title || `Variant ${i + 1}`,
+      title: h.title,
+    };
+  });
+
+  const addVariant = () => {
+    const h = parseMoveName(move.name);
+    const nv: Move = {
+      id: `variant-${Date.now()}`,
+      name: `${h.stance ? `[${h.stance}] ` : ''}${h.key} [🔼] - [New Variant] 🔴`,
+      description: 'Description here',
+      videoSrc: '',
+    };
+    edit?.onChange({ ...move, hasVariant: true, variants: [...(move.variants || []), nv] });
+  };
+  const setVariant = (i: number, nv: Move) =>
+    edit?.onChange({ ...move, variants: (move.variants || []).map((x, j) => (j === i ? nv : x)) });
 
   return (
     <div className="bg-[#0a0a0d] border border-[#2a2418] hover:border-[#3d3423] transition-colors">
@@ -1198,19 +1367,25 @@ const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandle
 
         <div className="flex items-center gap-3 shrink-0">
           {head.icons && <span className="text-sm leading-none">{head.icons}</span>}
-          {move.hasFinisher && (
-            <div className="flex bg-[#14121a] border border-[#2a2418] rounded-sm p-0.5">
-              {(['base', 'finisher'] as const).map((t) => (
-                <button
-                  key={t}
-                  onClick={() => setActiveTab(t)}
-                  className={`px-3 py-1 text-[10px] font-mono uppercase tracking-widest transition-all ${
-                    shownTab === t ? 'bg-[#2a2418] text-[#e6c278]' : 'text-[#5c584f] hover:text-[#8a857a]'
-                  }`}
-                >
-                  {t === 'base' ? 'Base' : 'Finisher'}
-                </button>
-              ))}
+          {(variants.length > 0 || cur.hasFinisher) && (
+            <div className="border border-[#3d3423] divide-y divide-[#2a2418] bg-[#0d0c10]">
+              {variants.length > 0 && (
+                <SegRow
+                  options={[{ id: '0', label: 'Base' }, ...variantOptions]}
+                  value={String(safeIdx)}
+                  onChange={(id) => setVariantIdx(Number(id))}
+                />
+              )}
+              {cur.hasFinisher && (
+                <SegRow
+                  options={[
+                    { id: 'base', label: 'Normal' },
+                    { id: 'finisher', label: 'Finisher' },
+                  ]}
+                  value={shownTab}
+                  onChange={(id) => setActiveTab(id as 'base' | 'finisher')}
+                />
+              )}
             </div>
           )}
         </div>
@@ -1304,82 +1479,53 @@ const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandle
               <button
                 type="button"
                 className={smallBtnCls}
-                onClick={() => confirm(`Delete "${move.name}"?`) && edit.onDelete()}
+                onClick={() => confirm(`Delete "${move.name}"${move.variants?.length ? ' and its variants' : ''}?`) && edit.onDelete()}
               >
                 Delete
               </button>
             </div>
           </div>
-          <EditField label="Move name (format: KEY [mods] - [Title] 🔴)">
-            <input className={inputCls} value={move.name} onChange={(e) => edit.onChange({ ...move, name: e.target.value })} />
-          </EditField>
-          <EditField label="Description (prose, then Damage/CD/Tags/Heat lines)">
-            <textarea rows={7} className={inputCls} value={move.description} onChange={(e) => edit.onChange({ ...move, description: e.target.value })} />
-          </EditField>
-          <EditField label="Video path (e.g. /videos/star-platinum/barrage.mp4)">
-            <input className={inputCls} value={move.videoSrc} onChange={(e) => edit.onChange({ ...move, videoSrc: e.target.value })} />
-          </EditField>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <EditField label="Blockable">
-              <select className={inputCls} value={triSelectVal(move.blockable)} onChange={(e) => edit.onChange({ ...move, blockable: triSelectParse(e.target.value) })}>
-                <option value="auto">Auto (from tags)</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-              </select>
-            </EditField>
-            <EditField label="Parryable">
-              <select className={inputCls} value={triSelectVal(move.parryable)} onChange={(e) => edit.onChange({ ...move, parryable: triSelectParse(e.target.value) })}>
-                <option value="auto">Auto (from tags)</option>
-                <option value="yes">Yes</option>
-                <option value="no">No</option>
-              </select>
-            </EditField>
-            <EditField label="Armor (blank = auto)">
-              <input className={inputCls} value={move.armor || ''} onChange={(e) => edit.onChange({ ...move, armor: e.target.value || undefined })} />
-            </EditField>
-          </div>
-          <EditField label="Extra block properties (base move)">
-            {(() => {
-              const current = deriveProps(parseMoveBody(move.description).tags, move, true).extras;
-              const toggle = (n: string) =>
-                edit.onChange({
-                  ...move,
-                  blockExtras: current.includes(n) ? current.filter((x) => x !== n) : [...current, n],
-                });
-              return (
-                <div className="flex flex-wrap gap-x-4 gap-y-2">
-                  {EXTRA_BLOCK_PROPS.map((n) => (
-                    <label key={n} className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">
-                      <input type="checkbox" checked={current.includes(n)} onChange={() => toggle(n)} />
-                      {n}
-                    </label>
-                  ))}
-                  {move.blockExtras && (
-                    <button type="button" className={smallBtnCls} onClick={() => edit.onChange({ ...move, blockExtras: undefined })}>
-                      Reset to auto
-                    </button>
-                  )}
-                </div>
-              );
-            })()}
-          </EditField>
+
+          <MoveFieldsEditor move={move} onChange={edit.onChange} />
+
           <label className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">
             <input
               type="checkbox"
-              checked={!!move.hasFinisher}
-              onChange={(e) => edit.onChange({ ...move, hasFinisher: e.target.checked })}
+              checked={!!move.hasVariant}
+              onChange={(e) => {
+                if (e.target.checked && !(move.variants && move.variants.length)) addVariant();
+                else edit.onChange({ ...move, hasVariant: e.target.checked });
+              }}
             />
-            Has finisher
+            Has variant
           </label>
-          {move.hasFinisher && (
-            <>
-              <EditField label="Finisher description (format: KEY - [Title] 🔴: text, then stat lines)">
-                <textarea rows={5} className={inputCls} value={move.finisherDescription || ''} onChange={(e) => edit.onChange({ ...move, finisherDescription: e.target.value })} />
-              </EditField>
-              <EditField label="Finisher video path">
-                <input className={inputCls} value={move.finisherVideoSrc || ''} onChange={(e) => edit.onChange({ ...move, finisherVideoSrc: e.target.value })} />
-              </EditField>
-            </>
+
+          {move.hasVariant && (
+            <div className="space-y-3 pl-3 border-l border-[#3d3423]">
+              {(move.variants || []).map((v, i) => (
+                <div key={v.id} className="border border-dashed border-[#3d3423] p-3 space-y-3">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#34d399]">
+                      Variant editor — {parseMoveName(v.name).title || `Variant ${i + 1}`}
+                    </span>
+                    <button
+                      type="button"
+                      className={smallBtnCls}
+                      onClick={() =>
+                        confirm(`Delete variant "${v.name}"?`) &&
+                        edit.onChange({ ...move, variants: (move.variants || []).filter((_, j) => j !== i) })
+                      }
+                    >
+                      Delete variant
+                    </button>
+                  </div>
+                  <MoveFieldsEditor move={v} onChange={(nv) => setVariant(i, nv)} />
+                </div>
+              ))}
+              <button type="button" className={smallBtnCls} onClick={addVariant}>
+                + Add variant
+              </button>
+            </div>
           )}
         </div>
       )}
