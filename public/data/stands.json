@@ -1,0 +1,627 @@
+[
+  {
+    "id": "star-platinum",
+    "name": "Star Platinum",
+    "part": "Part 3",
+    "color": "#8144e4",
+    "confirmed": true,
+    "pfpSrc": "Source Here",
+    "fullArtSrc": "/Star Platinum Full Art.png",
+    "quote": "I can't beat your ass without getting closer",
+    "description": "Awakened in 1988, Jotaro Kujo was possessed by what he deemed an evil spirit. Star Platinum is the pinnacle of close-range combat, capable of breaking even the planet.\n\nBase Stats: M1 Damage: 8.1, M1 Uppercut: 10.2, Speed Tier: A, Power Tier: A.\n\nExtra Traits: Combo Break [Star Burst + Unstoppable Force] replaces standard combo break, stunning nearby opponents and canceling non-I-Frame moves.\n\nAdd-on Passives:\n- Star Guardian: Guard hitbox increased from 200° to 300°. Guard HP increases 100%-200% based on player's hp loss. Perfect Guards trigger a swift jab doing 20hp (cannot kill) and grant 10% more damage on the next hit.\n- True Stardust Spirit: Awakening costs 20 meters and 25% Stand Endurance. Special moves use 25% less endurance but require more heat. Dashes in awakening become flash warps. Awakening grants Super Armour (tanks up to 50 damage).\n\nMaturity Refineries:\n- Power (Immesurable Power): All damage becomes TRUE DAMAGE. Barrage Finisher gets a true block break end hit.\n- Agility (Shooting Star): Grab moves get 10% damage increase. Attack speed increases by 35% under 50% HP or in awakening.\n- Endurance (Unstoppable Force): Perfect guards give 15% more guard bar and 10 heat. Under 20% HP, combo break does a burst Timestop automatically putting you in awakening.",
+    "rarity": "High Tier Rarity",
+    "standType": "Awakening (Class: Strength/Pow) - Close Range Grappler",
+    "moves": [
+      {
+        "id": "m2-brute-force",
+        "name": "M2/LMB - [Brute Force] 🔴",
+        "description": "Star Platinum grabs the opponent's neck and performs a secondary punch with their other hand straight to the victim's skull, sending them hurdling back.\n\nDamage: 3.3(Grab) + 13.6 + (Skull Damage) | CD: 10s\nTags: Grab | Ragdoll+Knockback | Guardable | COMBO ENDER/GRAB | CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.15s",
+        "videoSrc": "MOVE VIDEO HERE/m2-brute-force.mp4"
+      },
+      {
+        "id": "m2-you-bastard",
+        "name": "M2/LMB [🧱] - [\"You Bastard!\"] 🔴",
+        "description": "Star Platinum chokes the enemy to the wall before using their other arm to release a one armed barrage of strikes to the opponent before punching them through the wall.\n\nDamage: 1.2 + 0.5*10 + 5.3 | CD: 10s\nTags: Ragdoll+Knockback | Guardable | Wall Crash | COMBO ENDER | CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.2s",
+        "videoSrc": "MOVE VIDEO HERE/m2-you-bastard.mp4"
+      },
+      {
+        "id": "m2-stand-uppercut",
+        "name": "M2/LMB [🔼] - [Stand Uppercut] 🔴",
+        "description": "The stand uppercuts the enemy into the air, allowing for air combos.\n\nDamage: 8.5 | CD: 10s\nTags: Stun (1.0s) | Guardable | Upper-Spike | COMBO EXTENDER | CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.1s",
+        "videoSrc": "MOVE VIDEO HERE/m2-stand-uppercut.mp4"
+      },
+      {
+        "id": "e-barrage",
+        "name": "E [♦️] - [Barrage] 🔴",
+        "description": "Stand unleashes a burst of rapid punches, dealing stun (lasts 3.5s).\n\nDamage: 1.2*28 @8 hits/s | CD: 8s\nTags: Stun (0.5/hit) | Stun Evasive | Ragdoll Bypass | Guardable | Uncancellable | COMBO EXTENDER | EXTENDED CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 1*12 @4/s",
+        "videoSrc": "MOVE VIDEO HERE/star-platinum-barrage.mp4",
+        "hasFinisher": true,
+        "finisherDescription": "E+M2 - [Barrage Finisher] 🔴: Stand ends the barrage with a heavy strike that knocks away the opponent.\n\nDamage: 6.8 | CD: (E+2s)\nTags: Guard Break | True Follow-Up | Soft Ragdoll | Slight Knockback | Parriable | Uncancellable | COMBO ENDER [MINI CUTSCENE] | EXTENDED CLOSE RANGE\nHeat Cost: 5 | Heat Gain: 0 | Endlag: 0.15s",
+        "finisherVideoSrc": "MOVE VIDEO HERE/star-platinum-barrage-finisher.mp4"
+      },
+      {
+        "id": "r-star-breaker",
+        "name": "R - [Star Breaker] 🔴",
+        "description": "Star Platinum strikes the victim's skull with immense force, dealing massive damage.\n\nDamage: 19.5 | CD: 16s\nTags: Guard Break| Ragdoll | Heavy Knockback | Hyper Armor | Hyper Armor Crash | Heavy Parriable | Uncancellable | COMBO ENDER | CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 20 | Endlag: 0.3s",
+        "videoSrc": "MOVE VIDEO HERE/r-star-breaker.mp4"
+      },
+      {
+        "id": "r-skull-crusher",
+        "name": "R [🟥] - [Skull Crusher] 🔴",
+        "description": "Star Platinum charges its strike to unleash an even more powerful blow, crushing the opponents skull and sending them flying away. (User moves slightly forward upon use)\n\nDamage: 29.5 + (Skull Damage) | CD: 18s\nTags: Guard Break | Stand Crasher | Ragdoll | Heavy Knockback | Hyper Armor | Hyper Armor Bypass | Heavy Parriable | COMBO ENDER | CLOSE RANGE+ | STAND POSITIONABLE\nHeat Cost: 25 | Heat Gain: 0 | Endlag: 0.3s",
+        "videoSrc": "MOVE VIDEO HERE/r-skull-crusher.mp4",
+        "hasFinisher": true,
+        "finisherDescription": "R [🟥] - [Skull Crusher] Finisher: Partial Cutscene/Impact Frame. Star Platinum crushes the opponent's skull, shattering it 3 times before the entire skeleton is shattered, right before the stand launches the body miles away.\n\nHP Required: >40hp",
+        "finisherVideoSrc": "MOVE VIDEO HERE/r-skull-crusher-finisher.mp4"
+      },
+      {
+        "id": "t-star-finger",
+        "name": "T - [\"Star Finger!\"] 🔴",
+        "description": "Star Platinum extends its index and middle fingers to pierce anyone within its range.\n\nDamage: 10.3 + [BLEED(T1)] | CD: 12s\nTags: True Stun (0.85s) | Guardable | Dodge Bypass | Enemy Pull | Knockback Cancel | COMBO EXTENDER/MIXUP | CLOSE RANGE+\nHeat Cost: 0 | Heat Gain: 5",
+        "videoSrc": "MOVE VIDEO HERE/t-star-finger.mp4"
+      },
+      {
+        "id": "t-down",
+        "name": "T [🔝] - [\"I’ll stop him before he kills me!\"] 🔴",
+        "description": "Star Platinum swipes its finger, slicing the opponent downwards.\n\nDamage: 12.3 + [BLEED(T1)] | CD: 14s\nTags: Soft Ragdoll | Guardable | Rebound | Enemy Pull | Knockback Cancel | Grounded Bypass | Stun (0.45s) | COMBO EXTENDER/MIXUP | CLOSE RANGE+\nHeat Cost: 0 | Heat Gain: 5",
+        "videoSrc": "MOVE VIDEO HERE/t-down.mp4"
+      },
+      {
+        "id": "t-whirling",
+        "name": "T [✴️] - [Whirling Star] 🔴",
+        "description": "Star Platinum zooms out, grabs their opponent and spins them around a couple times, before throwing them away (User is left behind).\n\nDamage: 9.1 | CD: 12s\nTags: Aimable(Camera) | Guardable | Knockback | Stun (0.65s) | COMBO EXTENDER | SEMI MID RANGE\nHeat Cost: 0 | Heat Gain: 6",
+        "videoSrc": "MOVE VIDEO HERE/t-whirling.mp4"
+      },
+      {
+        "id": "g-stardust-smash",
+        "name": "G [♦️+❇️] - [Stardust Smash] 🔴",
+        "description": "Star Platinum destroys the ground beneath them with its fist, forming a massive crater that is larger and more spiked towards the front. Each of the 3 charge stages do 15% more dmg. Can be used to get out stun.\n\nDamage: 20.8 (Front) + 18.2 (AOE) | CD: 23s\nTags: Grounded Bypass | Guard Break | Knockback+Ragdoll | Stand Crash | Hyper Armor+Break | Heavy Parriable[Unparriable at 3rd charge] | Dodge Bypass | Stun Evasive | COMBO ENDER | AOE (SMALL - SUB-MID SCALE)\nHeat Cost: 0 | Heat Gain: 8 | Endlag: 0.35s",
+        "videoSrc": "MOVE VIDEO HERE/g-stardust-smash.mp4"
+      },
+      {
+        "id": "g-stardust-meteor",
+        "name": "G [⏏️]  - [Stardust Meteor] 🔴",
+        "description": "Star Platinum does a diving downward punch into the ground after a stand jump to unleash an even more powerful impact, destroying anything in the area.\n\nDamage: 28.7 | CD: 23s\nTags: Grounded Bypass | True Guard Break | Knockback+Ragdoll | Stand Crash | Hyper Armor+Hyper Armor Bypass | Aimable | Dodge Bypass | COMBO ENDER | AOE (SUB-MID - MID SCALE)\nHeat Cost: 0 | Heat Gain: 8 | Endlag: 0.35s",
+        "videoSrc": "MOVE VIDEO HERE/g-stardust-meteor.mp4"
+      },
+      {
+        "id": "x-mach-impact",
+        "name": "X [🛡️] - [Mach Impact] 🔴",
+        "description": "Star Platinum lunges forward for a powerful skull punch to the opponent, knocking them back from the impact (Has 3 charge stages, this is 1st stage).\n\nDamage: 16.2 | CD: 12s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | COMBO EXTENDER | SEMI-MID RANGE\nHeat Cost: 0 | Heat Gain: 5 | Endlag: 0.3s",
+        "videoSrc": "MOVE VIDEO HERE/x-mach-impact.mp4"
+      },
+      {
+        "id": "x-supersonic-impact",
+        "name": "X [1st 🟥] [🛡️] - [Supersonic Impact] 🔴",
+        "description": "Star Platinum lunges forward for a hard hitting punch to the opponent’s skull, (2nd Stage).\n\nDamage: 18.2 | CD: 12s\nTags: Knockback+Soft Ragdoll | Guard Break | Heavy Parriable | COMBO EXTENDER/ENDER | SEMI-MID RANGE\nHeat Cost: 0 | Heat Gain: 7 | Endlag: 0.35s",
+        "videoSrc": "MOVE VIDEO HERE/x-supersonic-impact.mp4"
+      },
+      {
+        "id": "x-hypersonic-impact",
+        "name": "X [ 2nd 🟥] [🛡️] - [Hypersonic Impact] 🔴",
+        "description": "Star Platinum lunges out for a powerful punch to the opponent’s skull, knocking them away from the impact. (Third and final charge of mach impact).\n\nDamage: 20.2 | CD: 12s\nTags: Heavy Knockback+Ragdoll | True Guard Break | COMBO ENDER | SEMI-MID RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 9 | Endlag: 0.4s",
+        "videoSrc": "MOVE VIDEO HERE/x-hypersonic-impact.mp4",
+        "hasFinisher": true,
+        "finisherDescription": "X [🟥] - [Hypersonic Impact] Finisher: Non-Cutscene. A hitstop effect occurs right before the victim is sent flying miles away (body causes destruction).\n\nHP Required >40hp",
+        "finisherVideoSrc": "MOVE VIDEO HERE/x-hypersonic-impact-finisher.mp4"
+      },
+      {
+        "id": "x-c-judge-you",
+        "name": "X [🟥]+C  - [\"I’ll Judge You Myself!\"] 🔴",
+        "description": "Star Platinum lunges forward and grabs the opponent before doing a series of punches with its right arm and finally uppercutting them into the air. Each charge variant does a different version upon impact (Variant 1: Non-Cutscene, Variant 2: Short Cutscene, Variant 3: Cutscene w/ Skull Damage + Grand Upper-Spike).\n\nDamage: Dependant on variant | CD: Dependant on Variant\nTags: Light Parriable[Unparriable at 3rd charge] | Guard Bypass | Knockback+Ragdoll | Grab | Hyper Armor Crash | Rebound | Uncancellable | Upper-Spike | COMBO ENDER [SUPER] | SEMI-MID RANGE | STAND POSITIONABLE\nHeat Cost: 40 | Heat Gain: 0 | Endlag: 0.5s (if missed)",
+        "videoSrc": "MOVE VIDEO HERE/x-c-judge-you.mp4",
+        "hasFinisher": true,
+        "finisherDescription": "X+C (Variant 3) - [\"I’ll Judge You Myself!\"] Finisher: Cutscene Finisher. On the final uppercut hit, Star Platinum puts in more force, releasing its punch as the victim is seen in the background flying in the sky with a cartoon twinkle.\n\nHP Required >65hp",
+        "finisherVideoSrc": "MOVE VIDEO HERE/x-c-judge-you-finisher.mp4"
+      },
+      {
+        "id": "x-t-beat-breath",
+        "name": "X+T - [\"Beat In A Breath\"] 🔴",
+        "description": "Star Platinum does a strong inhale that can pull multiple enemies towards him.\n\nDamage: 0 | CD: 10s\nTags: True Stun (0.75s) | Guard Bypass | Dodge Bypass | Enemy Pull | Knockback Cancel | COMBO EXTENDER/MIXUP | SEMI-MID | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 0 | Endlag: 0.45s (if missed)",
+        "videoSrc": "MOVE VIDEO HERE/x-t-beat-breath.mp4"
+      },
+      {
+        "id": "y-jaw-breaker",
+        "name": "Y - [Jaw Breaker] 🔴",
+        "description": "Star Platinum does a shoving elbow jab at the opponent’s jaw that stuns them.\n\nDamage: 9.5 | CD: 12s\nTags: Guardable | Stun (0.65s) | Push Back | MIXUP | EXTENDED CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 8",
+        "videoSrc": "MOVE VIDEO HERE/y-jaw-breaker.mp4"
+      },
+      {
+        "id": "c-immense-power",
+        "name": "C - [\"What Immense Power!\"] 🔴",
+        "description": "Star Platinum lunges out and drags the opponent on the ground before throwing them in the air.\n\nDamage: 5.3 | CD: 12s\nTags: Guardable | Grab | Medium Knockback+Soft Ragdoll | Stun (0.5s) | Rebound | COMBO EXTENDER/ENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 12 | Endlag: 0.2s",
+        "videoSrc": "MOVE VIDEO HERE/c-immense-power.mp4"
+      },
+      {
+        "id": "c-space-immense-power",
+        "name": "C+[SPACE]{HELD} [🔼] - [\"What Immense Power!\"] 🔴",
+        "description": "Star Platinum lunges out and drags the opponent on the ground before throwing them in the air.\n\nDamage: 5.3 | CD: 12s\nTags: Guardable | Grab | Knockback+Soft Ragdoll | Stun (0.5s) | Rebound | Upper-Spike | COMBO EXTENDER/ENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 12 | Endlag: 0.2s",
+        "videoSrc": "MOVE VIDEO HERE/c-space-immense-power.mp4"
+      },
+      {
+        "id": "c-up-no-mercy",
+        "name": "C [⬆️] - [\"No Mercy!\"] 🔴",
+        "description": "Star Platinum does an uppercut, before slamming the opponent back down to the ground with a strong hit.\n\nDamage: 8.2 + 11.2 | CD: 12s\nTags: True Guard Break | Knockback+Ragdoll | Down-Spike | COMBO ENDER [PARTIAL CUTSCENE] | CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 4+10 | Endlag: 0.2s",
+        "videoSrc": "MOVE VIDEO HERE/c-up-no-mercy.mp4"
+      },
+      {
+        "id": "z-star-synchrony",
+        "name": "Z - [Star Synchrony] 🔴",
+        "description": "The user runs up and grabs the opponent, tumbling over with the victim’s neck in their arms. Star Platinum summons and the user chokes the victim, allowing Star Platinum to M1 before spinning them around and throwing them away.\n\nDamage: 8.2 (grab) + 6.3 (throw) | CD: 25s\nTags: Grab | Guard-Bypass | Light Parriable | Hyper Armor | Dodge Bypass > Knockback + Ragdoll | Rebound | COMBO ENDER [SUPER & PARTIAL CUTSCENE] | MID RANGE\nHeat Cost: 30 | Heat Gain: 0 | Endlag: 0.5s(if missed)",
+        "videoSrc": "MOVE VIDEO HERE/z-star-synchrony.mp4",
+        "hasFinisher": true,
+        "finisherDescription": "Z - [Star Synchrony] Finisher: Cutscene. A cinematic beatdown where Star Platinum comes forward to face the victim, finishing with a black screen impact.\n\nHP Required >45hp",
+        "finisherVideoSrc": "MOVE VIDEO HERE/z-star-synchrony-finisher.mp4"
+      },
+      {
+        "id": "z-up-star-drive",
+        "name": "Z [⬆️/✴️] - [Star Drive] 🔴",
+        "description": "Star Platinum catches the enemy, throws them in the air, before catching them and pile driving them to the floor.\n\nDamage: 5.2 (grab) + 29.3 (ground hit) | CD: 20s\nTags: Camera Aimable | Hyper Armor | True Guard Bypass | Grab | Knockback+Ragdoll | COMBO ENDER | CLOSE RANGE\nHeat Cost: 20 | Heat Gain: 0 | Endlag: 0.4s(if missed)",
+        "videoSrc": "MOVE VIDEO HERE/z-up-star-drive.mp4"
+      },
+      {
+        "id": "h-stellar-resolve",
+        "name": "H - [Stellar Resolve] 🟣",
+        "description": "The user awakens its inner resolve and grows more powerful, as Star platinum goes in front of the user as the user does the iconic pose and yells in rage before returning to its original stance.\n\nDamage: 1*10+25 | CD: 50s\nTags: I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | Slows if in AOE | Stun (0.9s) | Push-Back | AWAKENING MOVE + PARTIAL-CUTSCENE | SUB-MID AOE\nHeat Cost: 50 | Heat Gain: 0",
+        "videoSrc": "MOVE VIDEO HERE/h-stellar-resolve.mp4"
+      },
+      {
+        "id": "h-up-stellar-resolve",
+        "name": "H [⬆️] - [Stellar Resolve] 🟣",
+        "description": "The user awakens its inner resolve and grows more powerful, as Star platinum bursts out with rage.\n\nDamage: 1*10+25 | CD: 50s\nTags: I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | Slows if in AOE | Stun (0.9s) | Push-Back | AWAKENING MOVE + PARTIAL-CUTSCENE | SUB-MID AOE\nHeat Cost: 50 | Heat Gain: 0",
+        "videoSrc": "MOVE VIDEO HERE/h-up-stellar-resolve.mp4"
+      },
+      {
+        "id": "h-red-stellar-resolve",
+        "name": "H [🟥] - [Stellar Resolve] 🟣",
+        "description": "CUTSCENE: The user drops to the floor on his knees then enters a flashback. Star Platinum's arm partially manifests and causes a massive crater, bigger than G move, and the roar stuns players and knocks them away at the end.\n\nDamage: 12.2+ 1.2*7+7.3 | CD: 50s\nTags: True I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | 90% Slowed after groundslam | Knockback+Ragdoll after roar | Stun (0.55s) | AWAKENING MOVE [SUPER & PARTIAL CUTSCENE] | MID+ AOE\nHeat Cost: 50 | Heat Gain: 0",
+        "videoSrc": "MOVE VIDEO HERE/h-red-stellar-resolve.mp4"
+      },
+      {
+        "id": "j-destructive-uppercut",
+        "name": "J - [Destructive Uppercut] 🔴",
+        "description": "Star Platinum lunges forward and grabs the opponent, and launches them into the air before doing a second uppercut punch.\n\nDamage: 3.2 (grab)+ 21.3 (punch)+ (Torso Damage) | CD: 16s\nTags: Guardable | Grab | Knockback | Soft Ragdoll | Upper-Spike | COMBO EXTENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.3s(if missed)",
+        "videoSrc": "MOVE VIDEO HERE/j-destructive-uppercut.mp4",
+        "hasFinisher": true,
+        "finisherDescription": "J - [Destructive Uppercut] Finisher: Cutscene. As the victim flies in the air, Star Platinum ZOOMS out to deliver a final punch to the victim.\n\nHP Required >30hp",
+        "finisherVideoSrc": "MOVE VIDEO HERE/j-destructive-uppercut-finisher.mp4"
+      },
+      {
+        "id": "j-x-destructive-impact",
+        "name": "J+X - [Destructive Impact] 🔴",
+        "description": "Star Platinum lunges forward and grabs the opponent, and launches them into the air before doing a second skull punch to send them away.\n\nDamage: 3.2 (grab)+ 26.3 (punch)+ (Skull Damage) | CD: 16s\nTags: Guardable | Grab | Knockback | Soft Ragdoll | Rebound | COMBO EXTENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 12 | Endlag: 0.3s(if missed)",
+        "videoSrc": "MOVE VIDEO HERE/j-x-destructive-impact.mp4",
+        "hasFinisher": true,
+        "finisherDescription": "J+X - [Destructive Impact] Finisher: Cutscene. As the victim flies in the air, The user flash steps behind the enemy and follows up with an uppercut.\n\nHP Required >45hp",
+        "finisherVideoSrc": "MOVE VIDEO HERE/j-x-destructive-impact-finisher.mp4"
+      },
+      {
+        "id": "j-up-sparking-fist",
+        "name": "J [🔼] - [Sparking Fist] 🔴",
+        "description": "Star Platinum and the user charges before lunging a punch forward that hits the enemy’s head before a second gut punch that sends the victim flying far away.\n\nDamage: 25.3 + (Aimed Body Part Damage) | CD: 16s\nTags: Guard Break | Knockback | Soft Ragdoll | Light Parriable | Hyper Armor | Grounded Bypass | COMBO EXTENDER | SEMI-MID RANGE\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.3s(if missed)",
+        "videoSrc": "MOVE VIDEO HERE/j-up-sparking-fist.mp4"
+      },
+      {
+        "id": "j-wall-crushing-fist",
+        "name": "J [🧱] - [Crushing Fist] 🔴",
+        "description": "Star Platinum does a series of punches to the victim on the wall before a final punch to send them away.\n\nDamage: 25.3 + (Aimed Body Part Damage) | CD: 16s\nTags: Guard Break | Knockback | Soft Ragdoll | Light Parriable | Hyper Armor | Grounded Bypass | COMBO EXTENDER | SEMI-MID RANGE\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.3s(if missed)",
+        "videoSrc": "MOVE VIDEO HERE/j-wall-crushing-fist.mp4"
+      },
+      {
+        "id": "j-up-red-nova",
+        "name": "J [🔼🟥] - [Nova Sparking Fist] 🔴",
+        "description": "Star Platinum and the user charges even more before lunging a punch forward. Upon impact, the stand drives their fist into the victim slowly until they blow away from the impact.\n\nDamage: 29.3 (punch)+ (Aimed Body Part Damage) | CD: 16s\nTags: True Guard Break | Heavy Knockback | Ragdoll | Counter Bypass | Hyper Armor+ Crash | Grounded Bypass | COMBO ENDER | SEMI-MID RANGE\nHeat Cost: 15 | Heat Gain: 0 | Endlag: 0.4s(if missed)",
+        "videoSrc": "MOVE VIDEO HERE/j-up-red-nova.mp4",
+        "hasFinisher": true,
+        "finisherDescription": "J [🔼🟥] - [Nova Sparking Fist] Finisher: Non-Cutscene. Upon Impact, the screen goes grey for a second as the stand’s fist drives deeper into the victim's skull. Until their skull explodes due to the sheer force.\n\nHP Required >30hp",
+        "finisherVideoSrc": "MOVE VIDEO HERE/j-up-red-nova-finisher.mp4"
+      },
+      {
+        "id": "so-e-blitz",
+        "name": "[Stand-Off] E - [Blitz Strike] 🔴",
+        "description": "Star Platinum zooms forward to punch the nearest opponent if they're in range.\n\nDamage: 8.5 | CD: 12s\nTags: Auto-Aim | Stun (0.7s) | Guardable | MIXUP | CLOSE RANGE+ | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 10",
+        "videoSrc": "MOVE VIDEO HERE/so-e-blitz.mp4"
+      },
+      {
+        "id": "so-ee-rising",
+        "name": "[Stand-Off] E+E - [Rising Star] 🔴",
+        "description": "Star Platinum follows up with an upper punch that knocks the opponent away.\n\nDamage: 7.9 | CD: 10s\nTags: Follow-Up | Knockback+Ragdoll | Guard Break | Rebound | Light Parriable | Upper-Spike | ENDER | CLOSE RANGE+ | STAND POSITIONABLE\nHeat Cost: 5 | Heat Gain: 0",
+        "videoSrc": "MOVE VIDEO HERE/so-ee-rising.mp4"
+      },
+      {
+        "id": "so-r-skull-shredder",
+        "name": "[Stand-Off] R - [Skull Shredder] 🔴",
+        "description": "Star Platinum blitzes out, grabs and crashes the victim to the floor and them tosses them away.\n\nDamage: 9.4 + 4.2 | CD: 15s\nTags: Knockback+Ragdoll | Guardable | COMBO ENDER | CLOSE+ RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 3+1",
+        "videoSrc": "MOVE VIDEO HERE/so-r-skull-shredder.mp4"
+      },
+      {
+        "id": "so-t-neo-star",
+        "name": "[Stand-Off] T [♦️] - [Neo Star Breaker] 🔴",
+        "description": "Star Platinum charges one of its strongest punches at the victim. For every 3 seconds this is held, the move gets 50% more damage.\n\nDamage: [Minimum] 16.0 | CD: 30s (+10s if past 4s charge)\nTags: Heavy Knockback+Ragdoll | True Guard Break | Counter Bypass | Dodge Bypass | COMBO ENDER | CLOSE+ RANGE | STAND POSITIONABLE | AUTO STAND SUMMON\nHeat Cost: 15 | Heat Gain: 0",
+        "videoSrc": "MOVE VIDEO HERE/so-t-neo-star.mp4"
+      },
+      {
+        "id": "so-y-back-off",
+        "name": "[Stand-Off] Y - [\"Back Off!\"] 🔴",
+        "description": "The user grabs the opponent as star platinum knocks them away.\n\nDamage: 9.2 | CD: 15s\nTags: Knockback+Soft Ragdoll | Guardable | Counter Bypass | COMBO ENDER/EXTENDER | CLOSE RANGE | AUTO STAND SUMMON\nHeat Cost: 0 | Heat Gain: 5",
+        "videoSrc": "MOVE VIDEO HERE/so-y-back-off.mp4"
+      },
+      {
+        "id": "so-yr-understand",
+        "name": "[Stand-Off] Y+R - [\"Do You Understand?\"] 🔴",
+        "description": "The user grabs the opponent and restrains from behind for a couple seconds.\n\nDamage: 2.1 | CD: 15s\nTags: Knockback+Soft Ragdoll | Guardable | Counter Bypass | COMBO ENDER/EXTENDER | CLOSE RANGE | AUTO STAND SUMMON\nHeat Cost: 0 | Heat Gain: 1",
+        "videoSrc": "MOVE VIDEO HERE/so-yr-understand.mp4"
+      },
+      {
+        "id": "so-yr-missed",
+        "name": "[Stand-Off] Y+R [🛑] - [\"Do You Understand\" Missed] 🔴",
+        "description": "When Missed, Star Platinum does a strong inhale that pulls in the enemy.\n\nDamage: 0.0 | CD: 15s\nTags: True Stun (0.85s) | Guardable | Dodge Bypass | Enemy Pull | Knockback Cancel | COMBO EXTENDER/MIXUP | SEMI MID\nHeat Cost: 0 | Heat Gain: 0",
+        "videoSrc": "MOVE VIDEO HERE/so-yr-missed.mp4"
+      },
+      {
+        "id": "so-yre-brutal",
+        "name": "[Stand-Off] Y+R+E - [Brutal Beatdown] 🔴",
+        "description": "When used, Star Platinum comes out and does a swift combo of attacks leading to an uppercut hit before throwing them away from their legs.\n\nDamage: 2.1 + X | CD: 15s\nTags: Knockback+Soft Ragdoll | Guardable | Counter Bypass | COMBO ENDER/EXTENDER | CLOSE RANGE | AUTO STAND SUMMON\nHeat Cost: 0 | Heat Gain: 1+X",
+        "videoSrc": "MOVE VIDEO HERE/so-yre-brutal.mp4"
+      },
+      {
+        "id": "so-y-knockout",
+        "name": "[Stand-Off] Y [✴️] - [\"Knockout!\"] 🔴",
+        "description": "Star Platinum appears in front of the enemy and grabs them before slamming them vertically to the ground.\n\nDamage: 13.3 (-10% per 10 studs past 20 stud range, limit=70) | CD: 15s\nTags: Knockback+Soft Ragdoll | Guardable | Dodge Bypass | COMBO ENDER/EXTENDER | MID + RANGE\nHeat Cost: 15 | Heat Gain: 0",
+        "videoSrc": "MOVE VIDEO HERE/so-y-knockout.mp4"
+      },
+      {
+        "id": "so-h-platinum-fists",
+        "name": "[Stand-Off] H - [Platinum Fists] 🔴",
+        "description": "Star Platinum engulfs the user’s arms partially, acting as a damage, defence and attack speed buff. Mode can be toggled on and off freely.\n\nDamage: Null | CD: 10s\nTags: Move Buff | PASSIVE BUFFER | RANGE IRRELEANT\nHeat Cost: 20 + 5/s | Heat Gain: 0",
+        "videoSrc": "MOVE VIDEO HERE/so-h-platinum-fists.mp4"
+      }
+    ],
+    "awakeningMoves": [
+      {
+        "id": "awk-m2-crushing-grip",
+        "name": "M2 - [Crushing Grip] 🔴",
+        "description": "Star Platinum grabs the opponent and throws them away with one arm.\n\nDamage: 14.2 | CD: 10s\nTags: Guardable | Knockback | Soft Ragdoll | COMBO ENDER | CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 6",
+        "videoSrc": "MOVE VIDEO HERE/awk-m2-crushing-grip.mp4"
+      },
+      {
+        "id": "awk-m2x-crushing-rage",
+        "name": "M2+X - [Crushing Rage] 🔴",
+        "description": "Star Platinum grabs the opponent and slams them on the ground before tossing them away with one arm.\n\nDamage: 17.2 + 3.2 + (Torso Damage) | CD: 10s\nTags: Guardable | Knockback | Soft Ragdoll | COMBO ENDER | CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 6",
+        "videoSrc": "MOVE VIDEO HERE/awk-m2x-crushing-rage.mp4"
+      },
+      {
+        "id": "awk-m2xc-crushing-fury",
+        "name": "M2+X+C - [Crushing Fury] 🔴",
+        "description": "Star Platinum grabs the opponent and slams them on the ground, dragging them on the floor and throwing them into the air.\n\nDamage: 17.2 + 3.2 | CD: 10s\nTags: Guardable | Knockback | Soft Ragdoll | COMBO ENDER | CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 6",
+        "videoSrc": "MOVE VIDEO HERE/awk-m2xc-crushing-fury.mp4"
+      },
+      {
+        "id": "awk-r-star-breaker",
+        "name": "R [♦️] - [Star Breaker] 🔴",
+        "description": "This move loses the charged variant, however, for every 2 seconds this is held, the move’s power is increased by 50%.\n\nDamage: 20.0 + (Skull Damage) | CD: 18s\nTags: Guard Break | True Follow-Up | Ragdoll | Heavy Knockback | Hyper Armor | Hyper Armor Crash | Heavy Parriable | Uncancellable | COMBO ENDER | CLOSE RANGE",
+        "videoSrc": "MOVE VIDEO HERE/awk-r-star-breaker.mp4"
+      },
+      {
+        "id": "awk-x-lightspeed-impact",
+        "name": "X [3nd 🟥] [🛡️] - [Lightspeed Impact] 🔴",
+        "description": "Star Platinum blitzes out for a powerful lightspeed punch to the opponent’s skull. The pressure from the wind acts as a projectile.\n\nDamage: 40.4 | CD: 20s\nTags: Heavy Knockback+Ragdoll | True Guard Bypass | Rebound | COMBO ENDER | MID RANGE + SEMI-MID RANGE | STAND POSITIONABLE\nHeat Cost: 15 | Heat Gain: 5 | Endlag: 0.8s",
+        "videoSrc": "MOVE VIDEO HERE/awk-x-lightspeed-impact.mp4"
+      },
+      {
+        "id": "awk-h-timestop",
+        "name": "H - [\"Star Platinum!\"] 🟣",
+        "description": "Star Platinum stops the flow of time down to a standstill. Can be pre-emptively ended. Counters other timestops.\n\nCD: 30s (-10s for each second cut short) | Cost: 50% Stand Endurance/s\nTags: True Stun | Hyper Armor | SPECIAL MOVE [PARTIAL CUTSCENE] | AOE (HYPER LARGE SCALE)\nHeat Requirement: 25 | Heat Gain Reduction: 50%",
+        "videoSrc": "MOVE VIDEO HERE/awk-h-timestop.mp4"
+      },
+      {
+        "id": "awk-hm2-grab",
+        "name": "H+M2/LMB - [Grab] 🔴",
+        "description": "Star Platinum simply grabs the opponent, clicking again throws them.\n\nDamage: 5.0 | CD: 10s\nTags: Grab | Ragdoll+Knockback | Guardable | GRAB | CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 0 | Endlag: 0.15s",
+        "videoSrc": "MOVE VIDEO HERE/awk-hm2-grab.mp4"
+      },
+      {
+        "id": "awk-g-neo-stardust-smash",
+        "name": "G [♦️] + G [🔳] - [Neo Stardust Smash] 🔴",
+        "description": "Star Platinum does a charged ground slam, if pressed again at the right time, causes a stronger shockwave impact.\n\nDamage: 31.3 + 19.9 (shockwave) | CD: 23s\nTags: Follow-up | Guardable | Stun | Bypass Getup I-Frames | Grounded Bypass | Hyper Armor | Trip Ragdoll | Dodge Bypass | Stage Destruction | COMBO EXTENDER | AOE\nHeat Cost: 0 | Heat Gain: 2+2+5",
+        "videoSrc": "MOVE VIDEO HERE/awk-g-neo-stardust-smash.mp4"
+      },
+      {
+        "id": "awk-gm2-meteor-launch",
+        "name": "G+M2 - [Meteor Launch] 🔴",
+        "description": "Star Platinum punches the floor for a giant spiked boulder to flip out. Charges up to throw it.\n\nDamage: 44.2 | CD: 25s\nTags: True Guard Bypass | Counter Bypass | I-Frame Charge Up | Bypass Getup I-Frames | Insta Stand Crash | Ragdoll + Hyper Armor Bypass | Knockback + Ragdoll | Dodge Bypass | Grounded Bypass | COMBO ENDER / HEAVY PROJECTILE | MID RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 20",
+        "videoSrc": "MOVE VIDEO HERE/awk-gm2-meteor-launch.mp4",
+        "hasFinisher": true,
+        "finisherDescription": "G+M2 - [Meteor Launch] Finisher: Non-Cutscene. The victim just splats in blood upon impact.\n\nHP Required: >50hp",
+        "finisherVideoSrc": "MOVE VIDEO HERE/awk-gm2-meteor-launch-finisher.mp4"
+      },
+      {
+        "id": "awk-y-keep-change",
+        "name": "Y [🟥] - [\"And Keep The Damn Change!\"] 🔴",
+        "description": "Star Platinum punches the enemy, does a long, extensive barrage of punches, with stronger individual punches in-between.\n\nDamage: 45.4 | CD: 30s\nTags: Guardable | Counter Bypass | Grab | Hyper Armor | Heavy Knockback + Ragdoll | COMBO ENDER [SUPER] | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 20 | Heat Gain: 0",
+        "videoSrc": "MOVE VIDEO HERE/awk-y-keep-change.mp4",
+        "hasFinisher": true,
+        "finisherDescription": "Y [🟥] - [Platinum Fists] Finisher: Cutscene. A cinematic barrage sequence ending with an impact frame and shattered glass effect as the victim flies away.\n\nHP Required: >50hp",
+        "finisherVideoSrc": "MOVE VIDEO HERE/awk-y-keep-change-finisher.mp4"
+      },
+      {
+        "id": "awk-hy-ora-ora",
+        "name": "H+Y [🟥] - [\"Ora Ora Ora!\"] 🔴",
+        "description": "In timestop, Star Platinum uppercuts the enemy, cracks knuckles, delivers a swift barrage, and the user casually dodges the flying victim and writes a receipt.\n\nDamage: XX.XX | CD: 30s\nTags: Guardable | Counter Bypass | Grab | Hyper Armor | Heavy Knockback + Ragdoll | COMBO ENDER [SUPER + MINI CUTSCENE] | CLOSE RANGE\nHeat Cost: 20 | Heat Gain: 0",
+        "videoSrc": "MOVE VIDEO HERE/awk-hy-ora-ora.mp4"
+      },
+      {
+        "id": "awk-c-crusading-comet",
+        "name": "C - [Crusading Comet] 🔴",
+        "description": "The user and star platinum rams a short distance, knocking away anyone in their path.\n\nDamage: 17.2 | CD: 19s\nTags: Guard Break | Counter Bypass | Hyper Armor | Light Parriable | Hyper Armor Bypass | Knockback + Soft Ragdoll | Dodge Bypass | Grounded Bypass | COMBO EXTENDER | SEMI-MID RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 7 | Endlag: 0.55s (if missed)",
+        "videoSrc": "MOVE VIDEO HERE/awk-c-crusading-comet.mp4"
+      },
+      {
+        "id": "awk-c-run-up",
+        "name": "C [▶️/🟥] - [Crusading Comet] 🔴",
+        "description": "The user readies up and does a run up, grabbing anyone caught, holding them with Star Platinum's arms, then jumping and throwing them to the floor.\n\nDamage: 13.2 (Grab) + 8.2 (Throw) | CD: 19s\nTags: Guard Bypass | Grab | Hyper Armor Charge Up | Heavy Parriable | Insta Stand Crash | Hyper Armor Bypass | Knockback + Ragdoll | Dodge Bypass | Grounded Bypass | COMBO EXTENDER | LONG RANGE\nHeat Cost: 0 | Heat Gain: 3+2 | Endlag: 0.6s (if missed)",
+        "videoSrc": "MOVE VIDEO HERE/awk-c-run-up.mp4"
+      },
+      {
+        "id": "awk-cg-destructive-rage",
+        "name": "C [▶️/🟥]+G - [Destructive Rage] 🔴+🟣",
+        "description": "After the throw, a QTE triggers 2 extra punches. If successful, user flash-warps behind the victim for a final back punch.\n\nDamage: 17*3 + 25.9 + (Torso Damage) | CD: 30s | Cost: 20% Stand Endurance\nTags: Grab Follow Up | Heavy Knockback+Ragdoll | Guard Bypass | Heavy Parriable | Insta Stand Crash | Hyper Armor Bypass | Dodge Bypass | Grounded Bypass | COMBO ENDER\nHeat Cost: 0 | Heat Gain: 3+2",
+        "videoSrc": "MOVE VIDEO HERE/awk-cg-destructive-rage.mp4",
+        "hasFinisher": true,
+        "finisherDescription": "C [🟥]+G - [Destructive Rage] Finisher: Cutscene Ender. The final punch breaks ribs, then zooms out showing the skeleton fracturing, sending the body miles away.\n\nHP Required: >80hp",
+        "finisherVideoSrc": "MOVE VIDEO HERE/awk-cg-destructive-rage-finisher.mp4"
+      },
+      {
+        "id": "awk-fh-no-pity",
+        "name": "F+H [⚠️] - [\"I feel no pity for you at all...\"] 🟣",
+        "description": "Counter Move: Stops time, shatters victim's shins from behind, then gut punches them away. If missed, Star Platinum swipes fist.\n\nDamage: 6.2 + 15.1 + (Leg Damage) . 12.3 if missed | CD: 25s + 3s Block CD | Cost: 40% Stand Endurance\nTags: Ragdoll + Knockback | True Guard Break | Melee Counter | Missed > Stun + Push-Back | COMBO ENDER [MINI CUTSCENE + Counter] | SEMI-MID RANGE\nHeat Cost: 20 (1 bar) | Heat Gain: 0 | Endlag: 0.35s",
+        "videoSrc": "MOVE VIDEO HERE/awk-fh-no-pity.mp4"
+      },
+      {
+        "id": "awk-x-ora-strike",
+        "name": "X [⏩] - [Ora Strike] 🔴",
+        "description": "As the user flashsteps, Star Platinum has already prepared a skull crushing punch to knock the victim away.\n\nDamage: 18.5 | CD: 12s\nTags: Standing Knockback | Guardable | Stun (0.35s) | COMBO EXTENDER | SEMI-MID RANGE\nHeat Cost: 0 | Heat Gain: 8 | Endlag: 0.3s",
+        "videoSrc": "MOVE VIDEO HERE/awk-x-ora-strike.mp4",
+        "hasFinisher": true,
+        "finisherDescription": "X [⏩] - [Ora Strike] Finisher: Cutscene Ender. The punch sends the victim flying as the user and Star Platinum swiftly follow up for a quick combo of punches, ending with a final one to the skull.\n\nHP Required: >20hp",
+        "finisherVideoSrc": "MOVE VIDEO HERE/awk-x-ora-strike-finisher.mp4"
+      },
+      {
+        "id": "awk-z-stardust-showdown",
+        "name": "Z - [Stardust Showdown] 🔴+🟡",
+        "description": "Star Platinum strikes the opponent as the camera pans to cutscene mode. The stand then delivers a series of punches to the victim before its final strike.\n\nDamage: 10.0 + 2*49 + 42 | CD: 45s\nTags: Guard Bypass | Counter Bypass | Hyper Armor Charge Up | Parriable | Insta Stand Crash | Hyper Armor Bypass | Heavy Knockback + Ragdoll | Dodge Bypass | COMBO ENDER [ULTIMATE & CUTSCENE] | CLOSE RANGE+\nHeat Cost: 40 (2 Bars) | Heat Gain: 0 | Endlag: 0.85s",
+        "videoSrc": "MOVE VIDEO HERE/awk-z-stardust-showdown.mp4",
+        "hasFinisher": true,
+        "finisherDescription": "Z - [Stardust Showdown] Finisher: Cutscene. The victim imitates Dio in Cairo before the beatdown, ending with Star Platinum charging up its strongest skull punch to send the victim flying.\n\nHP Required: >150hp",
+        "finisherVideoSrc": "MOVE VIDEO HERE/awk-z-stardust-showdown-finisher.mp4"
+      },
+      {
+        "id": "awk-hz-time-stands-still",
+        "name": "H+Z - [\"While Time Stands Still\"] 🔴+🟡",
+        "description": "Similar beatdown, but extends the timestop and does not grant endurance fatigue immunity. Time resumes when finished.\n\nDamage: 125.0 | CD: 45s\nTags: Guard Bypass | Counter Bypass | Hyper Armor Charge Up | Parriable | Insta Stand Crash | Hyper Armor Bypass | Heavy Knockback + Ragdoll | Dodge Bypass | Auto Timestop Ender | COMBO ENDER [ULTIMATE & CUTSCENE] | CLOSE RANGE+\nHeat Cost: 40 (2 Bars) | Heat Gain: 0 | Endlag: 0.85s",
+        "videoSrc": "MOVE VIDEO HERE/awk-hz-time-stands-still.mp4"
+      },
+      {
+        "id": "awk-j-supernova-strike",
+        "name": "J - [Supernova Strike] 🔴",
+        "description": "Star Platinum charges up its strongest punch. Player mashes button to increase gigatons. Has 4 charges (Charged, Super Charged, Hyper Charged, Neo Charged).\n\nDamage: [Base] 55.9 [Ultra] 185.9 (+ Skull Damage) | CD: 80s (40s if missed)\nTags: True Guard Bypass | Counter Bypass | Hyper Armor | Heavy Parriable | Insta Stand Crash | Hyper Armor Bypass | Extreme Knockback + Ragdoll | True Damage | Dodge Bypass | COMBO ENDER [ULTIMATE & NON-CUTSCENE] | CLOSE RANGE+ | STAND POSITIONABLE\nHeat Cost: 40 (2 Bars) | Heat Gain: 0 | Endlag: 0.65s",
+        "videoSrc": "MOVE VIDEO HERE/awk-j-supernova-strike.mp4",
+        "hasFinisher": true,
+        "finisherDescription": "J - [Supernova Strike] Finisher: Cutscene. (Neo Charge) The stand downward hooks the victim, charging up to 100,000 gigatons and unleashing a punch that shatters the skeleton and sends a shockwave visible from outer space.\n\nHP Required: >200hp",
+        "finisherVideoSrc": "MOVE VIDEO HERE/awk-j-supernova-strike-finisher.mp4"
+      },
+      {
+        "id": "awk-hj-swift-fist",
+        "name": "H+J [💠] - [Swift Fist] 🔴",
+        "description": "Star Platinum lunges out and does a straight jab. Can be re-casted a total of 5 times with the last one being a mini cutscene and stronger.\n\nDamage: 15.3 | CD: 0s\nTags: Guardable | Standing Knockback | Ragdoll Bypass | Stun | COMBO EXTENDER/ENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 5",
+        "videoSrc": "MOVE VIDEO HERE/awk-hj-swift-fist.mp4"
+      }
+    ]
+  },
+  {
+    "id": "the-world",
+    "name": "The World",
+    "part": "Part 3",
+    "color": "#F1C232",
+    "confirmed": true,
+    "quote": "Invincibility, Immortality, STAND POWER!",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "silver-chariot",
+    "name": "Silver Chariot",
+    "part": "Part 3",
+    "color": "#7CA9DE",
+    "confirmed": true,
+    "quote": "Bravo OH Bravo!",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "hierophant-green",
+    "name": "Hierophant Green",
+    "part": "Part 3",
+    "color": "#0DCB74",
+    "confirmed": true,
+    "quote": "It's time for your punishment, baby",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "anubis",
+    "name": "Anubis",
+    "part": "Part 3",
+    "color": "#70237c",
+    "confirmed": true,
+    "quote": "No one is stronger than you….use me and kill!",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "magicians-red",
+    "name": "Magician's Red",
+    "part": "Part 3",
+    "color": "#FF3C00",
+    "confirmed": true,
+    "quote": "Hell 2 U!",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "cursed-chariot",
+    "name": "Cursed Chariot",
+    "part": "Part 3",
+    "color": "#990000",
+    "confirmed": true,
+    "quote": "You're no match for two master swordsmen combined!",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "horus",
+    "name": "Horus",
+    "part": "Part 3",
+    "color": "#3CC2FF",
+    "confirmed": true,
+    "quote": "CRAWWWW!",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "hermit-purple",
+    "name": "Hermit Purple",
+    "part": "Part 3",
+    "color": "#B651F0",
+    "confirmed": true,
+    "quote": "OH MY GOD!!",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "cream",
+    "name": "Cream",
+    "part": "Part 3",
+    "color": "#9c93c5",
+    "confirmed": true,
+    "quote": "One by one, one after the other, I'll scatter your atoms across my void",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "emperor-hanged-man",
+    "name": "Emperor + Hanged Man",
+    "part": "Part 3",
+    "color": "#BF9000",
+    "secondaryColor": "#E7C279",
+    "confirmed": true,
+    "quote": "Aye Aye Sir!",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "shadow-the-world",
+    "name": "Shadow The World",
+    "part": "Part 3",
+    "color": "#A83AA6",
+    "confirmed": true,
+    "quote": "What is it that you truly desire?",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "the-fool",
+    "name": "The Fool",
+    "part": "Part 3",
+    "color": "#E7C279",
+    "confirmed": false,
+    "quote": "Seems like I can't let a kid who likes dogs die",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "justice",
+    "name": "Justice",
+    "part": "Part 3",
+    "color": "#CCCCCC",
+    "confirmed": false,
+    "quote": "Justice Always wins!",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "death-13",
+    "name": "Death 13",
+    "part": "Part 3",
+    "color": "#4B2FA0",
+    "secondaryColor": "#F1C232",
+    "confirmed": false,
+    "quote": "Lali-Ho",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "tower-of-grey",
+    "name": "Tower of Grey",
+    "part": "Part 3",
+    "color": "#6FA8DC",
+    "confirmed": false,
+    "quote": "M A S S A C R E",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "sun",
+    "name": "Sun",
+    "part": "Part 3",
+    "color": "#E69138",
+    "confirmed": false,
+    "quote": "THE SUN IS A DEADLY LASER",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  },
+  {
+    "id": "geb",
+    "name": "Geb",
+    "part": "Part 3",
+    "color": "#3C7DE0",
+    "confirmed": false,
+    "quote": "I do not fear death, for evil needs a saviour as well",
+    "description": "Desc Here",
+    "rarity": "Desc Here",
+    "standType": "Desc Here",
+    "moves": []
+  }
+]
