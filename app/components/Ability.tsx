@@ -641,14 +641,187 @@ const STANDS: Stand[] = [
   },
 ];
 
-function useStandsByPart(): Record<StandPart, Stand[]> {
+function useStandsByPart(stands: Stand[]): Record<StandPart, Stand[]> {
   return useMemo(() => {
     const map = {} as Record<StandPart, Stand[]>;
     PART_ORDER.forEach((p) => (map[p] = []));
-    STANDS.forEach((s) => map[s.part].push(s));
+    stands.forEach((s) => {
+      if (map[s.part]) map[s.part].push(s);
+    });
     return map;
-  }, []);
+  }, [stands]);
 }
+
+// ============================================================================
+// DATA LOADING + EDIT MODE
+// Viewers: stands load from /data/stands.json (falls back to the built-in
+// STANDS array above if that file is missing).
+// Owner: visit any page URL with ?edit=1 once (?edit=0 turns it off). Edits are
+// kept as a draft in this browser only; "Export stands.json" downloads the file
+// you then upload to public/data/stands.json in the repo to publish.
+// ============================================================================
+
+const DRAFT_KEY = 'bb-stands-draft-v1';
+const EDIT_FLAG_KEY = 'bb-edit-mode';
+
+function readEditFlag(): boolean {
+  try {
+    const q = new URLSearchParams(window.location.search).get('edit');
+    if (q === '1') localStorage.setItem(EDIT_FLAG_KEY, '1');
+    if (q === '0') localStorage.removeItem(EDIT_FLAG_KEY);
+    return localStorage.getItem(EDIT_FLAG_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function useStandsData() {
+  const [stands, setStandsState] = useState<Stand[]>(STANDS);
+  const [editMode, setEditMode] = useState(false);
+  const [hasDraft, setHasDraft] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const edit = readEditFlag();
+    setEditMode(edit);
+    (async () => {
+      let base: Stand[] = STANDS;
+      try {
+        const res = await fetch('/data/stands.json', { cache: 'no-store' });
+        if (res.ok) {
+          const json = await res.json();
+          if (Array.isArray(json) && json.length) base = json as Stand[];
+        }
+      } catch {
+        /* no published file yet, use built-in data */
+      }
+      if (edit) {
+        try {
+          const raw = localStorage.getItem(DRAFT_KEY);
+          if (raw) {
+            const draft = JSON.parse(raw);
+            if (Array.isArray(draft) && draft.length) {
+              base = draft as Stand[];
+              if (!cancelled) setHasDraft(true);
+            }
+          }
+        } catch {
+          /* ignore corrupt draft */
+        }
+      }
+      if (!cancelled) setStandsState(base);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const setStands = (next: Stand[]) => {
+    setStandsState(next);
+    if (editMode) {
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(next));
+        setHasDraft(true);
+      } catch {
+        /* storage full or blocked */
+      }
+    }
+  };
+
+  const resetDraft = () => {
+    try {
+      localStorage.removeItem(DRAFT_KEY);
+    } catch {}
+    window.location.reload();
+  };
+
+  return { stands, editMode, hasDraft, setStands, resetDraft };
+}
+
+const inputCls =
+  "w-full bg-[#14121a] border border-dashed border-[#3d3423] text-[#e6c278] text-sm px-2 py-1.5 font-mono focus:outline-none focus:border-[#c3a35e]";
+const smallBtnCls =
+  "px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider border border-[#3d3423] text-[#e6c278] bg-[#14121a] hover:border-[#c3a35e] transition-colors";
+
+const EditField: React.FC<{ label: string; children: React.ReactNode; className?: string }> = ({
+  label,
+  children,
+  className = "",
+}) => (
+  <label className={`block ${className}`}>
+    <span className="block text-[10px] font-mono uppercase tracking-widest text-[#8a857a] mb-1">{label}</span>
+    {children}
+  </label>
+);
+
+const EditBar: React.FC<{
+  stands: Stand[];
+  hasDraft: boolean;
+  onImport: (s: Stand[]) => void;
+  onReset: () => void;
+  onAdd: () => void;
+}> = ({ stands, hasDraft, onImport, onReset, onAdd }) => {
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const doExport = () => {
+    const blob = new Blob([JSON.stringify(stands, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'stands.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const doImport = async (file?: File) => {
+    if (!file) return;
+    try {
+      const json = JSON.parse(await file.text());
+      if (Array.isArray(json)) onImport(json as Stand[]);
+      else alert('That file is not a stands.json (expected a list of stands).');
+    } catch {
+      alert('Could not read that file as JSON.');
+    }
+  };
+
+  const exitEdit = () => {
+    try {
+      localStorage.removeItem(EDIT_FLAG_KEY);
+    } catch {}
+    window.location.reload();
+  };
+
+  return (
+    <div className="fixed bottom-4 right-4 z-[100] flex flex-wrap items-center gap-2 bg-[#0a0a0d] border border-[#c3a35e] p-2 shadow-[0_0_25px_rgba(195,163,94,0.25)] max-w-[calc(100vw-2rem)]">
+      <span className="text-[10px] font-mono uppercase tracking-wider text-[#34d399] px-1">
+        Edit mode{hasDraft ? ' · draft saved' : ''}
+      </span>
+      <button type="button" className={smallBtnCls} onClick={onAdd}>+ Stand</button>
+      <button type="button" className={smallBtnCls} onClick={() => fileRef.current?.click()}>Import</button>
+      <button type="button" className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider bg-[#c3a35e] text-black font-bold" onClick={doExport}>
+        Export stands.json
+      </button>
+      <button
+        type="button"
+        className={smallBtnCls}
+        onClick={() => confirm('Discard your local draft and reload the published version?') && onReset()}
+      >
+        Reset
+      </button>
+      <button type="button" className={smallBtnCls} onClick={exitEdit}>Exit</button>
+      <input
+        ref={fileRef}
+        type="file"
+        accept="application/json,.json"
+        className="hidden"
+        onChange={(e) => {
+          doImport(e.target.files?.[0]);
+          e.target.value = '';
+        }}
+      />
+    </div>
+  );
+};
 
 // ============================================================================
 // SHARED CODEX BOX
@@ -817,8 +990,15 @@ const PartHexSection: React.FC<{ part: StandPart; stands: Stand[]; onSelect: (s:
 // Handles individual moves, swapping between Base and Finisher tabs, and Video
 // ============================================================================
 
-const MoveCard: React.FC<{ move: Move; standColor: string }> = ({ move, standColor }) => {
+interface MoveEditHandlers {
+  onChange: (m: Move) => void;
+  onDelete: () => void;
+  onShift: (dir: -1 | 1) => void;
+}
+
+const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandlers }> = ({ move, standColor, edit }) => {
   const [activeTab, setActiveTab] = useState<'base' | 'finisher'>('base');
+  const shownTab = move.hasFinisher ? activeTab : 'base';
 
   return (
     <div className="flex flex-col bg-[#0a0a0d] border border-[#2a2418] hover:border-[#3d3423] transition-colors h-full">
@@ -834,7 +1014,7 @@ const MoveCard: React.FC<{ move: Move; standColor: string }> = ({ move, standCol
             <button
               onClick={() => setActiveTab('base')}
               className={`px-3 py-1 text-[10px] font-mono uppercase tracking-widest transition-all ${
-                activeTab === 'base' 
+                shownTab === 'base' 
                   ? 'bg-[#2a2418] text-[#e6c278]' 
                   : 'text-[#5c584f] hover:text-[#8a857a]'
               }`}
@@ -859,7 +1039,7 @@ const MoveCard: React.FC<{ move: Move; standColor: string }> = ({ move, standCol
         {/* Unique Video Rendering Placeholder */}
         <div className="relative aspect-video bg-[#121116] border border-[#2a2418] mb-4 group overflow-hidden flex items-center justify-center">
           <video 
-            src={activeTab === 'base' ? move.videoSrc : move.finisherVideoSrc} 
+            src={shownTab === 'base' ? move.videoSrc : move.finisherVideoSrc} 
             controls 
             className="absolute inset-0 w-full h-full object-cover z-10"
             poster={`INSERT STAND ART HERE/video-poster-placeholder.png`}
@@ -872,11 +1052,57 @@ const MoveCard: React.FC<{ move: Move; standColor: string }> = ({ move, standCol
 
         <p className="text-sm text-[#c7c2b5] leading-relaxed font-['Zen_Old_Mincho',serif] whitespace-pre-wrap">
           <span className="text-[#e6c278] mr-2 text-xs font-mono uppercase tracking-wider block mb-2">
-            {activeTab === 'base' ? 'Description:' : 'Finisher Description:'}
+            {shownTab === 'base' ? 'Description:' : 'Finisher Description:'}
           </span>
-          {activeTab === 'base' ? move.description : move.finisherDescription}
+          {shownTab === 'base' ? move.description : move.finisherDescription}
         </p>
       </div>
+
+      {edit && (
+        <div className="border-t border-dashed border-[#3d3423] bg-[#0d0c10] p-4 space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[10px] font-mono uppercase tracking-widest text-[#34d399]">Editing move</span>
+            <div className="flex gap-1">
+              <button type="button" className={smallBtnCls} onClick={() => edit.onShift(-1)}>↑</button>
+              <button type="button" className={smallBtnCls} onClick={() => edit.onShift(1)}>↓</button>
+              <button
+                type="button"
+                className={smallBtnCls}
+                onClick={() => confirm(`Delete "${move.name}"?`) && edit.onDelete()}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+          <EditField label="Move name">
+            <input className={inputCls} value={move.name} onChange={(e) => edit.onChange({ ...move, name: e.target.value })} />
+          </EditField>
+          <EditField label="Description">
+            <textarea rows={7} className={inputCls} value={move.description} onChange={(e) => edit.onChange({ ...move, description: e.target.value })} />
+          </EditField>
+          <EditField label="Video path (e.g. /videos/star-platinum/barrage.mp4)">
+            <input className={inputCls} value={move.videoSrc} onChange={(e) => edit.onChange({ ...move, videoSrc: e.target.value })} />
+          </EditField>
+          <label className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">
+            <input
+              type="checkbox"
+              checked={!!move.hasFinisher}
+              onChange={(e) => edit.onChange({ ...move, hasFinisher: e.target.checked })}
+            />
+            Has finisher
+          </label>
+          {move.hasFinisher && (
+            <>
+              <EditField label="Finisher description">
+                <textarea rows={5} className={inputCls} value={move.finisherDescription || ''} onChange={(e) => edit.onChange({ ...move, finisherDescription: e.target.value })} />
+              </EditField>
+              <EditField label="Finisher video path">
+                <input className={inputCls} value={move.finisherVideoSrc || ''} onChange={(e) => edit.onChange({ ...move, finisherVideoSrc: e.target.value })} />
+              </EditField>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 };
@@ -892,7 +1118,72 @@ const InfoField: React.FC<{ label: string; children: React.ReactNode }> = ({ lab
   </div>
 );
 
-const StandDetailScreen: React.FC<{ stand: Stand; onBack: () => void }> = ({ stand, onBack }) => {
+const StandEditor: React.FC<{ stand: Stand; onChange: (s: Stand) => void; onDelete: () => void }> = ({
+  stand,
+  onChange,
+  onDelete,
+}) => (
+  <div className="mb-8 border border-dashed border-[#c3a35e]/60 bg-[#0d0c10] p-5 space-y-4">
+    <div className="flex items-center justify-between">
+      <span className="text-[10px] font-mono uppercase tracking-widest text-[#34d399]">Editing {stand.name || 'stand'}</span>
+      <button
+        type="button"
+        className={smallBtnCls}
+        onClick={() => confirm(`Delete ${stand.name}? This removes it from your draft.`) && onDelete()}
+      >
+        Delete stand
+      </button>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <EditField label="Name">
+        <input className={inputCls} value={stand.name} onChange={(e) => onChange({ ...stand, name: e.target.value })} />
+      </EditField>
+      <EditField label="Part">
+        <select className={inputCls} value={stand.part} onChange={(e) => onChange({ ...stand, part: e.target.value as StandPart })}>
+          {PART_ORDER.map((p) => (
+            <option key={p} value={p}>{p}</option>
+          ))}
+        </select>
+      </EditField>
+      <EditField label="Aura colour">
+        <div className="flex gap-2">
+          <input type="color" className="h-9 w-12 bg-transparent border border-[#3d3423]" value={/^#[0-9a-f]{6}$/i.test(stand.color) ? stand.color : '#c3a35e'} onChange={(e) => onChange({ ...stand, color: e.target.value })} />
+          <input className={inputCls} value={stand.color} onChange={(e) => onChange({ ...stand, color: e.target.value })} />
+        </div>
+      </EditField>
+      <EditField label="Rarity">
+        <input className={inputCls} value={stand.rarity || ''} onChange={(e) => onChange({ ...stand, rarity: e.target.value })} />
+      </EditField>
+      <EditField label="Stand type" className="md:col-span-2">
+        <input className={inputCls} value={stand.standType || ''} onChange={(e) => onChange({ ...stand, standType: e.target.value })} />
+      </EditField>
+      <EditField label="Profile image path (hexagon)">
+        <input className={inputCls} placeholder="/stands/pfp/star-platinum.png" value={stand.pfpSrc || ''} onChange={(e) => onChange({ ...stand, pfpSrc: e.target.value })} />
+      </EditField>
+      <EditField label="Full art path">
+        <input className={inputCls} placeholder="/stands/art/star-platinum.png" value={stand.fullArtSrc || ''} onChange={(e) => onChange({ ...stand, fullArtSrc: e.target.value })} />
+      </EditField>
+      <label className="flex items-end gap-2 pb-2 text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">
+        <input type="checkbox" checked={stand.confirmed} onChange={(e) => onChange({ ...stand, confirmed: e.target.checked })} />
+        Confirmed
+      </label>
+    </div>
+    <EditField label="Quote">
+      <input className={inputCls} value={stand.quote} onChange={(e) => onChange({ ...stand, quote: e.target.value })} />
+    </EditField>
+    <EditField label="Overview / description">
+      <textarea rows={10} className={inputCls} value={stand.description || ''} onChange={(e) => onChange({ ...stand, description: e.target.value })} />
+    </EditField>
+  </div>
+);
+
+const StandDetailScreen: React.FC<{
+  stand: Stand;
+  onBack: () => void;
+  editMode?: boolean;
+  onChange?: (s: Stand) => void;
+  onDelete?: () => void;
+}> = ({ stand, onBack, editMode = false, onChange, onDelete }) => {
   // State for toggling between standard and awakening movesets
   const [moveCategory, setMoveCategory] = useState<'standard' | 'awakening'>('standard');
 
@@ -901,6 +1192,16 @@ const StandDetailScreen: React.FC<{ stand: Stand; onBack: () => void }> = ({ sta
   }, [stand.id]);
 
   const displayedMoves = moveCategory === 'standard' ? stand.moves : stand.awakeningMoves;
+
+  const setMoves = (list: Move[]) => {
+    if (!onChange) return;
+    onChange(moveCategory === 'standard' ? { ...stand, moves: list } : { ...stand, awakeningMoves: list });
+  };
+  const addMove = () =>
+    setMoves([
+      ...(displayedMoves || []),
+      { id: `move-${Date.now()}`, name: 'New Move', description: 'Description here', videoSrc: '' },
+    ]);
 
   return (
     <div className="animate-fadeIn">
@@ -911,6 +1212,8 @@ const StandDetailScreen: React.FC<{ stand: Stand; onBack: () => void }> = ({ sta
         <ChevronLeft className="w-4 h-4" />
         Back to Stand Registry
       </button>
+
+      {editMode && onChange && onDelete && <StandEditor stand={stand} onChange={onChange} onDelete={onDelete} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* LEFT COLUMN */}
@@ -994,7 +1297,7 @@ const StandDetailScreen: React.FC<{ stand: Stand; onBack: () => void }> = ({ sta
           </div>
 
           {/* MOVESET & ABILITIES SECTION */}
-          {((stand.moves && stand.moves.length > 0) || (stand.awakeningMoves && stand.awakeningMoves.length > 0)) && (
+          {(editMode || (stand.moves && stand.moves.length > 0) || (stand.awakeningMoves && stand.awakeningMoves.length > 0)) && (
             <div className="mt-10 animate-fadeIn">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#2a2418] pb-4 mb-6">
                 <h3 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278] flex items-center gap-3">
@@ -1003,7 +1306,7 @@ const StandDetailScreen: React.FC<{ stand: Stand; onBack: () => void }> = ({ sta
                 </h3>
 
                 {/* Awakening Tab Navigation (Visible if Awakening Moves exist) */}
-                {stand.awakeningMoves && stand.awakeningMoves.length > 0 && (
+                {(editMode || (stand.awakeningMoves && stand.awakeningMoves.length > 0)) && (
                   <div className="flex border border-[#2a2418] bg-[#0a0a0d] p-1">
                     <button
                       onClick={() => setMoveCategory('standard')}
@@ -1033,8 +1336,27 @@ const StandDetailScreen: React.FC<{ stand: Stand; onBack: () => void }> = ({ sta
               {/* Moves Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {displayedMoves && displayedMoves.length > 0 ? (
-                  displayedMoves.map((move) => (
-                    <MoveCard key={move.id} move={move} standColor={stand.color} />
+                  displayedMoves.map((move, i) => (
+                    <MoveCard
+                      key={move.id}
+                      move={move}
+                      standColor={stand.color}
+                      edit={
+                        editMode
+                          ? {
+                              onChange: (m) => setMoves(displayedMoves.map((x, j) => (j === i ? m : x))),
+                              onDelete: () => setMoves(displayedMoves.filter((_, j) => j !== i)),
+                              onShift: (dir) => {
+                                const k = i + dir;
+                                if (k < 0 || k >= displayedMoves.length) return;
+                                const next = [...displayedMoves];
+                                [next[i], next[k]] = [next[k], next[i]];
+                                setMoves(next);
+                              },
+                            }
+                          : undefined
+                      }
+                    />
                   ))
                 ) : (
                   <div className="col-span-full border border-dashed border-[#2a2418] bg-[#0a0a0d]/60 py-10 text-center">
@@ -1044,6 +1366,12 @@ const StandDetailScreen: React.FC<{ stand: Stand; onBack: () => void }> = ({ sta
                   </div>
                 )}
               </div>
+
+              {editMode && (
+                <button type="button" className={`${smallBtnCls} mt-4`} onClick={addMove}>
+                  + Add move to {moveCategory === 'standard' ? 'Standard Kit' : 'Awakening'}
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -1099,41 +1427,75 @@ const StandDetailScreen: React.FC<{ stand: Stand; onBack: () => void }> = ({ sta
 // ============================================================================
 
 const StandsSection: React.FC<{ initialStandId?: string | null }> = ({ initialStandId }) => {
-  const standsByPart = useStandsByPart();
-  const [selectedStand, setSelectedStand] = useState<Stand | null>(null);
+  const { stands, editMode, hasDraft, setStands, resetDraft } = useStandsData();
+  const standsByPart = useStandsByPart(stands);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const appliedNav = useRef<string | null>(null);
 
   // Opens straight to a specific Stand's detail screen when search
   // navigation hands us a standId (AbilitiesPage forwards it here after
   // picking up the 'navigate-tab' event / pending payload).
   useEffect(() => {
-    if (!initialStandId) return;
-    const match = STANDS.find((s) => s.id === initialStandId);
-    if (match) setSelectedStand(match);
-  }, [initialStandId]);
+    if (!initialStandId || appliedNav.current === initialStandId) return;
+    if (stands.some((s) => s.id === initialStandId)) {
+      appliedNav.current = initialStandId;
+      setSelectedId(initialStandId);
+    }
+  }, [initialStandId, stands]);
 
-  if (selectedStand) {
-    return <StandDetailScreen stand={selectedStand} onBack={() => setSelectedStand(null)} />;
-  }
+  const selectedStand = selectedId ? stands.find((s) => s.id === selectedId) || null : null;
+
+  const updateStand = (next: Stand) => setStands(stands.map((s) => (s.id === next.id ? next : s)));
+  const deleteStand = (id: string) => {
+    setStands(stands.filter((s) => s.id !== id));
+    setSelectedId(null);
+  };
+  const addStand = () => {
+    const name = window.prompt('New stand name?');
+    if (!name) return;
+    const base = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'stand';
+    let id = base;
+    let n = 2;
+    while (stands.some((s) => s.id === id)) id = `${base}-${n++}`;
+    setStands([...stands, { id, name, part: 'Part 3', quote: '', color: '#c3a35e', confirmed: false, moves: [] }]);
+    setSelectedId(id);
+  };
 
   return (
-    <div className="animate-fadeIn">
-      <CodexBox
-        title="Stand Registry"
-        badge="STAND DATA"
-        accentColor="border-l-4 border-l-[#c3a35e] border-[#2a2418]"
-        className="mb-14"
-      >
-        <p className="text-sm sm:text-base text-[#c7c2b5] leading-relaxed">
-          Every Stand featured in Beyond Bizarre, organized by the part it debuts in. Hover a cell to see its
-          Stand aura colour, then click through to its full codex entry. Art is being logged in per-Stand as it's
-          finalized — until then, each slot holds its place in the registry.
-        </p>
-      </CodexBox>
+    <>
+      {selectedStand ? (
+        <StandDetailScreen
+          stand={selectedStand}
+          onBack={() => setSelectedId(null)}
+          editMode={editMode}
+          onChange={updateStand}
+          onDelete={() => deleteStand(selectedStand.id)}
+        />
+      ) : (
+        <div className="animate-fadeIn">
+          <CodexBox
+            title="Stand Registry"
+            badge="STAND DATA"
+            accentColor="border-l-4 border-l-[#c3a35e] border-[#2a2418]"
+            className="mb-14"
+          >
+            <p className="text-sm sm:text-base text-[#c7c2b5] leading-relaxed">
+              Every Stand featured in Beyond Bizarre, organized by the part it debuts in. Hover a cell to see its
+              Stand aura colour, then click through to its full codex entry. Art is being logged in per-Stand as it's
+              finalized — until then, each slot holds its place in the registry.
+            </p>
+          </CodexBox>
 
-      {PART_ORDER.map((part) => (
-        <PartHexSection key={part} part={part} stands={standsByPart[part]} onSelect={setSelectedStand} />
-      ))}
-    </div>
+          {PART_ORDER.map((part) => (
+            <PartHexSection key={part} part={part} stands={standsByPart[part]} onSelect={(s) => setSelectedId(s.id)} />
+          ))}
+        </div>
+      )}
+
+      {editMode && (
+        <EditBar stands={stands} hasDraft={hasDraft} onImport={setStands} onReset={resetDraft} onAdd={addStand} />
+      )}
+    </>
   );
 };
 
