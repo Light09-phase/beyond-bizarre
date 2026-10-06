@@ -91,6 +91,7 @@ interface Move {
   blockable?: boolean;  // optional override (default: derived from Tags)
   parryable?: boolean;  // optional override (default: derived from Tags)
   armor?: string;       // optional override, e.g. 'Hyper Armor' (default: derived from Tags)
+  blockExtras?: string[]; // optional override of the extra block properties (default: derived from Tags)
 }
 
 interface Stand {
@@ -1089,6 +1090,15 @@ function parseMoveBody(raw: string): ParsedBody {
   return { prose: prose.join('\n').replace(/\n{3,}/g, '\n\n').trim(), stats, tags };
 }
 
+const EXTRA_BLOCK_PROPS = [
+  'Block Break',
+  'Block Bypass (Passive)',
+  'Block Bypass (Semi Active)',
+  'Block Bypass (Active)',
+  'True Block Break',
+  'True Block Bypass',
+] as const;
+
 function deriveProps(tags: string[], move: Move, useOverrides: boolean) {
   const clean = tags.map((t) => t.replace(/\[[^\]]*\]/g, '').trim());
   const has = (re: RegExp) => clean.some((t) => re.test(t));
@@ -1102,7 +1112,14 @@ function deriveProps(tags: string[], move: Move, useOverrides: boolean) {
       break;
     }
   }
+  // Extra block properties. Only the ones that map cleanly from tags are auto-detected;
+  // the Passive / Semi Active / Active bypass tiers need to be set per move in edit mode.
+  const autoExtras: string[] = [];
+  if (clean.some((t) => /true guard break/i.test(t))) autoExtras.push('True Block Break');
+  else if (clean.some((t) => /guard break/i.test(t))) autoExtras.push('Block Break');
+  if (clean.some((t) => /true guard[-\s]?bypass|true guard\/.*bypass/i.test(t))) autoExtras.push('True Block Bypass');
   return {
+    extras: useOverrides && move.blockExtras ? move.blockExtras : autoExtras,
     blockable: useOverrides && move.blockable !== undefined ? move.blockable : autoBlock,
     parryable: useOverrides && move.parryable !== undefined ? move.parryable : autoParry,
     armor: useOverrides && move.armor ? move.armor : autoArmor,
@@ -1217,6 +1234,9 @@ const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandle
               <div className="flex flex-col items-start gap-1.5">
                 <PropPill label="Blockable" on={props.blockable} />
                 <PropPill label="Parryable" on={props.parryable} />
+                {EXTRA_BLOCK_PROPS.filter((n) => props.extras.includes(n)).map((n) => (
+                  <PropPill key={n} label={n} on />
+                ))}
               </div>
             </div>
             <div>
@@ -1318,6 +1338,31 @@ const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandle
               <input className={inputCls} value={move.armor || ''} onChange={(e) => edit.onChange({ ...move, armor: e.target.value || undefined })} />
             </EditField>
           </div>
+          <EditField label="Extra block properties (base move)">
+            {(() => {
+              const current = deriveProps(parseMoveBody(move.description).tags, move, true).extras;
+              const toggle = (n: string) =>
+                edit.onChange({
+                  ...move,
+                  blockExtras: current.includes(n) ? current.filter((x) => x !== n) : [...current, n],
+                });
+              return (
+                <div className="flex flex-wrap gap-x-4 gap-y-2">
+                  {EXTRA_BLOCK_PROPS.map((n) => (
+                    <label key={n} className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">
+                      <input type="checkbox" checked={current.includes(n)} onChange={() => toggle(n)} />
+                      {n}
+                    </label>
+                  ))}
+                  {move.blockExtras && (
+                    <button type="button" className={smallBtnCls} onClick={() => edit.onChange({ ...move, blockExtras: undefined })}>
+                      Reset to auto
+                    </button>
+                  )}
+                </div>
+              );
+            })()}
+          </EditField>
           <label className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">
             <input
               type="checkbox"
