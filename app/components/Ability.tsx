@@ -10,7 +10,8 @@ import {
   Lock,
   HelpCircle,
   PlayCircle,
-  Film
+  Check,
+  X
 } from 'lucide-react';
 
 // ============================================================================
@@ -87,6 +88,9 @@ interface Move {
   hasFinisher?: boolean;
   finisherDescription?: string;
   finisherVideoSrc?: string;
+  blockable?: boolean;  // optional override (default: derived from Tags)
+  parryable?: boolean;  // optional override (default: derived from Tags)
+  armor?: string;       // optional override, e.g. 'Hyper Armor' (default: derived from Tags)
 }
 
 interface Stand {
@@ -994,7 +998,10 @@ const PartHexSection: React.FC<{ part: StandPart; stands: Stand[]; onSelect: (s:
 
 // ============================================================================
 // MOVE CARD COMPONENT
-// Handles individual moves, swapping between Base and Finisher tabs, and Video
+// Wide codex-style card: key badge + name header, "What it does" on the left,
+// video on the right. Parses the existing move strings (name + description with
+// Damage / CD / Tags / Heat lines) so no data changes are required.
+// Optional per-move overrides on Move: blockable, parryable, armor.
 // ============================================================================
 
 interface MoveEditHandlers {
@@ -1003,66 +1010,268 @@ interface MoveEditHandlers {
   onShift: (dir: -1 | 1) => void;
 }
 
+const stripCites = (s: string) => (s || '').replace(/\[cite:[^\]]*\]/g, '').trim();
+
+const MOVE_ICON = '[\\u{1F534}\\u{1F535}\\u{1F7E0}-\\u{1F7EB}]';
+const MOVE_ICON_TAIL = new RegExp(`(?:\\s*(?:${MOVE_ICON}|\\+))+\\s*$`, 'u');
+const STAT_LINE = /^(Damage|CD|Cost|Heat Cost|Heat Gain|Heat Requirement|Heat Gain Reduction|Endlag|Tags)\s*:/i;
+
+interface ParsedHead {
+  key: string;
+  mods: string[];
+  stance?: string;
+  title: string;
+  icons: string;
+}
+
+function parseMoveName(raw: string): ParsedHead {
+  let s = stripCites(raw);
+  let stance: string | undefined;
+  const st = s.match(/^\[([^\]]+)\]\s+(?=\S.* - )/);
+  if (st) {
+    stance = st[1];
+    s = s.slice(st[0].length);
+  }
+  let icons = '';
+  const tail = s.match(MOVE_ICON_TAIL);
+  if (tail && tail[0].trim()) {
+    icons = tail[0].replace(/\s+/g, '');
+    s = s.slice(0, tail.index).trim();
+  }
+  const idx = s.indexOf(' - ');
+  let left = idx >= 0 ? s.slice(0, idx) : '';
+  let right = idx >= 0 ? s.slice(idx + 3) : s;
+  const mods: string[] = [];
+  left = left
+    .replace(/\[([^\]]*)\]/g, (m, inner) => {
+      if (/^[A-Za-z\-\s]{2,}$/.test(inner)) return m; // word brackets like [SPACE] stay in the key
+      mods.push(inner.trim());
+      return '';
+    })
+    .replace(/\s*\+\s*/g, '+')
+    .replace(/\s+/g, ' ')
+    .trim();
+  right = right.trim();
+  const wrapped = right.match(/^\[(.*)\]$/);
+  if (wrapped) right = wrapped[1];
+  return { key: left, mods, stance, title: right, icons };
+}
+
+interface ParsedBody {
+  prose: string;
+  stats: [string, string][];
+  tags: string[];
+}
+
+function parseMoveBody(raw: string): ParsedBody {
+  const prose: string[] = [];
+  const stats: [string, string][] = [];
+  let tags: string[] = [];
+  for (const line of stripCites(raw).split('\n')) {
+    const t = line.trim();
+    if (!t) {
+      prose.push('');
+      continue;
+    }
+    if (STAT_LINE.test(t)) {
+      if (/^Tags\s*:/i.test(t)) {
+        tags = t.replace(/^Tags\s*:\s*/i, '').split(/\s*\|\s*/).filter(Boolean);
+      } else {
+        t.split(/\s*\|\s*/).forEach((part) => {
+          const i = part.indexOf(':');
+          if (i > 0) stats.push([part.slice(0, i).trim(), part.slice(i + 1).trim()]);
+        });
+      }
+    } else {
+      prose.push(line);
+    }
+  }
+  return { prose: prose.join('\n').replace(/\n{3,}/g, '\n\n').trim(), stats, tags };
+}
+
+function deriveProps(tags: string[], move: Move, useOverrides: boolean) {
+  const clean = tags.map((t) => t.replace(/\[[^\]]*\]/g, '').trim());
+  const has = (re: RegExp) => clean.some((t) => re.test(t));
+  const autoBlock = has(/guardable|guard break/i) && !has(/guard[-\s]?bypass/i);
+  const autoParry = has(/parri(able|yable)/i) && !has(/un-?parri/i);
+  let autoArmor = 'None';
+  for (const t of clean) {
+    const m = t.match(/(hyper|super|regular)\s+armou?r(?!\s*(?:bypass|crash|break))/i);
+    if (m) {
+      autoArmor = m[0].replace(/\b\w/g, (c) => c.toUpperCase());
+      break;
+    }
+  }
+  return {
+    blockable: useOverrides && move.blockable !== undefined ? move.blockable : autoBlock,
+    parryable: useOverrides && move.parryable !== undefined ? move.parryable : autoParry,
+    armor: useOverrides && move.armor ? move.armor : autoArmor,
+  };
+}
+
+const CardLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <span className="block font-mono text-[9px] uppercase tracking-[0.25em] text-[#7d8794] mb-1.5">{children}</span>
+);
+
+const PropPill: React.FC<{ label: string; on: boolean }> = ({ label, on }) => (
+  <span
+    className={`inline-flex items-center gap-1.5 px-2 py-1 border font-mono text-[11px] ${
+      on ? 'border-[#c3a35e] bg-[#14121a] text-[#e6e2d4]' : 'border-[#2a2418] bg-[#0d0c10] text-[#5c584f]'
+    }`}
+  >
+    {on ? <Check className="w-3 h-3 text-[#34d399]" /> : <X className="w-3 h-3 text-[#ef4444]" />}
+    <span className={on ? '' : 'line-through'}>{label}</span>
+  </span>
+);
+
+const triSelectVal = (v?: boolean) => (v === undefined ? 'auto' : v ? 'yes' : 'no');
+const triSelectParse = (v: string) => (v === 'auto' ? undefined : v === 'yes');
+
 const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandlers }> = ({ move, standColor, edit }) => {
   const [activeTab, setActiveTab] = useState<'base' | 'finisher'>('base');
   const shownTab = move.hasFinisher ? activeTab : 'base';
 
-  return (
-    <div className="flex flex-col bg-[#0a0a0d] border border-[#2a2418] hover:border-[#3d3423] transition-colors h-full">
-      <div className="flex items-center justify-between p-4 border-b border-[#2a2418]">
-        <h5 className="font-['Gilda_Display',serif] text-lg text-[#e6c278] tracking-wide flex items-center gap-2">
-          <Film className="w-4 h-4 text-[#8a857a]" />
-          {move.name}
-        </h5>
-        
-        {/* Dynamic Move Tabs (Base vs Finisher) */}
-        {move.hasFinisher && (
-          <div className="flex bg-[#14121a] border border-[#2a2418] rounded-sm p-0.5">
-            <button
-              onClick={() => setActiveTab('base')}
-              className={`px-3 py-1 text-[10px] font-mono uppercase tracking-widest transition-all ${
-                shownTab === 'base' 
-                  ? 'bg-[#2a2418] text-[#e6c278]' 
-                  : 'text-[#5c584f] hover:text-[#8a857a]'
-              }`}
-            >
-              Base
-            </button>
-            <button
-              onClick={() => setActiveTab('finisher')}
-              className={`px-3 py-1 text-[10px] font-mono uppercase tracking-widest transition-all ${
-                activeTab === 'finisher' 
-                  ? 'bg-[#2a2418] text-[#e6c278]' 
-                  : 'text-[#5c584f] hover:text-[#8a857a]'
-              }`}
-            >
-              Finisher
-            </button>
-          </div>
-        )}
-      </div>
+  const view = useMemo(() => {
+    if (shownTab === 'finisher' && move.finisherDescription) {
+      const fd = stripCites(move.finisherDescription);
+      // Finisher text looks like: "E+M2 - [Barrage Finisher] 🔴: description..."
+      const m = fd.match(/^(.{1,120}? - .{1,100}?):\s+([\s\S]*)$/);
+      if (m) return { head: parseMoveName(m[1]), body: parseMoveBody(m[2]) };
+      return { head: parseMoveName(move.name), body: parseMoveBody(fd) };
+    }
+    return { head: parseMoveName(move.name), body: parseMoveBody(move.description) };
+  }, [shownTab, move.name, move.description, move.finisherDescription]);
 
-      <div className="p-4 flex-1 flex flex-col">
-        {/* Unique Video Rendering Placeholder */}
-        <div className="relative aspect-video bg-[#121116] border border-[#2a2418] mb-4 group overflow-hidden flex items-center justify-center">
-          <video 
-            src={shownTab === 'base' ? move.videoSrc : move.finisherVideoSrc} 
-            controls 
-            className="absolute inset-0 w-full h-full object-cover z-10"
-            poster={`INSERT STAND ART HERE/video-poster-placeholder.png`}
-          >
-            Your browser does not support the video tag.
-          </video>
-          {/* Fallback styling just to look nice before the video loads */}
-          <PlayCircle className="w-8 h-8 text-[#3d3423] group-hover:text-[var(--stand-glow)] transition-colors absolute z-0" style={{ ['--stand-glow' as any]: standColor }} />
+  const { head, body } = view;
+  const props = deriveProps(body.tags, move, shownTab === 'base');
+
+  const costEntry =
+    body.stats.find(([k]) => /^heat cost$/i.test(k)) || body.stats.find(([k]) => /^heat requirement$/i.test(k));
+  const costLabel = costEntry && /requirement/i.test(costEntry[0]) ? 'Heat Requirement' : 'Heat Cost';
+  const otherStats = body.stats
+    .filter((s) => s !== costEntry)
+    .map(([k, v]) => [/^cd$/i.test(k) ? 'Cooldown' : k, v] as [string, string]);
+
+  const videoSrc = shownTab === 'base' ? move.videoSrc : move.finisherVideoSrc;
+
+  return (
+    <div className="bg-[#0a0a0d] border border-[#2a2418] hover:border-[#3d3423] transition-colors">
+      {/* Header: key badge + name */}
+      <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-[#2a2418] bg-[#0c0c10]">
+        <div className="flex flex-wrap items-center gap-3 min-w-0">
+          {head.key && (
+            <span className="inline-flex items-center justify-center min-w-[2.25rem] h-9 px-2 border border-[#3d3423] bg-[#14121a] font-mono text-xs text-[#e6c278] whitespace-nowrap">
+              {head.key}
+            </span>
+          )}
+          <h5 className="font-['Cormorant_Upright',serif] text-xl sm:text-2xl text-[#f0dfb2] tracking-wide leading-tight">
+            {head.title}
+          </h5>
+          {head.stance && (
+            <span className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 border border-[#3d3423] text-[#8a857a]">
+              {head.stance}
+            </span>
+          )}
+          {head.mods.map((m, i) => (
+            <span key={i} className="font-mono text-[10px] px-1.5 py-0.5 border border-[#2a2418] bg-[#101014] text-[#c7c2b5]">
+              {m}
+            </span>
+          ))}
         </div>
 
-        <p className="text-sm text-[#c7c2b5] leading-relaxed font-['Zen_Old_Mincho',serif] whitespace-pre-wrap">
-          <span className="text-[#e6c278] mr-2 text-xs font-mono uppercase tracking-wider block mb-2">
-            {shownTab === 'base' ? 'Description:' : 'Finisher Description:'}
-          </span>
-          {shownTab === 'base' ? move.description : move.finisherDescription}
-        </p>
+        <div className="flex items-center gap-3 shrink-0">
+          {head.icons && <span className="text-sm leading-none">{head.icons}</span>}
+          {move.hasFinisher && (
+            <div className="flex bg-[#14121a] border border-[#2a2418] rounded-sm p-0.5">
+              {(['base', 'finisher'] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setActiveTab(t)}
+                  className={`px-3 py-1 text-[10px] font-mono uppercase tracking-widest transition-all ${
+                    shownTab === t ? 'bg-[#2a2418] text-[#e6c278]' : 'text-[#5c584f] hover:text-[#8a857a]'
+                  }`}
+                >
+                  {t === 'base' ? 'Base' : 'Finisher'}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Body: details left, media right */}
+      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <div className="p-5 min-w-0 md:border-r border-[#2a2418]">
+          <CardLabel>What it does</CardLabel>
+          <p className="text-sm sm:text-base text-[#d8c9a3] leading-relaxed font-['Zen_Old_Mincho',serif] whitespace-pre-wrap">
+            {body.prose || '—'}
+          </p>
+
+          <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-4">
+            <div>
+              <CardLabel>{costLabel}</CardLabel>
+              <span className="font-mono text-sm text-[#e6e2d4]">{costEntry ? costEntry[1] : '0'}</span>
+            </div>
+            <div>
+              <CardLabel>Block Properties</CardLabel>
+              <div className="flex flex-col items-start gap-1.5">
+                <PropPill label="Blockable" on={props.blockable} />
+                <PropPill label="Parryable" on={props.parryable} />
+              </div>
+            </div>
+            <div>
+              <CardLabel>Armor Properties</CardLabel>
+              <span className="font-['Zen_Old_Mincho',serif] text-sm text-[#e6c278]">{props.armor}</span>
+            </div>
+          </div>
+
+          {otherStats.length > 0 && (
+            <div className="mt-5 pt-4 border-t border-[#1c1912] flex flex-wrap items-baseline gap-x-6 gap-y-2">
+              {otherStats.map(([k, v], i) => (
+                <div key={i} className="flex items-baseline gap-2 min-w-0">
+                  <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-[#7d8794] whitespace-nowrap">{k}</span>
+                  <span className="font-mono text-xs text-[#e6e2d4]">{v}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {body.tags.length > 0 && (
+            <div className="mt-4">
+              <CardLabel>Tags</CardLabel>
+              <div className="flex flex-wrap gap-1.5">
+                {body.tags.map((t, i) => (
+                  <span
+                    key={i}
+                    className="font-mono text-[10px] uppercase tracking-wider px-1.5 py-0.5 border border-[#2a2418] bg-[#101014] text-[#9a9486]"
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="p-4 bg-[#08080b] border-t md:border-t-0 border-[#2a2418]">
+          <div className="relative aspect-video bg-[#121116] border border-[#2a2418] group overflow-hidden flex items-center justify-center">
+            {videoSrc ? (
+              <video
+                key={videoSrc}
+                src={videoSrc}
+                controls
+                className="absolute inset-0 w-full h-full object-cover z-10"
+                poster={`INSERT STAND ART HERE/video-poster-placeholder.png`}
+              >
+                Your browser does not support the video tag.
+              </video>
+            ) : null}
+            <PlayCircle
+              className="w-8 h-8 text-[#3d3423] group-hover:text-[var(--stand-glow)] transition-colors absolute z-0"
+              style={{ ['--stand-glow' as any]: standColor }}
+            />
+          </div>
+        </div>
       </div>
 
       {edit && (
@@ -1081,15 +1290,34 @@ const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandle
               </button>
             </div>
           </div>
-          <EditField label="Move name">
+          <EditField label="Move name (format: KEY [mods] - [Title] 🔴)">
             <input className={inputCls} value={move.name} onChange={(e) => edit.onChange({ ...move, name: e.target.value })} />
           </EditField>
-          <EditField label="Description">
+          <EditField label="Description (prose, then Damage/CD/Tags/Heat lines)">
             <textarea rows={7} className={inputCls} value={move.description} onChange={(e) => edit.onChange({ ...move, description: e.target.value })} />
           </EditField>
           <EditField label="Video path (e.g. /videos/star-platinum/barrage.mp4)">
             <input className={inputCls} value={move.videoSrc} onChange={(e) => edit.onChange({ ...move, videoSrc: e.target.value })} />
           </EditField>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <EditField label="Blockable">
+              <select className={inputCls} value={triSelectVal(move.blockable)} onChange={(e) => edit.onChange({ ...move, blockable: triSelectParse(e.target.value) })}>
+                <option value="auto">Auto (from tags)</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </EditField>
+            <EditField label="Parryable">
+              <select className={inputCls} value={triSelectVal(move.parryable)} onChange={(e) => edit.onChange({ ...move, parryable: triSelectParse(e.target.value) })}>
+                <option value="auto">Auto (from tags)</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </EditField>
+            <EditField label="Armor (blank = auto)">
+              <input className={inputCls} value={move.armor || ''} onChange={(e) => edit.onChange({ ...move, armor: e.target.value || undefined })} />
+            </EditField>
+          </div>
           <label className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">
             <input
               type="checkbox"
@@ -1100,7 +1328,7 @@ const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandle
           </label>
           {move.hasFinisher && (
             <>
-              <EditField label="Finisher description">
+              <EditField label="Finisher description (format: KEY - [Title] 🔴: text, then stat lines)">
                 <textarea rows={5} className={inputCls} value={move.finisherDescription || ''} onChange={(e) => edit.onChange({ ...move, finisherDescription: e.target.value })} />
               </EditField>
               <EditField label="Finisher video path">
@@ -1303,84 +1531,6 @@ const StandDetailScreen: React.FC<{
             </p>
           </div>
 
-          {/* MOVESET & ABILITIES SECTION */}
-          {(editMode || (stand.moves && stand.moves.length > 0) || (stand.awakeningMoves && stand.awakeningMoves.length > 0)) && (
-            <div className="mt-10 animate-fadeIn">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#2a2418] pb-4 mb-6">
-                <h3 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278] flex items-center gap-3">
-                  <Swords className="w-5 h-5" />
-                  Combat Abilities
-                </h3>
-
-                {/* Awakening Tab Navigation (Visible if Awakening Moves exist) */}
-                {(editMode || (stand.awakeningMoves && stand.awakeningMoves.length > 0)) && (
-                  <div className="flex border border-[#2a2418] bg-[#0a0a0d] p-1">
-                    <button
-                      onClick={() => setMoveCategory('standard')}
-                      className={`px-4 py-1.5 text-xs font-mono uppercase tracking-wider transition-all ${
-                        moveCategory === 'standard' 
-                          ? 'bg-[#1c1810] text-[#e6c278] border border-[#c3a35e]/30' 
-                          : 'text-[#8a857a] hover:text-[#c7c2b5] border border-transparent'
-                      }`}
-                    >
-                      Standard Kit
-                    </button>
-                    <button
-                      onClick={() => setMoveCategory('awakening')}
-                      className={`px-4 py-1.5 text-xs font-mono uppercase tracking-wider transition-all flex items-center gap-2 ${
-                        moveCategory === 'awakening' 
-                          ? 'bg-[#1c1810] text-[#e6c278] border border-[#c3a35e]/30' 
-                          : 'text-[#8a857a] hover:text-[#c7c2b5] border border-transparent'
-                      }`}
-                    >
-                      <Sparkles className="w-3 h-3" />
-                      Awakening
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Moves Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {displayedMoves && displayedMoves.length > 0 ? (
-                  displayedMoves.map((move, i) => (
-                    <MoveCard
-                      key={move.id}
-                      move={move}
-                      standColor={stand.color}
-                      edit={
-                        editMode
-                          ? {
-                              onChange: (m) => setMoves(displayedMoves.map((x, j) => (j === i ? m : x))),
-                              onDelete: () => setMoves(displayedMoves.filter((_, j) => j !== i)),
-                              onShift: (dir) => {
-                                const k = i + dir;
-                                if (k < 0 || k >= displayedMoves.length) return;
-                                const next = [...displayedMoves];
-                                [next[i], next[k]] = [next[k], next[i]];
-                                setMoves(next);
-                              },
-                            }
-                          : undefined
-                      }
-                    />
-                  ))
-                ) : (
-                  <div className="col-span-full border border-dashed border-[#2a2418] bg-[#0a0a0d]/60 py-10 text-center">
-                    <p className="font-mono text-xs uppercase tracking-widest text-[#5c584f]">
-                      Moveset currently being documented
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {editMode && (
-                <button type="button" className={`${smallBtnCls} mt-4`} onClick={addMove}>
-                  + Add move to {moveCategory === 'standard' ? 'Standard Kit' : 'Awakening'}
-                </button>
-              )}
-            </div>
-          )}
         </div>
 
         {/* RIGHT COLUMN — portrait plate */}
@@ -1425,6 +1575,87 @@ const StandDetailScreen: React.FC<{
           </div>
         </div>
       </div>
+
+      {/* MOVESET & ABILITIES SECTION — full width, below the two-column header area */}
+      {(editMode || (stand.moves && stand.moves.length > 0) || (stand.awakeningMoves && stand.awakeningMoves.length > 0)) && (
+        <div className="relative left-1/2 w-screen -translate-x-1/2 px-4 md:px-10">
+        <div className="mt-10 animate-fadeIn">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#2a2418] pb-4 mb-6">
+            <h3 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278] flex items-center gap-3">
+              <Swords className="w-5 h-5" />
+              Combat Abilities
+            </h3>
+
+            {/* Awakening Tab Navigation (Visible if Awakening Moves exist) */}
+            {(editMode || (stand.awakeningMoves && stand.awakeningMoves.length > 0)) && (
+              <div className="flex border border-[#2a2418] bg-[#0a0a0d] p-1">
+                <button
+                  onClick={() => setMoveCategory('standard')}
+                  className={`px-4 py-1.5 text-xs font-mono uppercase tracking-wider transition-all ${
+                    moveCategory === 'standard' 
+                      ? 'bg-[#1c1810] text-[#e6c278] border border-[#c3a35e]/30' 
+                      : 'text-[#8a857a] hover:text-[#c7c2b5] border border-transparent'
+                  }`}
+                >
+                  Standard Kit
+                </button>
+                <button
+                  onClick={() => setMoveCategory('awakening')}
+                  className={`px-4 py-1.5 text-xs font-mono uppercase tracking-wider transition-all flex items-center gap-2 ${
+                    moveCategory === 'awakening' 
+                      ? 'bg-[#1c1810] text-[#e6c278] border border-[#c3a35e]/30' 
+                      : 'text-[#8a857a] hover:text-[#c7c2b5] border border-transparent'
+                  }`}
+                >
+                  <Sparkles className="w-3 h-3" />
+                  Awakening
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Moves Grid */}
+          <div className="flex flex-col gap-5">
+            {displayedMoves && displayedMoves.length > 0 ? (
+              displayedMoves.map((move, i) => (
+                <MoveCard
+                  key={move.id}
+                  move={move}
+                  standColor={stand.color}
+                  edit={
+                    editMode
+                      ? {
+                          onChange: (m) => setMoves(displayedMoves.map((x, j) => (j === i ? m : x))),
+                          onDelete: () => setMoves(displayedMoves.filter((_, j) => j !== i)),
+                          onShift: (dir) => {
+                            const k = i + dir;
+                            if (k < 0 || k >= displayedMoves.length) return;
+                            const next = [...displayedMoves];
+                            [next[i], next[k]] = [next[k], next[i]];
+                            setMoves(next);
+                          },
+                        }
+                      : undefined
+                  }
+                />
+              ))
+            ) : (
+              <div className="col-span-full border border-dashed border-[#2a2418] bg-[#0a0a0d]/60 py-10 text-center">
+                <p className="font-mono text-xs uppercase tracking-widest text-[#5c584f]">
+                  Moveset currently being documented
+                </p>
+              </div>
+            )}
+          </div>
+
+          {editMode && (
+            <button type="button" className={`${smallBtnCls} mt-4`} onClick={addMove}>
+              + Add move to {moveCategory === 'standard' ? 'Standard Kit' : 'Awakening'}
+            </button>
+          )}
+        </div>
+        </div>
+      )}
     </div>
   );
 };
