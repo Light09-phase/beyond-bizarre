@@ -11,7 +11,9 @@ import {
   HelpCircle,
   PlayCircle,
   Check,
-  X
+  X,
+  Clock as ClockIcon,
+  ExternalLink as ExternalLinkIcon
 } from 'lucide-react';
 
 // ============================================================================
@@ -73,6 +75,512 @@ const ScrollBackground: React.FC<{ activeOpacity?: string; className?: string }>
 };
 
 // ============================================================================
+// VIDEO REFERENCES — your own files + links (YouTube / X / Google Drive / …)
+// ============================================================================
+//
+// Every place that used to take a single `videoSrc` still does. On top of that
+// you can now add `videos={[ ... ]}` (or `finisherVideos` on an ability move)
+// to attach as many extra references as you like. When there's more than one
+// reference, a tab switcher appears under the player.
+//
+//   videoSrc: "/videos/star-platinum/barrage.mp4",          // own file (unchanged)
+//   videos: [
+//     { src: "https://youtu.be/dQw4w9WgXcQ?t=83" },           // opens at 1:23
+//     { src: "https://youtu.be/dQw4w9WgXcQ", start: "1:23", end: "1:40", label: "Frame data" },
+//     { src: "https://x.com/user/status/1234567890" },         // X / Twitter post
+//     { src: "https://drive.google.com/file/d/FILE_ID/view", start: "0:45" },
+//   ]
+//
+// `src` may also be a link on its own `videoSrc` — it is detected automatically.
+// `start` / `end` accept seconds (83), "1:23", "1:02:03" or "1m23s". If `start`
+// is left out, a timestamp already in the link (?t=83, &t=1m23s, #t=83) is used.
+
+interface VideoRef {
+  src: string;
+  label?: string;              // tab label (defaults to the host, e.g. "YouTube")
+  start?: number | string;
+  end?: number | string;
+  posterSrc?: string;          // only used for direct video files
+}
+
+type MediaKind = 'file' | 'embed' | 'link';
+
+interface ResolvedMedia {
+  kind: MediaKind;
+  provider: string;            // "YouTube", "X", "Google Drive", "Clip", …
+  start: number;               // seconds (0 = none)
+  end?: number;
+  seekable: boolean;           // can the embed be opened at `start` from the URL alone?
+  fileUrl?: string;            // kind === 'file'
+  openUrl?: (start: number) => string;
+  buildEmbed?: (o: { start: number; end?: number; autoplay: boolean }) => string;
+}
+
+const VIDEO_PLACEHOLDER = "UNIQUE VIDEO HERE";
+
+const cleanSrc = (s?: string | null): string | undefined => {
+  const t = (s ?? '').trim();
+  return !t || t === VIDEO_PLACEHOLDER ? undefined : t;
+};
+
+function parseTimeValue(v?: string | number | null): number {
+  if (v === undefined || v === null || v === '') return 0;
+  if (typeof v === 'number') return Number.isFinite(v) && v > 0 ? Math.floor(v) : 0;
+  const s = String(v).trim().toLowerCase();
+  if (!s) return 0;
+  if (s.includes(':')) {
+    const nums = s.split(':').map(Number);
+    if (nums.some((n) => !Number.isFinite(n))) return 0;
+    return Math.floor(nums.reduce((acc, n) => acc * 60 + n, 0));
+  }
+  const m = s.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+(?:\.\d+)?)s?)?$/);
+  if (m && (m[1] || m[2] || m[3])) {
+    return Number(m[1] || 0) * 3600 + Number(m[2] || 0) * 60 + Math.floor(Number(m[3] || 0));
+  }
+  return 0;
+}
+
+function formatTime(total: number): string {
+  const s = Math.max(0, Math.floor(total));
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return h > 0 ? `${h}:${pad(m)}:${pad(sec)}` : `${m}:${pad(sec)}`;
+}
+
+// "#t=83" or "#t=83,95" (standard media fragment, also used by Vimeo as "#t=1m3s")
+function fragmentTimes(hash?: string): [number, number] {
+  const t = new URLSearchParams((hash || '').replace(/^#/, '')).get('t');
+  if (!t) return [0, 0];
+  const [a, b] = t.split(',');
+  return [parseTimeValue(a), parseTimeValue(b)];
+}
+
+const hasTime = (v: unknown) => v !== undefined && v !== null && String(v).trim() !== '';
+
+const KNOWN_HOSTS =
+  /^(?:www\.|m\.|mobile\.)?(?:youtube\.com|youtu\.be|youtube-nocookie\.com|vimeo\.com|x\.com|twitter\.com|drive\.google\.com|streamable\.com|loom\.com|dropbox\.com)(?:[/?#]|$)/i;
+const VIDEO_FILE_EXT = /\.(?:mp4|webm|ogv|ogg|mov|m4v)$/i;
+
+function resolveVideoRef(ref: VideoRef): ResolvedMedia {
+  const raw = (ref.src || '').trim();
+  const exStart = hasTime(ref.start) ? parseTimeValue(ref.start) : undefined;
+  const exEnd = hasTime(ref.end) ? parseTimeValue(ref.end) : undefined;
+
+  type Base = Pick<ResolvedMedia, 'kind' | 'provider' | 'seekable'> &
+    Partial<Pick<ResolvedMedia, 'fileUrl' | 'openUrl' | 'buildEmbed'>>;
+  const make = (base: Base, urlStart = 0, urlEnd = 0): ResolvedMedia => {
+    const start = exStart ?? urlStart;
+    const endVal = exEnd ?? urlEnd;
+    return { ...base, start, end: endVal > start ? endVal : undefined };
+  };
+
+  let url: URL | null = null;
+  try {
+    url = new URL(KNOWN_HOSTS.test(raw) ? `https://${raw}` : raw);
+    if (!/^https?:$/.test(url.protocol)) url = null;
+  } catch {
+    url = null;
+  }
+
+  // Not an absolute web link -> one of your own files / paths.
+  if (!url) {
+    const [path, hash] = raw.split('#');
+    const [a, b] = fragmentTimes(hash);
+    return make({ kind: 'file', provider: 'Clip', seekable: true, fileUrl: path }, a, b);
+  }
+
+  const href = url.href;
+  const host = url.hostname.replace(/^(?:www|m|mobile|music)\./i, '').toLowerCase();
+  const parts = url.pathname.split('/').filter(Boolean);
+  const q = (k: string) => url!.searchParams.get(k);
+  const urlStart =
+    parseTimeValue(q('t') ?? q('start') ?? q('time_continue')) || fragmentTimes(url.hash)[0];
+
+  // ---- YouTube ----
+  if (host === 'youtu.be' || host === 'youtube.com' || host === 'youtube-nocookie.com') {
+    let id = '';
+    if (host === 'youtu.be') id = parts[0] || '';
+    else if (parts[0] === 'watch') id = q('v') || '';
+    else if (['embed', 'shorts', 'live', 'v'].includes(parts[0])) id = parts[1] || '';
+    id = id.replace(/[^\w-]/g, '');
+    if (id) {
+      return make(
+        {
+          kind: 'embed',
+          provider: 'YouTube',
+          seekable: true,
+          openUrl: (s) => `https://www.youtube.com/watch?v=${id}${s ? `&t=${s}s` : ''}`,
+          buildEmbed: ({ start, end, autoplay }) => {
+            const p = new URLSearchParams({ rel: '0', playsinline: '1' });
+            if (start) p.set('start', String(start));
+            if (end) p.set('end', String(end));
+            if (autoplay) p.set('autoplay', '1');
+            return `https://www.youtube-nocookie.com/embed/${id}?${p.toString()}`;
+          },
+        },
+        urlStart,
+        parseTimeValue(q('end'))
+      );
+    }
+  }
+
+  // ---- Vimeo ----
+  if (host === 'vimeo.com' || host === 'player.vimeo.com') {
+    const id = parts.find((p) => /^\d+$/.test(p));
+    if (id) {
+      const next = parts[parts.indexOf(id) + 1];
+      const priv = q('h') || (next && /^[a-z0-9]{8,}$/i.test(next) ? next : '');
+      return make(
+        {
+          kind: 'embed',
+          provider: 'Vimeo',
+          seekable: true,
+          openUrl: (s) => `https://vimeo.com/${id}${s ? `#t=${s}s` : ''}`,
+          buildEmbed: ({ start, autoplay }) => {
+            const p = new URLSearchParams();
+            if (priv) p.set('h', priv);
+            if (autoplay) p.set('autoplay', '1');
+            const qs = p.toString();
+            return `https://player.vimeo.com/video/${id}${qs ? `?${qs}` : ''}${start ? `#t=${start}s` : ''}`;
+          },
+        },
+        urlStart
+      );
+    }
+  }
+
+  // ---- X / Twitter (posts with video). The embed can't be seeked from the URL. ----
+  if (host === 'x.com' || host === 'twitter.com') {
+    const id = url.pathname.match(/\/status(?:es)?\/(\d+)/)?.[1];
+    if (id) {
+      return make({
+        kind: 'embed',
+        provider: 'X',
+        seekable: false,
+        openUrl: () => href,
+        buildEmbed: () =>
+          `https://platform.twitter.com/embed/Tweet.html?id=${id}&theme=dark&dnt=true&hideThread=true`,
+      });
+    }
+  }
+
+  // ---- Google Drive (file must be shared as "Anyone with the link") ----
+  if (host === 'drive.google.com') {
+    const id = url.pathname.match(/\/file\/(?:u\/\d+\/)?d\/([\w-]+)/)?.[1] || q('id');
+    if (id) {
+      return make({
+        kind: 'embed',
+        provider: 'Google Drive',
+        seekable: false,
+        openUrl: () => `https://drive.google.com/file/d/${id}/view`,
+        buildEmbed: () => `https://drive.google.com/file/d/${id}/preview`,
+      });
+    }
+  }
+
+  // ---- Streamable ----
+  if (host === 'streamable.com' && (parts.length === 1 || parts[0] === 'e')) {
+    const id = parts[parts.length - 1];
+    return make({
+      kind: 'embed',
+      provider: 'Streamable',
+      seekable: false,
+      openUrl: () => href,
+      buildEmbed: () => `https://streamable.com/e/${id}`,
+    });
+  }
+
+  // ---- Loom (start time is best-effort) ----
+  if (host === 'loom.com' && (parts[0] === 'share' || parts[0] === 'embed') && parts[1]) {
+    const id = parts[1];
+    return make(
+      {
+        kind: 'embed',
+        provider: 'Loom',
+        seekable: true,
+        openUrl: () => href,
+        buildEmbed: ({ start, autoplay }) => {
+          const p = new URLSearchParams();
+          if (start) p.set('t', String(start));
+          if (autoplay) p.set('autoplay', '1');
+          const qs = p.toString();
+          return `https://www.loom.com/embed/${id}${qs ? `?${qs}` : ''}`;
+        },
+      },
+      urlStart
+    );
+  }
+
+  // ---- Dropbox share link to a video file -> play it directly ----
+  if (host === 'dropbox.com' && VIDEO_FILE_EXT.test(url.pathname)) {
+    const d = new URL(href);
+    d.searchParams.delete('dl');
+    d.searchParams.set('raw', '1');
+    d.hash = '';
+    return make({ kind: 'file', provider: 'Clip', seekable: true, fileUrl: d.href, openUrl: () => href }, urlStart);
+  }
+
+  // ---- Any direct video file link (.mp4 / .webm / .mov …, Discord CDN, etc.) ----
+  if (VIDEO_FILE_EXT.test(url.pathname)) {
+    const [a, b] = fragmentTimes(url.hash);
+    const clean = new URL(href);
+    clean.hash = '';
+    return make(
+      { kind: 'file', provider: 'Clip', seekable: true, fileUrl: clean.href, openUrl: () => href },
+      a || urlStart,
+      b
+    );
+  }
+
+  // ---- Unknown host: offer "Open" + "Try embedding anyway" ----
+  return make({
+    kind: 'link',
+    provider: host || 'Link',
+    seekable: false,
+    openUrl: () => href,
+    buildEmbed: () => href,
+  });
+}
+
+const withFragment = (file: string, start: number, end?: number) =>
+  start || end ? `${file}#t=${start}${end ? `,${end}` : ''}` : file;
+
+interface MediaStageProps {
+  videoSrc?: string;           // your own file (or a link) — same as before
+  posterSrc?: string;
+  videos?: VideoRef[];         // extra references -> tab switcher
+  variant?: 'plate' | 'card';  // plate: big play button overlay · card: native controls always on
+  className?: string;          // wrapper (grid column, borders …)
+  stageClassName?: string;     // the 16:9 box
+  barClassName?: string;       // tab / timestamp bar under the player
+  buttonClassName?: string;    // size + colours of the round play button (plate)
+  iconClassName?: string;
+  tabActiveClassName?: string;
+  tabIdleClassName?: string;
+  background?: React.ReactNode;                                   // always rendered behind the player
+  overlays?: (ctx: { embedded: boolean }) => React.ReactNode;     // tags on top of the player
+}
+
+const MediaStage: React.FC<MediaStageProps> = ({
+  videoSrc,
+  posterSrc,
+  videos,
+  variant = 'plate',
+  className = '',
+  stageClassName = 'bg-[#121216]',
+  barClassName = 'bg-[#070709] border-t border-[#2a2418]',
+  buttonClassName = 'w-14 h-14 border-[#c3a35e] text-[#c3a35e] group-hover:bg-[#c3a35e] group-hover:text-black',
+  iconClassName = 'w-6 h-6',
+  tabActiveClassName = 'bg-[#1c1a24] text-[#e6c278] border-[#c3a35e] shadow-[0_0_10px_rgba(195,163,94,0.3)]',
+  tabIdleClassName = 'bg-[#0e0d12] text-[#716c62] border-[#221e15] hover:text-[#a09a8e] hover:border-[#3d3423]',
+  background,
+  overlays,
+}) => {
+  const [idx, setIdx] = useState(0);
+  const [nonce, setNonce] = useState(0); // bumped by "Jump to" so an embed reloads at its start time
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [forceEmbed, setForceEmbed] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Own source first (unchanged behaviour), then any extra references.
+  const refs: VideoRef[] = [];
+  const primary = cleanSrc(videoSrc);
+  if (primary) refs.push({ src: primary, posterSrc });
+  (videos || []).forEach((v) => {
+    const s = cleanSrc(v?.src);
+    if (s) refs.push({ ...v, src: s });
+  });
+
+  const resolved = refs.map(resolveVideoRef);
+  const baseLabels = refs.map((r, i) => r.label?.trim() || resolved[i].provider);
+  const labels = baseLabels.map((l, i) => {
+    const total = baseLabels.filter((x) => x === l).length;
+    return total > 1 ? `${l} ${baseLabels.slice(0, i + 1).filter((x) => x === l).length}` : l;
+  });
+
+  const cur = Math.min(idx, Math.max(refs.length - 1, 0));
+  const ref = refs[cur] as VideoRef | undefined;
+  const media = resolved[cur] as ResolvedMedia | undefined;
+
+  const embedding = !!media && (media.kind === 'embed' || (media.kind === 'link' && forceEmbed));
+  const isCard = variant === 'card';
+  const hasTimestamp = !!media && (media.start > 0 || !!media.end);
+  const canJump = !!media && (media.kind === 'file' || (media.kind === 'embed' && media.seekable));
+  const showBar = refs.length > 1 || (!!media && (hasTimestamp || media.kind !== 'file'));
+  const fileSrc =
+    media?.kind === 'file' && media.fileUrl ? withFragment(media.fileUrl, media.start, media.end) : undefined;
+
+  const select = (i: number) => {
+    setIdx(i);
+    setNonce(0);
+    setIsPlaying(false);
+    setForceEmbed(false);
+  };
+
+  const handlePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    const p = v.play();
+    if (p && typeof p.catch === 'function') p.catch(() => {});
+    setIsPlaying(true);
+  };
+
+  const jumpToStart = () => {
+    if (!media) return;
+    if (media.kind === 'file' && videoRef.current) {
+      videoRef.current.currentTime = media.start;
+      handlePlay();
+    } else if (media.kind === 'embed' && media.seekable) {
+      setNonce((n) => n + 1);
+    }
+  };
+
+  const playButtonCls = `rounded-full bg-black/80 border-2 flex items-center justify-center group-hover:scale-110 transition-all duration-300 shadow-2xl ${buttonClassName}`;
+  const playIcon = (
+    <svg className={`${iconClassName} translate-x-0.5 transition-colors`} fill="currentColor" viewBox="0 0 24 24">
+      <path d="M8 5v14l11-7z" />
+    </svg>
+  );
+
+  const timeLabel = media ? `${formatTime(media.start)}${media.end ? `–${formatTime(media.end)}` : ''}` : '';
+  const chipCls =
+    'inline-flex items-center gap-1 px-2 py-1 text-[11px] font-mono border border-[#3d3423] bg-[#14121a] text-[#e6c278]';
+
+  return (
+    <div className={`flex flex-col ${className}`}>
+      <div
+        className={`relative ${media?.provider === 'X' ? 'h-[480px]' : 'aspect-video'} grow shrink-0 overflow-hidden flex items-center justify-center ${stageClassName}`}
+      >
+        {background}
+
+        {refs.length === 0 && !isCard && <div className={`relative z-10 ${playButtonCls}`}>{playIcon}</div>}
+
+        {media?.kind === 'file' && (
+          <>
+            <video
+              key={`${cur}-${fileSrc}`}
+              ref={videoRef}
+              src={fileSrc}
+              poster={cleanSrc(ref?.posterSrc)}
+              className="absolute inset-0 w-full h-full object-cover z-10"
+              controls={isCard || isPlaying}
+              onPause={() => setIsPlaying(false)}
+              onEnded={() => setIsPlaying(false)}
+            >
+              {isCard && 'Your browser does not support the video tag.'}
+            </video>
+            {!isCard && !isPlaying && (
+              <button
+                type="button"
+                onClick={handlePlay}
+                aria-label="Play video"
+                className={`relative z-20 cursor-pointer ${playButtonCls}`}
+              >
+                {playIcon}
+              </button>
+            )}
+          </>
+        )}
+
+        {embedding && media?.buildEmbed && (
+          <iframe
+            key={`${cur}-${nonce}`}
+            src={media.buildEmbed({ start: media.start, end: media.end, autoplay: nonce > 0 })}
+            title={`${labels[cur]} video`}
+            className="absolute inset-0 w-full h-full z-10 border-0 bg-black"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+            allowFullScreen
+            referrerPolicy="strict-origin-when-cross-origin"
+            loading="lazy"
+          />
+        )}
+
+        {media?.kind === 'link' && !forceEmbed && (
+          <div className="relative z-10 flex flex-col items-center gap-2 px-4 text-center">
+            <ExternalLinkIcon className="w-6 h-6 text-[#8a857a]" />
+            <span className="text-[11px] font-mono text-[#b8b3a8] break-all">{media.provider}</span>
+            <span className="text-[10px] font-mono text-[#716c62]">Not a known video host — it may refuse to embed.</span>
+            <div className="flex flex-wrap justify-center gap-2">
+              <a
+                href={media.openUrl?.(media.start)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${chipCls} hover:text-white`}
+              >
+                Open link
+              </a>
+              <button type="button" onClick={() => setForceEmbed(true)} className={`${chipCls} hover:text-white`}>
+                Try embedding anyway
+              </button>
+            </div>
+          </div>
+        )}
+
+        {overlays?.({ embedded: embedding })}
+      </div>
+
+      {showBar && (
+        <div className={`flex flex-wrap items-center gap-1.5 px-2 py-1.5 ${barClassName}`}>
+          {refs.length > 1 && (
+            <div role="tablist" aria-label="Video references" className="flex flex-wrap gap-1.5">
+              {refs.map((r, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === cur}
+                  title={r.src}
+                  onClick={() => select(i)}
+                  className={`px-2.5 py-1 text-[11px] font-mono uppercase tracking-wider border transition-colors ${
+                    i === cur ? tabActiveClassName : tabIdleClassName
+                  }`}
+                >
+                  {labels[i]}
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div className="ml-auto flex flex-wrap items-center gap-1.5">
+            {hasTimestamp &&
+              (canJump ? (
+                <button
+                  type="button"
+                  onClick={jumpToStart}
+                  title="Restart this reference at its timestamp"
+                  className={`${chipCls} hover:text-white hover:border-[#c3a35e] transition-colors`}
+                >
+                  <ClockIcon className="w-3 h-3" />
+                  Jump to {timeLabel}
+                </button>
+              ) : (
+                <span title="This host can't be opened at a set time from a link — scrub to this point" className={chipCls}>
+                  <ClockIcon className="w-3 h-3" />
+                  Seek to {timeLabel}
+                </span>
+              ))}
+            {media?.openUrl && media.kind !== 'link' && (
+              <a
+                href={media.openUrl(media.start)}
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Open the original link"
+                className={`${chipCls} text-[#8a857a] hover:text-white transition-colors`}
+              >
+                <ExternalLinkIcon className="w-3 h-3" />
+                Open
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================================================
 // TYPES
 // ============================================================================
 
@@ -84,10 +592,12 @@ interface Move {
   id: string;
   name: string;
   description: string;
-  videoSrc: string;
+  videoSrc: string;     // your own file path — or a link (YouTube / X / Drive …), detected automatically
+  videos?: VideoRef[];  // extra video references -> tab switcher under the player
   hasFinisher?: boolean;
   finisherDescription?: string;
   finisherVideoSrc?: string;
+  finisherVideos?: VideoRef[]; // extra references for the finisher
   blockable?: boolean;  // optional override (default: derived from Tags)
   parryable?: boolean;  // optional override (default: derived from Tags)
   armor?: string;       // optional override, e.g. 'Hyper Armor' (default: derived from Tags)
@@ -1215,6 +1725,77 @@ const SegRow: React.FC<{
   </div>
 );
 
+// Editor for a move's list of extra video references (links or files).
+const VideoRefsEditor: React.FC<{
+  label: string;
+  refs?: VideoRef[];
+  onChange: (refs: VideoRef[] | undefined) => void;
+}> = ({ label, refs = [], onChange }) => {
+  const update = (i: number, patch: Partial<VideoRef>) =>
+    onChange(refs.map((r, j) => (j === i ? { ...r, ...patch } : r)));
+  const blankToUndef = (v: string) => (v.trim() === '' ? undefined : v);
+  return (
+    <div className="space-y-2">
+      <span className="block text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">{label}</span>
+      {refs.map((r, i) => {
+        const m = r.src.trim() ? resolveVideoRef(r) : null;
+        return (
+          <div key={i} className="border border-dashed border-[#3d3423] p-2 space-y-2">
+            <input
+              className={inputCls}
+              placeholder="YouTube / X / Google Drive / Vimeo link, or a file path"
+              value={r.src}
+              onChange={(e) => update(i, { src: e.target.value })}
+            />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <input
+                className={inputCls}
+                placeholder="Tab label (optional)"
+                value={r.label ?? ''}
+                onChange={(e) => update(i, { label: blankToUndef(e.target.value) })}
+              />
+              <input
+                className={inputCls}
+                placeholder="Start — 1:23 or 83 (optional)"
+                value={r.start ?? ''}
+                onChange={(e) => update(i, { start: blankToUndef(e.target.value) })}
+              />
+              <input
+                className={inputCls}
+                placeholder="End (optional)"
+                value={r.end ?? ''}
+                onChange={(e) => update(i, { end: blankToUndef(e.target.value) })}
+              />
+            </div>
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-mono text-[#716c62]">
+                {m
+                  ? `${m.provider}${m.start ? ` · starts ${formatTime(m.start)}` : ''}${
+                      m.kind === 'embed' && !m.seekable ? ' · seek manually' : ''
+                    }`
+                  : 'Paste a link or file path'}
+              </span>
+              <button
+                type="button"
+                className={smallBtnCls}
+                onClick={() => {
+                  const next = refs.filter((_, j) => j !== i);
+                  onChange(next.length ? next : undefined);
+                }}
+              >
+                Remove
+              </button>
+            </div>
+          </div>
+        );
+      })}
+      <button type="button" className={smallBtnCls} onClick={() => onChange([...refs, { src: '' }])}>
+        + Add video reference
+      </button>
+    </div>
+  );
+};
+
 // Editor for one move's own fields (used for the base move and for each variant).
 const MoveFieldsEditor: React.FC<{ move: Move; onChange: (m: Move) => void }> = ({ move, onChange }) => {
   const currentExtras = deriveProps(parseMoveBody(move.description).tags, move, true).extras;
@@ -1231,9 +1812,14 @@ const MoveFieldsEditor: React.FC<{ move: Move; onChange: (m: Move) => void }> = 
       <EditField label="Description (prose, then Damage/CD/Tags/Heat lines)">
         <textarea rows={7} className={inputCls} value={move.description} onChange={(e) => onChange({ ...move, description: e.target.value })} />
       </EditField>
-      <EditField label="Video path (e.g. /videos/star-platinum/barrage.mp4)">
+      <EditField label="Video path or link (e.g. /videos/star-platinum/barrage.mp4 or a YouTube / X / Drive link)">
         <input className={inputCls} value={move.videoSrc} onChange={(e) => onChange({ ...move, videoSrc: e.target.value })} />
       </EditField>
+      <VideoRefsEditor
+        label="More video references (shown as tabs)"
+        refs={move.videos}
+        onChange={(videos) => onChange({ ...move, videos })}
+      />
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <EditField label="Blockable">
           <select className={inputCls} value={triSelectVal(move.blockable)} onChange={(e) => onChange({ ...move, blockable: triSelectParse(e.target.value) })}>
@@ -1277,9 +1863,14 @@ const MoveFieldsEditor: React.FC<{ move: Move; onChange: (m: Move) => void }> = 
           <EditField label="Finisher description (format: KEY - [Title] 🔴: text, then stat lines)">
             <textarea rows={5} className={inputCls} value={move.finisherDescription || ''} onChange={(e) => onChange({ ...move, finisherDescription: e.target.value })} />
           </EditField>
-          <EditField label="Finisher video path">
+          <EditField label="Finisher video path or link">
             <input className={inputCls} value={move.finisherVideoSrc || ''} onChange={(e) => onChange({ ...move, finisherVideoSrc: e.target.value })} />
           </EditField>
+          <VideoRefsEditor
+            label="More finisher video references (shown as tabs)"
+            refs={move.finisherVideos}
+            onChange={(finisherVideos) => onChange({ ...move, finisherVideos })}
+          />
         </>
       )}
     </div>
@@ -1317,6 +1908,7 @@ const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandle
     .map(([k, v]) => [/^cd$/i.test(k) ? 'Cooldown' : k, v] as [string, string]);
 
   const videoSrc = shownTab === 'base' ? cur.videoSrc : cur.finisherVideoSrc;
+  const extraVideos = shownTab === 'base' ? cur.videos : cur.finisherVideos;
 
   const variantOptions = variants.map((v, i) => {
     const h = parseMoveName(v.name);
@@ -1449,23 +2041,23 @@ const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandle
         </div>
 
         <div className="p-4 bg-[#08080b] border-t md:border-t-0 border-[#2a2418]">
-          <div className="relative aspect-video bg-[#121116] border border-[#2a2418] group overflow-hidden flex items-center justify-center">
-            {videoSrc ? (
-              <video
-                key={videoSrc}
-                src={videoSrc}
-                controls
-                className="absolute inset-0 w-full h-full object-cover z-10"
-                poster={`INSERT STAND ART HERE/video-poster-placeholder.png`}
-              >
-                Your browser does not support the video tag.
-              </video>
-            ) : null}
-            <PlayCircle
-              className="w-8 h-8 text-[#3d3423] group-hover:text-[var(--stand-glow)] transition-colors absolute z-0"
-              style={{ ['--stand-glow' as any]: standColor }}
-            />
-          </div>
+          <MediaStage
+            key={`${cur.id}-${shownTab}`}
+            videoSrc={videoSrc}
+            posterSrc="INSERT STAND ART HERE/video-poster-placeholder.png"
+            videos={extraVideos}
+            variant="card"
+            stageClassName="bg-[#121116] border border-[#2a2418] group"
+            barClassName="mt-2 bg-[#0d0c10] border border-[#2a2418]"
+            tabActiveClassName="bg-[#2a2418] text-[#e6c278] border-[#c3a35e]"
+            tabIdleClassName="bg-[#101014] text-[#8a857a] border-[#221e15] hover:text-[#c7c2b5]"
+            background={
+              <PlayCircle
+                className="w-8 h-8 text-[#3d3423] group-hover:text-[var(--stand-glow)] transition-colors absolute z-0"
+                style={{ ['--stand-glow' as any]: standColor }}
+              />
+            }
+          />
         </div>
       </div>
 
