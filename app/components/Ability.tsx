@@ -15,6 +15,7 @@ import {
   Clock as ClockIcon,
   ExternalLink as ExternalLinkIcon
 } from 'lucide-react';
+import { readEditFlag, registerStandsToolbar } from '@/app/lib/editAuth';
 
 // ============================================================================
 // ANIMATION & SCROLL UTILITIES
@@ -103,7 +104,7 @@ interface VideoRef {
   posterSrc?: string;          // only used for direct video files
 }
 
-type MediaKind = 'file' | 'embed' | 'link';
+type MediaKind = 'file' | 'embed' | 'link' | 'image';
 
 interface ResolvedMedia {
   kind: MediaKind;
@@ -162,6 +163,7 @@ const hasTime = (v: unknown) => v !== undefined && v !== null && String(v).trim(
 const KNOWN_HOSTS =
   /^(?:www\.|m\.|mobile\.)?(?:youtube\.com|youtu\.be|youtube-nocookie\.com|vimeo\.com|x\.com|twitter\.com|drive\.google\.com|streamable\.com|loom\.com|dropbox\.com)(?:[/?#]|$)/i;
 const VIDEO_FILE_EXT = /\.(?:mp4|webm|ogv|ogg|mov|m4v)$/i;
+const IMAGE_FILE_EXT = /\.(?:gif|png|jpe?g|webp|avif)$/i;
 
 function resolveVideoRef(ref: VideoRef): ResolvedMedia {
   const raw = (ref.src || '').trim();
@@ -175,6 +177,11 @@ function resolveVideoRef(ref: VideoRef): ResolvedMedia {
     const endVal = exEnd ?? urlEnd;
     return { ...base, start, end: endVal > start ? endVal : undefined };
   };
+
+  // Pictures / GIFs: dropped files are stored as data: URLs, but normal image links and paths work too.
+  if (/^data:image\//i.test(raw) || IMAGE_FILE_EXT.test(raw.split(/[?#]/)[0])) {
+    return make({ kind: 'image', provider: 'Image', seekable: false, fileUrl: raw });
+  }
 
   let url: URL | null = null;
   try {
@@ -388,9 +395,18 @@ const MediaStage: React.FC<MediaStageProps> = ({
   const refs: VideoRef[] = [];
   const primary = cleanSrc(videoSrc);
   if (primary) refs.push({ src: primary, posterSrc });
+  // Skip extra references that repeat an existing one (same link + same times),
+  // so pasting a link in both the main clip and the links list gives a single tab.
+  const refKey = (r: VideoRef) => `${r.src.trim()}|${r.start ?? ''}|${r.end ?? ''}`;
+  const seen = new Set(refs.map(refKey));
   (videos || []).forEach((v) => {
     const s = cleanSrc(v?.src);
-    if (s) refs.push({ ...v, src: s });
+    if (!s) return;
+    const next = { ...v, src: s };
+    const k = refKey(next);
+    if (seen.has(k)) return;
+    seen.add(k);
+    refs.push(next);
   });
 
   const resolved = refs.map(resolveVideoRef);
@@ -408,7 +424,8 @@ const MediaStage: React.FC<MediaStageProps> = ({
   const isCard = variant === 'card';
   const hasTimestamp = !!media && (media.start > 0 || !!media.end);
   const canJump = !!media && (media.kind === 'file' || (media.kind === 'embed' && media.seekable));
-  const showBar = refs.length > 1 || (!!media && (hasTimestamp || media.kind !== 'file'));
+  const showBar =
+    refs.length > 1 || (!!media && (hasTimestamp || (media.kind !== 'file' && media.kind !== 'image')));
   const fileSrc =
     media?.kind === 'file' && media.fileUrl ? withFragment(media.fileUrl, media.start, media.end) : undefined;
 
@@ -451,7 +468,7 @@ const MediaStage: React.FC<MediaStageProps> = ({
   return (
     <div className={`flex flex-col ${className}`}>
       <div
-        className={`relative ${media?.provider === 'X' ? 'h-[480px]' : 'aspect-video'} grow shrink-0 overflow-hidden flex items-center justify-center ${stageClassName}`}
+        className={`relative ${media?.provider === 'X' ? 'h-[480px]' : 'aspect-video'} grow shrink-0 min-h-[200px] overflow-hidden flex items-center justify-center ${stageClassName}`}
       >
         {background}
 
@@ -484,6 +501,16 @@ const MediaStage: React.FC<MediaStageProps> = ({
           </>
         )}
 
+        {media?.kind === 'image' && media.fileUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={`${cur}-img`}
+            src={media.fileUrl}
+            alt={labels[cur] || 'Reference image'}
+            className="absolute inset-0 w-full h-full object-contain z-10 bg-black"
+          />
+        )}
+
         {embedding && media?.buildEmbed && (
           <iframe
             key={`${cur}-${nonce}`}
@@ -493,7 +520,6 @@ const MediaStage: React.FC<MediaStageProps> = ({
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
             allowFullScreen
             referrerPolicy="strict-origin-when-cross-origin"
-            loading="lazy"
           />
         )}
 
@@ -586,6 +612,9 @@ const MediaStage: React.FC<MediaStageProps> = ({
 
 type AbilityTab = 'stands' | 'specs' | 'weapons';
 
+// Which move list is showing. Stand Off = the old "Standard Kit" (stored in `moves`).
+type MoveKit = 'standoff' | 'standon' | 'awakening';
+
 type StandPart = 'Part 3' | 'Part 4' | 'Part 5' | 'Part 6' | 'Part 7' | 'Part 8';
 
 interface Move {
@@ -602,6 +631,8 @@ interface Move {
   parryable?: boolean;  // optional override (default: derived from Tags)
   armor?: string;       // optional override, e.g. 'Hyper Armor' (default: derived from Tags)
   blockExtras?: string[]; // optional override of the extra block properties (default: derived from Tags)
+  held?: boolean;       // input is held (shows a "(Held)" tag)
+  notes?: string;       // optional note shown under the block properties
   hasVariant?: boolean; // this move has variants (e.g. M2/LMB [🧱]) shown as tabs on the same card
   variants?: Move[];    // each variant is a full Move with its own description, video and optional finisher
 }
@@ -618,6 +649,7 @@ interface Stand {
   rarity?: string;
   standType?: string;
   moves?: Move[];
+  standOnMoves?: Move[];
   awakeningMoves?: Move[];
   pfpSrc?: string;      // NEW: Individually insert Stand PFP path
   fullArtSrc?: string;  // NEW: Individually insert Stand Full Art path
@@ -646,6 +678,10 @@ const PART_TITLES: Record<StandPart, string> = {
   'Part 7': 'Steel Ball Run',
   'Part 8': 'JoJolion',
 };
+
+const KIT_ORDER: MoveKit[] = ['standoff', 'standon', 'awakening'];
+const KIT_LABEL: Record<MoveKit, string> = { standoff: 'Stand Off', standon: 'Stand On', awakening: 'Awakening' };
+const KIT_KEY = { standoff: 'moves', standon: 'standOnMoves', awakening: 'awakeningMoves' } as const;
 
 const STANDS: Stand[] = [
   // --- Part 3: 12 confirmed ---
@@ -1179,25 +1215,6 @@ function useStandsByPart(stands: Stand[]): Record<StandPart, Stand[]> {
 // ============================================================================
 
 const DRAFT_KEY = 'bb-stands-draft-v1';
-const EDIT_FLAG_KEY = 'bb-edit-mode';
-
-// CHANGE THIS before you push. It keeps casual visitors out of edit mode, but it
-// sits in the page code, so it is a lock on the door, not real security.
-const EDIT_PASSWORD = '#Light@09*';
-
-function readEditFlag(): boolean {
-  try {
-    const q = new URLSearchParams(window.location.search).get('edit');
-    if (q === '0') localStorage.removeItem(EDIT_FLAG_KEY);
-    if (q === '1' && localStorage.getItem(EDIT_FLAG_KEY) !== '1') {
-      const attempt = window.prompt('Edit mode password:');
-      if (attempt !== null && attempt === EDIT_PASSWORD) localStorage.setItem(EDIT_FLAG_KEY, '1');
-    }
-    return localStorage.getItem(EDIT_FLAG_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
 
 function useStandsData() {
   const [stands, setStandsState] = useState<Stand[]>(STANDS);
@@ -1247,7 +1264,11 @@ function useStandsData() {
         localStorage.setItem(DRAFT_KEY, JSON.stringify(next));
         setHasDraft(true);
       } catch {
-        /* storage full or blocked */
+        // Storage full (embedded pictures count toward it) or blocked.
+        if (!(window as any).__standsDraftWarned) {
+          (window as any).__standsDraftWarned = true;
+          alert('This draft is too big for the browser to keep. Export data.json now so you don\'t lose your edits.');
+        }
       }
     }
   };
@@ -1278,6 +1299,9 @@ const EditField: React.FC<{ label: string; children: React.ReactNode; className?
   </label>
 );
 
+// The stand-editing buttons now live in the site-wide edit bar (SiteEditor).
+// This component renders nothing itself; it just hands that bar the current
+// stand actions while the Stands section is on screen.
 const EditBar: React.FC<{
   stands: Stand[];
   hasDraft: boolean;
@@ -1285,66 +1309,35 @@ const EditBar: React.FC<{
   onReset: () => void;
   onAdd: () => void;
 }> = ({ stands, hasDraft, onImport, onReset, onAdd }) => {
-  const fileRef = useRef<HTMLInputElement>(null);
-
-  const doExport = () => {
-    const blob = new Blob([JSON.stringify(stands, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'stands.json';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const doImport = async (file?: File) => {
-    if (!file) return;
-    try {
-      const json = JSON.parse(await file.text());
-      if (Array.isArray(json)) onImport(json as Stand[]);
-      else alert('That file is not a stands.json (expected a list of stands).');
-    } catch {
-      alert('Could not read that file as JSON.');
-    }
-  };
-
-  const exitEdit = () => {
-    try {
-      localStorage.removeItem(EDIT_FLAG_KEY);
-    } catch {}
-    window.location.reload();
-  };
-
-  return (
-    <div className="fixed bottom-4 right-4 z-[100] flex flex-wrap items-center gap-2 bg-[#0a0a0d] border border-[#c3a35e] p-2 shadow-[0_0_25px_rgba(195,163,94,0.25)] max-w-[calc(100vw-2rem)]">
-      <span className="text-[10px] font-mono uppercase tracking-wider text-[#34d399] px-1">
-        Edit mode{hasDraft ? ' · draft saved' : ''}
-      </span>
-      <button type="button" className={smallBtnCls} onClick={onAdd}>+ Stand</button>
-      <button type="button" className={smallBtnCls} onClick={() => fileRef.current?.click()}>Import</button>
-      <button type="button" className="px-3 py-1.5 text-[10px] font-mono uppercase tracking-wider bg-[#c3a35e] text-black font-bold" onClick={doExport}>
-        Export stands.json
-      </button>
-      <button
-        type="button"
-        className={smallBtnCls}
-        onClick={() => confirm('Discard your local draft and reload the published version?') && onReset()}
-      >
-        Reset
-      </button>
-      <button type="button" className={smallBtnCls} onClick={exitEdit}>Exit</button>
-      <input
-        ref={fileRef}
-        type="file"
-        accept="application/json,.json"
-        className="hidden"
-        onChange={(e) => {
-          doImport(e.target.files?.[0]);
-          e.target.value = '';
-        }}
-      />
-    </div>
-  );
+  useEffect(() => {
+    registerStandsToolbar({
+      hasDraft,
+      onAdd,
+      onReset: () => {
+        if (confirm('Discard your local stands draft and reload the published version?')) onReset();
+      },
+      onExport: () => {
+        const blob = new Blob([JSON.stringify(stands, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'stands.json';
+        a.click();
+        URL.revokeObjectURL(url);
+      },
+      onImport: async (file: File) => {
+        try {
+          const json = JSON.parse(await file.text());
+          if (Array.isArray(json)) onImport(json as Stand[]);
+          else alert('That file is not a stands.json (expected a list of stands).');
+        } catch {
+          alert('Could not read that file as JSON.');
+        }
+      },
+    });
+  });
+  useEffect(() => () => registerStandsToolbar(null), []);
+  return null;
 };
 
 // ============================================================================
@@ -1521,13 +1514,15 @@ interface MoveEditHandlers {
   onChange: (m: Move) => void;
   onDelete: () => void;
   onShift: (dir: -1 | 1) => void;
+  onTransfer: (to: MoveKit) => void;
 }
 
 const stripCites = (s: string) => (s || '').replace(/\[cite:[^\]]*\]/g, '').trim();
 
 const MOVE_ICON = '[\\u{1F534}\\u{1F535}\\u{1F7E0}-\\u{1F7EB}]';
 const MOVE_ICON_TAIL = new RegExp(`(?:\\s*(?:${MOVE_ICON}|\\+))+\\s*$`, 'u');
-const STAT_LINE = /^(Damage|CD|Cost|Heat Cost|Heat Gain|Heat Requirement|Heat Gain Reduction|Endlag|Tags)\s*:/i;
+const STAT_LINE =
+  /^(Damage|CD|Cost|Heat Cost|Heat Gain|Heat Requirement|Heat Gain Reduction|Resolve Cost|Resolve Gain|Resolve Requirement|Resolve Gain Reduction|Endlag|Tags)\s*:/i;
 
 interface ParsedHead {
   key: string;
@@ -1576,10 +1571,21 @@ interface ParsedBody {
   tags: string[];
 }
 
-function parseMoveBody(raw: string): ParsedBody {
+// ----------------------------------------------------------------------------
+// Description model
+// A move description is prose followed by stat lines (Damage | CD, Tags, Cost…).
+// parseDesc splits it so the editor can change the prose / one stat at a time and
+// serializeDesc writes it back in the same layout. Nothing else in the data changes.
+// ----------------------------------------------------------------------------
+type StatLine = { kind: 'stats'; pairs: [string, string][] } | { kind: 'tags'; tags: string[] };
+interface DescModel {
+  prose: string;
+  lines: StatLine[];
+}
+
+function parseDesc(raw: string): DescModel {
   const prose: string[] = [];
-  const stats: [string, string][] = [];
-  let tags: string[] = [];
+  const lines: StatLine[] = [];
   for (const line of stripCites(raw).split('\n')) {
     const t = line.trim();
     if (!t) {
@@ -1588,18 +1594,108 @@ function parseMoveBody(raw: string): ParsedBody {
     }
     if (STAT_LINE.test(t)) {
       if (/^Tags\s*:/i.test(t)) {
-        tags = t.replace(/^Tags\s*:\s*/i, '').split(/\s*\|\s*/).filter(Boolean);
+        lines.push({ kind: 'tags', tags: t.replace(/^Tags\s*:\s*/i, '').split(/\s*\|\s*/).filter(Boolean) });
       } else {
+        const pairs: [string, string][] = [];
         t.split(/\s*\|\s*/).forEach((part) => {
           const i = part.indexOf(':');
-          if (i > 0) stats.push([part.slice(0, i).trim(), part.slice(i + 1).trim()]);
+          if (i > 0) pairs.push([part.slice(0, i).trim(), part.slice(i + 1).trim()]);
         });
+        lines.push({ kind: 'stats', pairs });
       }
     } else {
       prose.push(line);
     }
   }
-  return { prose: prose.join('\n').replace(/\n{3,}/g, '\n\n').trim(), stats, tags };
+  return { prose: prose.join('\n').replace(/\n{3,}/g, '\n\n').trim(), lines };
+}
+
+function serializeDesc(m: DescModel): string {
+  const out = m.lines
+    .map((l) =>
+      l.kind === 'tags'
+        ? l.tags.length
+          ? `Tags: ${l.tags.join(' | ')}`
+          : ''
+        : l.pairs.map(([k, v]) => `${k}: ${v}`).join(' | ')
+    )
+    .filter(Boolean);
+  return [m.prose.trim(), out.join('\n')].filter(Boolean).join('\n\n');
+}
+
+const cloneLines = (lines: StatLine[]): StatLine[] =>
+  lines.map((l) => (l.kind === 'tags' ? { kind: 'tags', tags: [...l.tags] } : { kind: 'stats', pairs: l.pairs.map(([k, v]) => [k, v] as [string, string]) }));
+
+// Set the value of the first stat whose key matches; add it to the last stat line if it isn't there yet.
+function setStat(m: DescModel, match: (k: string) => boolean, addKey: string, value: string): DescModel {
+  const lines = cloneLines(m.lines);
+  for (const l of lines) {
+    if (l.kind !== 'stats') continue;
+    const p = l.pairs.find(([k]) => match(k));
+    if (p) {
+      p[1] = value;
+      return { ...m, lines };
+    }
+  }
+  const last = [...lines].reverse().find((l) => l.kind === 'stats');
+  if (last && last.kind === 'stats') last.pairs.push([addKey, value]);
+  else lines.push({ kind: 'stats', pairs: [[addKey, value]] });
+  return { ...m, lines };
+}
+
+function removeStat(m: DescModel, match: (k: string) => boolean): DescModel {
+  const lines = cloneLines(m.lines).map((l) =>
+    l.kind === 'stats' ? { ...l, pairs: l.pairs.filter(([k]) => !match(k)) } : l
+  );
+  return { ...m, lines: lines.filter((l) => l.kind === 'tags' || l.pairs.length > 0) };
+}
+
+function setTags(m: DescModel, tags: string[]): DescModel {
+  const lines = cloneLines(m.lines);
+  const idx = lines.findIndex((l) => l.kind === 'tags');
+  if (idx >= 0) {
+    if (tags.length) lines[idx] = { kind: 'tags', tags };
+    else lines.splice(idx, 1);
+  } else if (tags.length) {
+    // keep Tags between the Damage/CD line and the cost line, like the existing data
+    const firstStats = lines.findIndex((l) => l.kind === 'stats');
+    lines.splice(firstStats >= 0 ? firstStats + 1 : lines.length, 0, { kind: 'tags', tags });
+  }
+  return { ...m, lines };
+}
+
+const COST_RE = /^(?:heat|resolve) cost$/i;
+const REQ_RE = /^(?:heat|resolve) requirement$/i;
+// Heat is called Resolve now. Old data still says Heat, so it's relabelled on display.
+const resolveLabel = (k: string) => k.replace(/^heat\b/i, 'Resolve');
+
+function parseMoveBody(raw: string): ParsedBody {
+  const d = parseDesc(raw);
+  const stats = d.lines.flatMap((l) => (l.kind === 'stats' ? l.pairs : []));
+  const tagLine = [...d.lines].reverse().find((l) => l.kind === 'tags');
+  return { prose: d.prose, stats, tags: tagLine && tagLine.kind === 'tags' ? tagLine.tags : [] };
+}
+
+// Name = "[stance] KEY [mods] - [Title] 🔴". The editor edits the left part and the title
+// separately and glues them back together without touching anything else.
+function splitName(raw: string) {
+  const idx = raw.indexOf(' - ');
+  const left = idx >= 0 ? raw.slice(0, idx) : '';
+  let right = idx >= 0 ? raw.slice(idx + 3) : raw;
+  let icons = '';
+  const tail = right.match(MOVE_ICON_TAIL);
+  if (tail && tail[0].trim() && tail.index !== undefined) {
+    icons = tail[0];
+    right = right.slice(0, tail.index);
+  }
+  const t = right.trim();
+  const wrapped = /^\[(.*)\]$/.test(t);
+  return { left, title: wrapped ? t.slice(1, -1) : t, wrapped, icons };
+}
+
+function joinName(p: { left: string; title: string; wrapped: boolean; icons: string }) {
+  const t = p.wrapped ? `[${p.title}]` : p.title;
+  return `${p.left ? `${p.left} - ` : ''}${t}${p.icons}`;
 }
 
 const EXTRA_BLOCK_PROPS = [
@@ -1681,6 +1777,7 @@ function groupStandsVariants(stands: Stand[]): Stand[] {
   return stands.map((s) => ({
     ...s,
     moves: groupMoveVariants(s.moves),
+    standOnMoves: groupMoveVariants(s.standOnMoves),
     awakeningMoves: groupMoveVariants(s.awakeningMoves),
   }));
 }
@@ -1689,19 +1786,25 @@ const CardLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => (
   <span className="block font-mono text-[9px] uppercase tracking-[0.25em] text-[#7d8794] mb-1.5">{children}</span>
 );
 
-const PropPill: React.FC<{ label: string; on: boolean }> = ({ label, on }) => (
-  <span
-    className={`inline-flex items-center gap-1.5 px-2 py-1 border font-mono text-[11px] ${
-      on ? 'border-[#c3a35e] bg-[#14121a] text-[#e6e2d4]' : 'border-[#2a2418] bg-[#0d0c10] text-[#5c584f]'
-    }`}
-  >
-    {on ? <Check className="w-3 h-3 text-[#34d399]" /> : <X className="w-3 h-3 text-[#ef4444]" />}
-    <span className={on ? '' : 'line-through'}>{label}</span>
-  </span>
-);
+const PropPill: React.FC<{ label: string; on: boolean; onClick?: () => void }> = ({ label, on, onClick }) => {
+  const cls = `inline-flex items-center gap-1.5 px-2 py-1 border font-mono text-[11px] ${
+    on ? 'border-[#c9a24a] bg-[#c9a24a] text-[#17120a]' : 'border-[#2a2418] bg-[#0d0c10] text-[#5c584f]'
+  } ${onClick ? 'cursor-pointer hover:border-[#e6c278] transition-colors' : ''}`;
+  const inner = (
+    <>
+      {on ? <Check className="w-3 h-3 text-[#17120a]" /> : <X className="w-3 h-3 text-[#ef4444]" />}
+      <span className={on || onClick ? '' : 'line-through'}>{label}</span>
+    </>
+  );
+  return onClick ? (
+    <button type="button" onClick={onClick} aria-pressed={on} className={cls}>
+      {inner}
+    </button>
+  ) : (
+    <span className={cls}>{inner}</span>
+  );
+};
 
-const triSelectVal = (v?: boolean) => (v === undefined ? 'auto' : v ? 'yes' : 'no');
-const triSelectParse = (v: string) => (v === 'auto' ? undefined : v === 'yes');
 
 const SegRow: React.FC<{
   options: { id: string; label: string; title?: string }[];
@@ -1730,42 +1833,61 @@ const VideoRefsEditor: React.FC<{
   label: string;
   refs?: VideoRef[];
   onChange: (refs: VideoRef[] | undefined) => void;
-}> = ({ label, refs = [], onChange }) => {
+  hideAdd?: boolean;
+}> = ({ label, refs = [], onChange, hideAdd }) => {
   const update = (i: number, patch: Partial<VideoRef>) =>
     onChange(refs.map((r, j) => (j === i ? { ...r, ...patch } : r)));
   const blankToUndef = (v: string) => (v.trim() === '' ? undefined : v);
   return (
     <div className="space-y-2">
       <span className="block text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">{label}</span>
+      {refs.length === 0 && (
+        <p className="text-[11px] font-mono text-[#5c584f]">Nothing added yet — drop a file or paste a link above.</p>
+      )}
       {refs.map((r, i) => {
+        const isImg = r.src.startsWith('data:');
         const m = r.src.trim() ? resolveVideoRef(r) : null;
         return (
           <div key={i} className="border border-dashed border-[#3d3423] p-2 space-y-2">
-            <input
-              className={inputCls}
-              placeholder="YouTube / X / Google Drive / Vimeo link, or a file path"
-              value={r.src}
-              onChange={(e) => update(i, { src: e.target.value })}
-            />
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {isImg ? (
+              <div className="flex items-center gap-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={r.src} alt="" className="h-12 w-12 object-cover border border-[#3d3423]" />
+                <span className="text-[11px] font-mono text-[#c7c2b5]">
+                  Embedded image · {Math.max(1, Math.round((r.src.length * 0.75) / 1024))} KB
+                </span>
+              </div>
+            ) : (
+              <input
+                className={inputCls}
+                placeholder="YouTube / X / Google Drive / Vimeo link, or a file path"
+                value={r.src}
+                onChange={(e) => update(i, { src: e.target.value })}
+              />
+            )}
+            <div className={isImg ? '' : 'grid grid-cols-1 sm:grid-cols-3 gap-2'}>
               <input
                 className={inputCls}
                 placeholder="Tab label (optional)"
                 value={r.label ?? ''}
                 onChange={(e) => update(i, { label: blankToUndef(e.target.value) })}
               />
-              <input
-                className={inputCls}
-                placeholder="Start — 1:23 or 83 (optional)"
-                value={r.start ?? ''}
-                onChange={(e) => update(i, { start: blankToUndef(e.target.value) })}
-              />
-              <input
-                className={inputCls}
-                placeholder="End (optional)"
-                value={r.end ?? ''}
-                onChange={(e) => update(i, { end: blankToUndef(e.target.value) })}
-              />
+              {!isImg && (
+                <>
+                  <input
+                    className={inputCls}
+                    placeholder="Start — 1:23 or 83 (optional)"
+                    value={r.start ?? ''}
+                    onChange={(e) => update(i, { start: blankToUndef(e.target.value) })}
+                  />
+                  <input
+                    className={inputCls}
+                    placeholder="End (optional)"
+                    value={r.end ?? ''}
+                    onChange={(e) => update(i, { end: blankToUndef(e.target.value) })}
+                  />
+                </>
+              )}
             </div>
             <div className="flex items-center justify-between gap-2">
               <span className="text-[10px] font-mono text-[#716c62]">
@@ -1789,126 +1911,216 @@ const VideoRefsEditor: React.FC<{
           </div>
         );
       })}
-      <button type="button" className={smallBtnCls} onClick={() => onChange([...refs, { src: '' }])}>
-        + Add video reference
-      </button>
-    </div>
-  );
-};
-
-// Editor for one move's own fields (used for the base move and for each variant).
-const MoveFieldsEditor: React.FC<{ move: Move; onChange: (m: Move) => void }> = ({ move, onChange }) => {
-  const currentExtras = deriveProps(parseMoveBody(move.description).tags, move, true).extras;
-  const toggleExtra = (n: string) =>
-    onChange({
-      ...move,
-      blockExtras: currentExtras.includes(n) ? currentExtras.filter((x) => x !== n) : [...currentExtras, n],
-    });
-  return (
-    <div className="space-y-3">
-      <EditField label="Move name (format: KEY [mods] - [Title] 🔴)">
-        <input className={inputCls} value={move.name} onChange={(e) => onChange({ ...move, name: e.target.value })} />
-      </EditField>
-      <EditField label="Description (prose, then Damage/CD/Tags/Heat lines)">
-        <textarea rows={7} className={inputCls} value={move.description} onChange={(e) => onChange({ ...move, description: e.target.value })} />
-      </EditField>
-      <EditField label="Video path or link (e.g. /videos/star-platinum/barrage.mp4 or a YouTube / X / Drive link)">
-        <input className={inputCls} value={move.videoSrc} onChange={(e) => onChange({ ...move, videoSrc: e.target.value })} />
-      </EditField>
-      <VideoRefsEditor
-        label="More video references (shown as tabs)"
-        refs={move.videos}
-        onChange={(videos) => onChange({ ...move, videos })}
-      />
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <EditField label="Blockable">
-          <select className={inputCls} value={triSelectVal(move.blockable)} onChange={(e) => onChange({ ...move, blockable: triSelectParse(e.target.value) })}>
-            <option value="auto">Auto (from tags)</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </EditField>
-        <EditField label="Parryable">
-          <select className={inputCls} value={triSelectVal(move.parryable)} onChange={(e) => onChange({ ...move, parryable: triSelectParse(e.target.value) })}>
-            <option value="auto">Auto (from tags)</option>
-            <option value="yes">Yes</option>
-            <option value="no">No</option>
-          </select>
-        </EditField>
-        <EditField label="Armor (blank = auto)">
-          <input className={inputCls} value={move.armor || ''} onChange={(e) => onChange({ ...move, armor: e.target.value || undefined })} />
-        </EditField>
-      </div>
-      <EditField label="Extra block properties">
-        <div className="flex flex-wrap gap-x-4 gap-y-2">
-          {EXTRA_BLOCK_PROPS.map((n) => (
-            <label key={n} className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">
-              <input type="checkbox" checked={currentExtras.includes(n)} onChange={() => toggleExtra(n)} />
-              {n}
-            </label>
-          ))}
-          {move.blockExtras && (
-            <button type="button" className={smallBtnCls} onClick={() => onChange({ ...move, blockExtras: undefined })}>
-              Reset to auto
-            </button>
-          )}
-        </div>
-      </EditField>
-      <label className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">
-        <input type="checkbox" checked={!!move.hasFinisher} onChange={(e) => onChange({ ...move, hasFinisher: e.target.checked })} />
-        Has finisher
-      </label>
-      {move.hasFinisher && (
-        <>
-          <EditField label="Finisher description (format: KEY - [Title] 🔴: text, then stat lines)">
-            <textarea rows={5} className={inputCls} value={move.finisherDescription || ''} onChange={(e) => onChange({ ...move, finisherDescription: e.target.value })} />
-          </EditField>
-          <EditField label="Finisher video path or link">
-            <input className={inputCls} value={move.finisherVideoSrc || ''} onChange={(e) => onChange({ ...move, finisherVideoSrc: e.target.value })} />
-          </EditField>
-          <VideoRefsEditor
-            label="More finisher video references (shown as tabs)"
-            refs={move.finisherVideos}
-            onChange={(finisherVideos) => onChange({ ...move, finisherVideos })}
-          />
-        </>
+      {!hideAdd && (
+        <button type="button" className={smallBtnCls} onClick={() => onChange([...refs, { src: '' }])}>
+          + Add video reference
+        </button>
       )}
     </div>
   );
 };
 
-const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandlers }> = ({ move, standColor, edit }) => {
+// ----------------------------------------------------------------------------
+// Inline-edit building blocks
+// ----------------------------------------------------------------------------
+const editBox =
+  'bg-[#13110d] border border-dashed border-[#4a3f26] text-[#e6c278] px-2 py-1.5 focus:outline-none focus:border-[#c3a35e] placeholder:text-[#5c584f]';
+
+const normDraft = (s: string) => s.replace(/\r/g, '').trim().replace(/\n{3,}/g, '\n\n');
+
+// A text box that keeps what you type (spaces, trailing newlines) even though the stored
+// value gets tidied on the way back in. Only re-syncs when the value really changed elsewhere.
+const DraftField: React.FC<{
+  value: string;
+  onCommit: (v: string) => void;
+  multiline?: boolean;
+  minRows?: number;
+  commitOnBlur?: boolean; // commit on blur / Enter instead of every keystroke
+  className?: string;
+  placeholder?: string;
+}> = ({ value, onCommit, multiline, minRows = 3, commitOnBlur, className = '', placeholder }) => {
+  const [txt, setTxt] = useState(value);
+  const sent = useRef(value);
+  useEffect(() => {
+    if (normDraft(value) !== normDraft(sent.current)) {
+      setTxt(value);
+      sent.current = value;
+    }
+  }, [value]);
+
+  const change = (v: string) => {
+    setTxt(v);
+    if (!commitOnBlur) {
+      sent.current = v;
+      onCommit(v);
+    }
+  };
+  const flush = () => {
+    if (commitOnBlur && normDraft(txt) !== normDraft(sent.current)) {
+      sent.current = txt;
+      onCommit(txt);
+    }
+  };
+
+  return multiline ? (
+    <textarea
+      rows={Math.max(minRows, txt.split('\n').length + 1)}
+      className={`w-full resize-y ${className}`}
+      value={txt}
+      placeholder={placeholder}
+      onChange={(e) => change(e.target.value)}
+      onBlur={flush}
+    />
+  ) : (
+    <input
+      className={className}
+      value={txt}
+      placeholder={placeholder}
+      onChange={(e) => change(e.target.value)}
+      onBlur={flush}
+      onKeyDown={(e) => e.key === 'Enter' && flush()}
+    />
+  );
+};
+
+const TagsInput: React.FC<{ tags: string[]; onChange: (t: string[]) => void }> = ({ tags, onChange }) => {
+  const [txt, setTxt] = useState(tags.join(' | '));
+  return (
+    <input
+      className={`${editBox} w-full font-mono text-xs`}
+      placeholder="Guardable | Knockback | COMBO ENDER | CLOSE RANGE"
+      value={txt}
+      onChange={(e) => {
+        setTxt(e.target.value);
+        onChange(e.target.value.split('|').map((s) => s.trim()).filter(Boolean));
+      }}
+    />
+  );
+};
+
+const QUICK_STATS: [string, string, RegExp][] = [
+  ['Damage', '0', /^damage$/i],
+  ['CD', '0s', /^cd$/i],
+  ['Resolve Gain', '0', /^(?:heat|resolve) gain$/i],
+  ['Endlag', '0s', /^endlag$/i],
+];
+
+const MoveCard: React.FC<{
+  move: Move;
+  standColor: string;
+  edit?: MoveEditHandlers;
+  kit?: MoveKit;
+  standId?: string;
+}> = ({ move, standColor, edit, kit = 'standoff', standId = 'stand' }) => {
   const [variantIdx, setVariantIdx] = useState(0); // 0 = base move, 1.. = variants
   const [activeTab, setActiveTab] = useState<'base' | 'finisher'>('base');
+  const [linkDraft, setLinkDraft] = useState('');
+  const [dragOver, setDragOver] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
 
+  const editing = !!edit;
   const variants = move.hasVariant ? move.variants || [] : [];
   const safeIdx = variantIdx <= variants.length ? variantIdx : 0;
   const cur: Move = safeIdx === 0 ? move : variants[safeIdx - 1];
   const shownTab = cur.hasFinisher ? activeTab : 'base';
+  const isBase = shownTab === 'base';
+  // In edit mode the finisher tab always edits the finisher text, even while it's still empty.
+  const isFin = shownTab === 'finisher' && (editing || !!cur.finisherDescription);
 
-  const view = useMemo(() => {
-    if (shownTab === 'finisher' && cur.finisherDescription) {
-      const fd = stripCites(cur.finisherDescription);
-      // Finisher text looks like: "E+M2 - [Barrage Finisher] 🔴: description..."
-      const m = fd.match(/^(.{1,120}? - .{1,100}?):\s+([\s\S]*)$/);
-      if (m) return { head: parseMoveName(m[1]), body: parseMoveBody(m[2]) };
-      return { head: parseMoveName(cur.name), body: parseMoveBody(fd) };
+  // Save a changed copy of whichever move is on screen (the base move or one of its variants).
+  const commit = (nm: Move) => {
+    if (!edit) return;
+    if (safeIdx === 0) edit.onChange(nm);
+    else edit.onChange({ ...move, variants: variants.map((x, j) => (j === safeIdx - 1 ? nm : x)) });
+  };
+
+  // Finisher text looks like: "E+M2 - [Barrage Finisher] 🔴: description..."
+  const fin = useMemo(() => {
+    const fd = stripCites(cur.finisherDescription || '');
+    const m = fd.match(/^(.{1,120}? - .{1,100}?):\s+([\s\S]*)$/);
+    return m ? { prefix: m[1], body: m[2] } : { prefix: '', body: fd };
+  }, [cur.finisherDescription]);
+
+  const descText = isFin ? fin.body : cur.description;
+  const desc = useMemo(() => parseDesc(descText), [descText]);
+  const body = useMemo(() => parseMoveBody(descText), [descText]);
+  const nameSource = isFin ? fin.prefix || cur.name : cur.name;
+  const head = useMemo(() => parseMoveName(nameSource), [nameSource]);
+  const np = splitName(nameSource);
+  const props = deriveProps(body.tags, cur, isBase);
+
+  const setDesc = (d: DescModel) => {
+    const text = serializeDesc(d);
+    if (isFin) commit({ ...cur, finisherDescription: fin.prefix ? `${fin.prefix}: ${text}` : text });
+    else commit({ ...cur, description: text });
+  };
+  const setName = (patch: Partial<typeof np>) => {
+    let next = joinName({ ...np, ...patch });
+    if (isFin) {
+      if (!next.includes(' - ')) next = `FIN - ${next}`;
+      commit({ ...cur, finisherDescription: `${next}: ${serializeDesc(desc)}` });
+    } else {
+      commit({ ...cur, name: next });
     }
-    return { head: parseMoveName(cur.name), body: parseMoveBody(cur.description) };
-  }, [shownTab, cur.name, cur.description, cur.finisherDescription]);
+  };
 
-  const { head, body } = view;
-  const props = deriveProps(body.tags, cur, shownTab === 'base');
+  const costEntry = body.stats.find(([k]) => COST_RE.test(k)) || body.stats.find(([k]) => REQ_RE.test(k));
+  const costLabel = costEntry && REQ_RE.test(costEntry[0]) ? 'Resolve Requirement' : 'Resolve Cost';
+  const otherPairs = body.stats.filter((s) => s !== costEntry);
+  const statLabel = (k: string) => (/^cd$/i.test(k) ? 'Cooldown' : resolveLabel(k));
 
-  const costEntry =
-    body.stats.find(([k]) => /^heat cost$/i.test(k)) || body.stats.find(([k]) => /^heat requirement$/i.test(k));
-  const costLabel = costEntry && /requirement/i.test(costEntry[0]) ? 'Heat Requirement' : 'Heat Cost';
-  const otherStats = body.stats
-    .filter((s) => s !== costEntry)
-    .map(([k, v]) => [/^cd$/i.test(k) ? 'Cooldown' : k, v] as [string, string]);
+  const videoSrc = isBase ? cur.videoSrc : cur.finisherVideoSrc;
+  const extraVideos = isBase ? cur.videos : cur.finisherVideos;
+  const setPrimary = (v: string) => commit(isBase ? { ...cur, videoSrc: v } : { ...cur, finisherVideoSrc: v });
+  const setExtras = (refs?: VideoRef[]) =>
+    commit(isBase ? { ...cur, videos: refs } : { ...cur, finisherVideos: refs });
+  const addLink = () => {
+    const s = linkDraft.trim();
+    if (!s) return;
+    setExtras([...(extraVideos || []), { src: s }]);
+    setLinkDraft('');
+  };
 
-  const videoSrc = shownTab === 'base' ? cur.videoSrc : cur.finisherVideoSrc;
-  const extraVideos = shownTab === 'base' ? cur.videos : cur.finisherVideos;
+  // Dropped / chosen files. Pictures and GIFs are stored inside the data itself (so they travel with
+  // data.json); videos are too big for that, so they get a path to upload to instead.
+  const MAX_EMBED_MB = 3;
+  const readDataUrl = (f: File) =>
+    new Promise<string>((res, rej) => {
+      const r = new FileReader();
+      r.onload = () => res(String(r.result));
+      r.onerror = () => rej(r.error);
+      r.readAsDataURL(f);
+    });
+  const handleFiles = async (files: FileList | File[]) => {
+    const added: VideoRef[] = [];
+    const notes: string[] = [];
+    for (const f of Array.from(files)) {
+      const label = f.name.replace(/\.[^.]+$/, '');
+      if (f.type.startsWith('image/')) {
+        if (f.size > MAX_EMBED_MB * 1024 * 1024) {
+          notes.push(
+            `${f.name} is ${(f.size / 1048576).toFixed(1)} MB, over the ${MAX_EMBED_MB} MB limit for pictures stored in the page. Shrink it, or put it in /public and paste its path.`
+          );
+          continue;
+        }
+        try {
+          added.push({ src: await readDataUrl(f), label });
+        } catch {
+          notes.push(`Couldn't read ${f.name}.`);
+        }
+      } else if (f.type.startsWith('video/')) {
+        const path = `/videos/${standId}/${f.name}`;
+        added.push({ src: path, label });
+        notes.push(
+          `${f.name}: videos can't be stored inside the page, so its path ${path} was added. Upload the file to public${path} in your repo for it to play.`
+        );
+      } else {
+        notes.push(`${f.name} isn't an image or a video.`);
+      }
+    }
+    if (added.length) setExtras([...(extraVideos || []), ...added]);
+    if (notes.length) alert(notes.join('\n\n'));
+  };
 
   const variantOptions = variants.map((v, i) => {
     const h = parseMoveName(v.name);
@@ -1928,55 +2140,164 @@ const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandle
       videoSrc: '',
     };
     edit?.onChange({ ...move, hasVariant: true, variants: [...(move.variants || []), nv] });
+    setVariantIdx((move.variants || []).length + 1);
   };
-  const setVariant = (i: number, nv: Move) =>
-    edit?.onChange({ ...move, variants: (move.variants || []).map((x, j) => (j === i ? nv : x)) });
+
+  // Block / armor overrides only exist for the normal move, so they're only editable on that tab.
+  const chipEdit = editing && isBase;
+  const hasOverride = cur.blockable !== undefined || cur.parryable !== undefined || !!cur.blockExtras;
+  const toggleExtra = (n: string) =>
+    commit({
+      ...cur,
+      blockExtras: props.extras.includes(n) ? props.extras.filter((x) => x !== n) : [...props.extras, n],
+    });
 
   return (
-    <div className="bg-[#0a0a0d] border border-[#2a2418] hover:border-[#3d3423] transition-colors">
-      {/* Header: key badge + name */}
+    <div
+      className={`bg-[#0a0a0d] border transition-colors ${
+        editing ? 'border-[#3d3423]' : 'border-[#2a2418] hover:border-[#3d3423]'
+      }`}
+    >
+      {/* Header: slot badge + name (+ edit controls) */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4 border-b border-[#2a2418] bg-[#0c0c10]">
-        <div className="flex flex-wrap items-center gap-3 min-w-0">
-          {head.key && (
-            <span className="inline-flex items-center justify-center min-w-[2.25rem] h-9 px-2 border border-[#3d3423] bg-[#14121a] font-mono text-xs text-[#e6c278] whitespace-nowrap">
-              {head.key}
-            </span>
-          )}
-          <h5 className="font-['Cormorant_Upright',serif] text-xl sm:text-2xl text-[#f0dfb2] tracking-wide leading-tight">
-            {head.title}
-          </h5>
-          {head.stance && (
-            <span className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 border border-[#3d3423] text-[#8a857a]">
-              {head.stance}
-            </span>
-          )}
-          {head.mods.map((m, i) => (
-            <span key={i} className="font-mono text-[10px] px-1.5 py-0.5 border border-[#2a2418] bg-[#101014] text-[#c7c2b5]">
-              {m}
-            </span>
-          ))}
-        </div>
+        {editing ? (
+          <div className="flex flex-wrap items-center gap-3 min-w-0 flex-1">
+            <DraftField
+              key={`slot-${cur.id}-${shownTab}`}
+              value={np.left}
+              onCommit={(v) => setName({ left: v })}
+              placeholder="Slot"
+              className={`${editBox} w-28 text-center font-mono text-xs`}
+            />
+            {cur.held && (
+              <span className="font-['Cormorant_Upright',serif] italic text-sm text-[#c3a35e]">(Held)</span>
+            )}
+            <DraftField
+              key={`title-${cur.id}-${shownTab}`}
+              value={np.title}
+              onCommit={(v) => setName({ title: v })}
+              placeholder="Move name"
+              className={`${editBox} flex-1 min-w-[12rem] font-['Cormorant_Upright',serif] text-xl sm:text-2xl text-[#f0dfb2]`}
+            />
+            <DraftField
+              key={`icons-${cur.id}-${shownTab}`}
+              value={np.icons.trim()}
+              onCommit={(v) => setName({ icons: v.trim() ? ` ${v.trim()}` : '' })}
+              placeholder="🔴"
+              commitOnBlur
+              className={`${editBox} w-16 text-center`}
+            />
+            <label className="flex items-center gap-1.5 text-[11px] font-mono text-[#8a857a]">
+              <input
+                type="checkbox"
+                checked={!!cur.held}
+                onChange={(e) => commit({ ...cur, held: e.target.checked || undefined })}
+              />
+              Held
+            </label>
+            <select
+              className={`${editBox} text-xs font-mono`}
+              value={kit}
+              onChange={(e) => edit?.onTransfer(e.target.value as MoveKit)}
+              title="Which tab this move lives in"
+            >
+              {KIT_ORDER.map((k) => (
+                <option key={k} value={k}>
+                  {KIT_LABEL[k]}
+                </option>
+              ))}
+            </select>
+            <button type="button" className={smallBtnCls} onClick={() => edit?.onShift(-1)} aria-label="Move up">↑</button>
+            <button type="button" className={smallBtnCls} onClick={() => edit?.onShift(1)} aria-label="Move down">↓</button>
+            <button
+              type="button"
+              className={smallBtnCls}
+              onClick={() =>
+                confirm(`Delete "${move.name}"${move.variants?.length ? ' and its variants' : ''}?`) && edit?.onDelete()
+              }
+            >
+              Delete
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-wrap items-center gap-3 min-w-0">
+            {head.key && (
+              <span className="inline-flex items-center justify-center min-w-[2.25rem] h-9 px-2 border border-[#3d3423] bg-[#14121a] font-mono text-xs text-[#e6c278] whitespace-nowrap">
+                {head.key}
+              </span>
+            )}
+            {cur.held && (
+              <span className="font-['Cormorant_Upright',serif] italic text-sm text-[#c3a35e]">(Held)</span>
+            )}
+            <h5 className="font-['Cormorant_Upright',serif] text-xl sm:text-2xl text-[#f0dfb2] tracking-wide leading-tight">
+              {head.title}
+            </h5>
+            {head.stance && (
+              <span className="font-mono text-[9px] uppercase tracking-widest px-1.5 py-0.5 border border-[#3d3423] text-[#8a857a]">
+                {head.stance}
+              </span>
+            )}
+            {head.mods.map((m, i) => (
+              <span key={i} className="font-mono text-[10px] px-1.5 py-0.5 border border-[#2a2418] bg-[#101014] text-[#c7c2b5]">
+                {m}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="flex items-center gap-3 shrink-0">
-          {head.icons && <span className="text-sm leading-none">{head.icons}</span>}
-          {(variants.length > 0 || cur.hasFinisher) && (
+          {!editing && head.icons && <span className="text-sm leading-none">{head.icons}</span>}
+          {(variants.length > 0 || cur.hasFinisher || editing) && (
             <div className="border border-[#3d3423] divide-y divide-[#2a2418] bg-[#0d0c10]">
-              {variants.length > 0 && (
-                <SegRow
-                  options={[{ id: '0', label: 'Base' }, ...variantOptions]}
-                  value={String(safeIdx)}
-                  onChange={(id) => setVariantIdx(Number(id))}
-                />
+              {(variants.length > 0 || editing) && (
+                <div className="flex divide-x divide-[#2a2418]">
+                  {variants.length > 0 ? (
+                    <SegRow
+                      options={[{ id: '0', label: 'Base' }, ...variantOptions]}
+                      value={String(safeIdx)}
+                      onChange={(id) => setVariantIdx(Number(id))}
+                    />
+                  ) : (
+                    <span className="px-4 py-1.5 text-sm font-['Zen_Old_Mincho',serif] bg-[#2a2418] text-[#e6c278]">Base</span>
+                  )}
+                  {editing && (
+                    <button
+                      type="button"
+                      onClick={addVariant}
+                      className="px-3 py-1.5 text-xs font-mono uppercase tracking-wider text-[#c3a35e] hover:bg-[#1c1810] whitespace-nowrap"
+                    >
+                      + Variant
+                    </button>
+                  )}
+                </div>
               )}
-              {cur.hasFinisher && (
-                <SegRow
-                  options={[
-                    { id: 'base', label: 'Normal' },
-                    { id: 'finisher', label: 'Finisher' },
-                  ]}
-                  value={shownTab}
-                  onChange={(id) => setActiveTab(id as 'base' | 'finisher')}
-                />
+              {(cur.hasFinisher || editing) && (
+                <div className="flex divide-x divide-[#2a2418]">
+                  {cur.hasFinisher ? (
+                    <SegRow
+                      options={[
+                        { id: 'base', label: 'Normal' },
+                        { id: 'finisher', label: 'Finisher' },
+                      ]}
+                      value={shownTab}
+                      onChange={(id) => setActiveTab(id as 'base' | 'finisher')}
+                    />
+                  ) : (
+                    <span className="px-4 py-1.5 text-sm font-['Zen_Old_Mincho',serif] bg-[#2a2418] text-[#e6c278]">Normal</span>
+                  )}
+                  {editing && !cur.hasFinisher && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        commit({ ...cur, hasFinisher: true });
+                        setActiveTab('finisher');
+                      }}
+                      className="px-3 py-1.5 text-xs font-mono uppercase tracking-wider text-[#c3a35e] hover:bg-[#1c1810] whitespace-nowrap"
+                    >
+                      + Finisher
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           )}
@@ -1985,57 +2306,162 @@ const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandle
 
       {/* Body: details left, media right */}
       <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-        <div className="p-5 min-w-0 md:border-r border-[#2a2418]">
+        <div className="p-5 min-w-0 md:border-r border-[#2a2418]" key={`${cur.id}-${shownTab}`}>
           <CardLabel>What it does</CardLabel>
-          <p className="text-sm sm:text-base text-[#d8c9a3] leading-relaxed font-['Zen_Old_Mincho',serif] whitespace-pre-wrap">
-            {body.prose || '—'}
-          </p>
+          {editing ? (
+            <DraftField
+              multiline
+              value={desc.prose}
+              onCommit={(v) => setDesc({ ...desc, prose: v })}
+              placeholder="What the move does"
+              className={`${editBox} text-sm sm:text-base leading-relaxed font-['Zen_Old_Mincho',serif] text-[#d8c9a3]`}
+            />
+          ) : (
+            <p className="text-sm sm:text-base text-[#d8c9a3] leading-relaxed font-['Zen_Old_Mincho',serif] whitespace-pre-wrap">
+              {body.prose || '—'}
+            </p>
+          )}
 
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-x-6 gap-y-4">
             <div>
               <CardLabel>{costLabel}</CardLabel>
-              <span className="font-mono text-sm text-[#e6e2d4]">{costEntry ? costEntry[1] : '0'}</span>
+              {editing ? (
+                <DraftField
+                  value={costEntry ? costEntry[1] : ''}
+                  placeholder="0"
+                  onCommit={(v) => {
+                    if (!costEntry && !v.trim()) return;
+                    setDesc(
+                      setStat(desc, (k) => COST_RE.test(k) || REQ_RE.test(k), costEntry ? costEntry[0] : 'Resolve Cost', v)
+                    );
+                  }}
+                  className={`${editBox} w-full font-mono text-sm`}
+                />
+              ) : (
+                <span className="font-mono text-sm text-[#e6e2d4]">{costEntry ? costEntry[1] : '0'}</span>
+              )}
             </div>
             <div>
               <CardLabel>Block Properties</CardLabel>
               <div className="flex flex-col items-start gap-1.5">
-                <PropPill label="Blockable" on={props.blockable} />
-                <PropPill label="Parryable" on={props.parryable} />
-                {EXTRA_BLOCK_PROPS.filter((n) => props.extras.includes(n)).map((n) => (
-                  <PropPill key={n} label={n} on />
+                <PropPill
+                  label="Blockable"
+                  on={props.blockable}
+                  onClick={chipEdit ? () => commit({ ...cur, blockable: !props.blockable }) : undefined}
+                />
+                <PropPill
+                  label="Parryable"
+                  on={props.parryable}
+                  onClick={chipEdit ? () => commit({ ...cur, parryable: !props.parryable }) : undefined}
+                />
+                {(chipEdit ? EXTRA_BLOCK_PROPS : EXTRA_BLOCK_PROPS.filter((n) => props.extras.includes(n))).map((n) => (
+                  <PropPill
+                    key={n}
+                    label={n}
+                    on={props.extras.includes(n)}
+                    onClick={chipEdit ? () => toggleExtra(n) : undefined}
+                  />
                 ))}
+                {chipEdit ? (
+                  <>
+                    <input
+                      className={`${editBox} w-full text-xs mt-1`}
+                      placeholder="Notes (optional)"
+                      value={cur.notes || ''}
+                      onChange={(e) => commit({ ...cur, notes: e.target.value || undefined })}
+                    />
+                    {hasOverride && (
+                      <button
+                        type="button"
+                        className="text-[10px] font-mono uppercase tracking-wider text-[#8a857a] hover:text-[#e6c278]"
+                        onClick={() => commit({ ...cur, blockable: undefined, parryable: undefined, blockExtras: undefined })}
+                      >
+                        Reset to auto (from tags)
+                      </button>
+                    )}
+                  </>
+                ) : (
+                  isBase &&
+                  cur.notes && <span className="text-xs italic text-[#8a857a] font-['Zen_Old_Mincho',serif]">{cur.notes}</span>
+                )}
               </div>
             </div>
             <div>
               <CardLabel>Armor Properties</CardLabel>
-              <span className="font-['Zen_Old_Mincho',serif] text-sm text-[#e6c278]">{props.armor}</span>
+              {chipEdit ? (
+                <input
+                  className={`${editBox} w-full text-sm font-['Zen_Old_Mincho',serif]`}
+                  placeholder={props.armor}
+                  value={cur.armor || ''}
+                  onChange={(e) => commit({ ...cur, armor: e.target.value || undefined })}
+                />
+              ) : (
+                <span className="font-['Zen_Old_Mincho',serif] text-sm text-[#e6c278]">{props.armor}</span>
+              )}
             </div>
           </div>
 
-          {otherStats.length > 0 && (
-            <div className="mt-5 pt-4 border-t border-[#1c1912] flex flex-wrap items-baseline gap-x-6 gap-y-2">
-              {otherStats.map(([k, v], i) => (
-                <div key={i} className="flex items-baseline gap-2 min-w-0">
-                  <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-[#7d8794] whitespace-nowrap">{k}</span>
-                  <span className="font-mono text-xs text-[#e6e2d4]">{v}</span>
-                </div>
-              ))}
+          {(otherPairs.length > 0 || editing) && (
+            <div className="mt-5 pt-4 border-t border-[#1c1912] flex flex-wrap items-center gap-x-6 gap-y-2">
+              {otherPairs.map(([k, v], i) =>
+                editing ? (
+                  <div key={`${k}-${i}`} className="flex items-center gap-1.5">
+                    <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-[#7d8794] whitespace-nowrap">
+                      {statLabel(k)}
+                    </span>
+                    <DraftField
+                      value={v}
+                      onCommit={(nv) => setDesc(setStat(desc, (x) => x === k, k, nv))}
+                      className={`${editBox} w-28 font-mono text-xs`}
+                    />
+                    <button
+                      type="button"
+                      aria-label={`Remove ${k}`}
+                      className="text-[#8a857a] hover:text-[#ef4444] text-sm leading-none"
+                      onClick={() => setDesc(removeStat(desc, (x) => x === k))}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <div key={i} className="flex items-baseline gap-2 min-w-0">
+                    <span className="font-mono text-[9px] uppercase tracking-[0.25em] text-[#7d8794] whitespace-nowrap">
+                      {statLabel(k)}
+                    </span>
+                    <span className="font-mono text-xs text-[#e6e2d4]">{v}</span>
+                  </div>
+                )
+              )}
+              {editing &&
+                QUICK_STATS.filter(([, , re]) => !body.stats.some(([k]) => re.test(k))).map(([key, dflt]) => (
+                  <button
+                    key={key}
+                    type="button"
+                    className="font-mono text-[10px] uppercase tracking-wider px-1.5 py-0.5 border border-dashed border-[#3d3423] text-[#8a857a] hover:text-[#e6c278] hover:border-[#c3a35e]"
+                    onClick={() => setDesc(setStat(desc, (x) => x.toLowerCase() === key.toLowerCase(), key, dflt))}
+                  >
+                    + {key}
+                  </button>
+                ))}
             </div>
           )}
 
-          {body.tags.length > 0 && (
+          {(body.tags.length > 0 || editing) && (
             <div className="mt-4">
               <CardLabel>Tags</CardLabel>
-              <div className="flex flex-wrap gap-1.5">
-                {body.tags.map((t, i) => (
-                  <span
-                    key={i}
-                    className="font-mono text-[10px] uppercase tracking-wider px-1.5 py-0.5 border border-[#2a2418] bg-[#101014] text-[#9a9486]"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
+              {editing && <TagsInput tags={body.tags} onChange={(t) => setDesc(setTags(desc, t))} />}
+              {body.tags.length > 0 && (
+                <div className={`flex flex-wrap gap-1.5 ${editing ? 'mt-2' : ''}`}>
+                  {body.tags.map((t, i) => (
+                    <span
+                      key={i}
+                      className="font-mono text-[10px] uppercase tracking-wider px-1.5 py-0.5 border border-[#2a2418] bg-[#101014] text-[#9a9486]"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -2058,66 +2484,122 @@ const MoveCard: React.FC<{ move: Move; standColor: string; edit?: MoveEditHandle
               />
             }
           />
+
+          {editing && (
+            <div className="mt-3 space-y-2" key={`media-${cur.id}-${shownTab}`}>
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={() => fileRef.current?.click()}
+                onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && fileRef.current?.click()}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setDragOver(true);
+                }}
+                onDragLeave={() => setDragOver(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setDragOver(false);
+                  if (e.dataTransfer.files.length) handleFiles(e.dataTransfer.files);
+                }}
+                className={`cursor-pointer border border-dashed px-3 py-5 text-center font-mono text-[11px] transition-colors ${
+                  dragOver
+                    ? 'border-[#c3a35e] bg-[#1c1810] text-[#e6c278]'
+                    : 'border-[#4a3f26] bg-[#0d0c10] text-[#8a857a] hover:border-[#c3a35e] hover:text-[#c7c2b5]'
+                }`}
+              >
+                Drop images or GIFs here, or click to choose
+              </div>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*,video/*"
+                multiple
+                className="hidden"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files.length) handleFiles(e.target.files);
+                  e.target.value = '';
+                }}
+              />
+              <div className="flex gap-2">
+                <input
+                  className={`${editBox} flex-1 min-w-0 text-xs`}
+                  placeholder="Paste a YouTube or other link, then press Enter"
+                  value={linkDraft}
+                  onChange={(e) => setLinkDraft(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && addLink()}
+                />
+                <button type="button" className={smallBtnCls} onClick={addLink}>
+                  Add link
+                </button>
+              </div>
+              <VideoRefsEditor
+                label={`Videos & links (${(extraVideos || []).length}) — each one becomes a tab under the player`}
+                refs={extraVideos}
+                onChange={setExtras}
+                hideAdd
+              />
+              <div>
+                <span className="block text-[10px] font-mono uppercase tracking-widest text-[#8a857a] mb-1">
+                  Main clip (file path, optional)
+                </span>
+                <DraftField
+                  commitOnBlur
+                  value={videoSrc || ''}
+                  onCommit={setPrimary}
+                  placeholder="/videos/star-platinum/barrage.mp4"
+                  className={`${editBox} w-full font-mono text-xs`}
+                />
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {edit && (
-        <div className="border-t border-dashed border-[#3d3423] bg-[#0d0c10] p-4 space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-[#34d399]">Editing move</span>
-            <div className="flex gap-1">
-              <button type="button" className={smallBtnCls} onClick={() => edit.onShift(-1)}>↑</button>
-              <button type="button" className={smallBtnCls} onClick={() => edit.onShift(1)}>↓</button>
-              <button
-                type="button"
-                className={smallBtnCls}
-                onClick={() => confirm(`Delete "${move.name}"${move.variants?.length ? ' and its variants' : ''}?`) && edit.onDelete()}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-
-          <MoveFieldsEditor move={move} onChange={edit.onChange} />
-
+      {editing && (
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-dashed border-[#3d3423] bg-[#0d0c10] px-5 py-3">
+          <label className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">
+            <input
+              type="checkbox"
+              checked={!!cur.hasFinisher}
+              onChange={(e) => {
+                commit({ ...cur, hasFinisher: e.target.checked });
+                if (!e.target.checked) setActiveTab('base');
+              }}
+            />
+            Has finisher
+          </label>
           <label className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">
             <input
               type="checkbox"
               checked={!!move.hasVariant}
               onChange={(e) => {
                 if (e.target.checked && !(move.variants && move.variants.length)) addVariant();
-                else edit.onChange({ ...move, hasVariant: e.target.checked });
+                else {
+                  edit?.onChange({ ...move, hasVariant: e.target.checked });
+                  if (!e.target.checked) setVariantIdx(0);
+                }
               }}
             />
             Has variant
           </label>
-
           {move.hasVariant && (
-            <div className="space-y-3 pl-3 border-l border-[#3d3423]">
-              {(move.variants || []).map((v, i) => (
-                <div key={v.id} className="border border-dashed border-[#3d3423] p-3 space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-[#34d399]">
-                      Variant editor — {parseMoveName(v.name).title || `Variant ${i + 1}`}
-                    </span>
-                    <button
-                      type="button"
-                      className={smallBtnCls}
-                      onClick={() =>
-                        confirm(`Delete variant "${v.name}"?`) &&
-                        edit.onChange({ ...move, variants: (move.variants || []).filter((_, j) => j !== i) })
-                      }
-                    >
-                      Delete variant
-                    </button>
-                  </div>
-                  <MoveFieldsEditor move={v} onChange={(nv) => setVariant(i, nv)} />
-                </div>
-              ))}
-              <button type="button" className={smallBtnCls} onClick={addVariant}>
-                + Add variant
-              </button>
-            </div>
+            <button type="button" className={smallBtnCls} onClick={addVariant}>
+              + Add variant
+            </button>
+          )}
+          {safeIdx > 0 && (
+            <button
+              type="button"
+              className={smallBtnCls}
+              onClick={() => {
+                if (!confirm(`Delete variant "${cur.name}"?`)) return;
+                edit?.onChange({ ...move, variants: variants.filter((_, j) => j !== safeIdx - 1) });
+                setVariantIdx(0);
+              }}
+            >
+              Delete this variant
+            </button>
           )}
         </div>
       )}
@@ -2195,31 +2677,107 @@ const StandEditor: React.FC<{ stand: Stand; onChange: (s: Stand) => void; onDele
   </div>
 );
 
+const CopyMovesetPanel: React.FC<{
+  target: Stand;
+  sources: Stand[];
+  onCopy: (sourceId: string, what: 'all' | MoveKit, replace: boolean) => void;
+  onClose: () => void;
+}> = ({ target, sources, onCopy, onClose }) => {
+  const [sourceId, setSourceId] = useState(sources[0]?.id || '');
+  const [what, setWhat] = useState<'all' | MoveKit>('all');
+  const [replace, setReplace] = useState(false);
+  return (
+    <div className="mb-5 border border-dashed border-[#c3a35e]/60 bg-[#0d0c10] p-4 space-y-3">
+      <div>
+        <h4 className="font-['Cormorant_Upright',serif] text-xl text-[#e6c278]">Copy moveset</h4>
+        <p className="text-xs font-mono text-[#8a857a]">Copy moves from another stand into {target.name || 'this stand'}.</p>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <EditField label="Copy from">
+          <select className={inputCls} value={sourceId} onChange={(e) => setSourceId(e.target.value)}>
+            {sources.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name} ({(s.moves?.length || 0) + (s.standOnMoves?.length || 0) + (s.awakeningMoves?.length || 0)} moves)
+              </option>
+            ))}
+          </select>
+        </EditField>
+        <EditField label="What to copy">
+          <select className={inputCls} value={what} onChange={(e) => setWhat(e.target.value as typeof what)}>
+            <option value="all">All tabs</option>
+            {KIT_ORDER.map((k) => (
+              <option key={k} value={k}>
+                {KIT_LABEL[k]} only
+              </option>
+            ))}
+          </select>
+        </EditField>
+      </div>
+      <label className="flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest text-[#8a857a]">
+        <input type="checkbox" checked={replace} onChange={(e) => setReplace(e.target.checked)} />
+        Replace the existing moves in the target first
+      </label>
+      <div className="flex gap-2">
+        <button type="button" className={smallBtnCls} onClick={onClose}>
+          Cancel
+        </button>
+        <button
+          type="button"
+          className={`${smallBtnCls} !bg-[#c9a24a] !text-[#17120a]`}
+          disabled={!sourceId}
+          onClick={() => {
+            onCopy(sourceId, what, replace);
+            onClose();
+          }}
+        >
+          Copy
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const StandDetailScreen: React.FC<{
   stand: Stand;
   onBack: () => void;
   editMode?: boolean;
   onChange?: (s: Stand) => void;
   onDelete?: () => void;
-}> = ({ stand, onBack, editMode = false, onChange, onDelete }) => {
-  // State for toggling between standard and awakening movesets
-  const [moveCategory, setMoveCategory] = useState<'standard' | 'awakening'>('standard');
+  allStands?: Stand[];
+  onCopyMoves?: (sourceId: string, what: 'all' | MoveKit, replace: boolean) => void;
+}> = ({ stand, onBack, editMode = false, onChange, onDelete, allStands = [], onCopyMoves }) => {
+  // Which move list (Stand Off / Stand On / Awakening) is showing
+  const [moveCategory, setMoveCategory] = useState<MoveKit>('standoff');
+  const [showCopy, setShowCopy] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [stand.id]);
 
-  const displayedMoves = moveCategory === 'standard' ? stand.moves : stand.awakeningMoves;
+  const kitKey = KIT_KEY[moveCategory];
+  const displayedMoves = stand[kitKey];
 
   const setMoves = (list: Move[]) => {
     if (!onChange) return;
-    onChange(moveCategory === 'standard' ? { ...stand, moves: list } : { ...stand, awakeningMoves: list });
+    onChange({ ...stand, [kitKey]: list });
   };
   const addMove = () =>
     setMoves([
       ...(displayedMoves || []),
       { id: `move-${Date.now()}`, name: 'New Move', description: 'Description here', videoSrc: '' },
     ]);
+
+  // Move one move to another tab (Stand Off / Stand On / Awakening).
+  const transferMove = (i: number, to: MoveKit) => {
+    if (!onChange || !displayedMoves || to === moveCategory) return;
+    const m = displayedMoves[i];
+    const destKey = KIT_KEY[to];
+    onChange({
+      ...stand,
+      [kitKey]: displayedMoves.filter((_, j) => j !== i),
+      [destKey]: [...(stand[destKey] || []), m],
+    });
+  };
 
   return (
     <div className="animate-fadeIn">
@@ -2360,42 +2918,53 @@ const StandDetailScreen: React.FC<{
       </div>
 
       {/* MOVESET & ABILITIES SECTION — full width, below the two-column header area */}
-      {(editMode || (stand.moves && stand.moves.length > 0) || (stand.awakeningMoves && stand.awakeningMoves.length > 0)) && (
+      {(editMode ||
+        (stand.moves && stand.moves.length > 0) ||
+        (stand.standOnMoves && stand.standOnMoves.length > 0) ||
+        (stand.awakeningMoves && stand.awakeningMoves.length > 0)) && (
         <div className="relative left-1/2 w-screen -translate-x-1/2 px-4 md:px-10">
         <div className="mt-10 animate-fadeIn">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#2a2418] pb-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto_1fr] items-center gap-4 border-b border-[#2a2418] pb-4 mb-6">
             <h3 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278] flex items-center gap-3">
               <Swords className="w-5 h-5" />
               Combat Abilities
             </h3>
 
-            {/* Awakening Tab Navigation (Visible if Awakening Moves exist) */}
-            {(editMode || (stand.awakeningMoves && stand.awakeningMoves.length > 0)) && (
-              <div className="flex border border-[#2a2418] bg-[#0a0a0d] p-1">
+            {/* Tabs, centred */}
+            <div className="flex justify-self-center border border-[#2a2418] bg-[#0a0a0d] p-1">
+              {KIT_ORDER.map((k) => (
                 <button
-                  onClick={() => setMoveCategory('standard')}
-                  className={`px-4 py-1.5 text-xs font-mono uppercase tracking-wider transition-all ${
-                    moveCategory === 'standard' 
-                      ? 'bg-[#1c1810] text-[#e6c278] border border-[#c3a35e]/30' 
-                      : 'text-[#8a857a] hover:text-[#c7c2b5] border border-transparent'
-                  }`}
-                >
-                  Standard Kit
-                </button>
-                <button
-                  onClick={() => setMoveCategory('awakening')}
+                  key={k}
+                  onClick={() => setMoveCategory(k)}
                   className={`px-4 py-1.5 text-xs font-mono uppercase tracking-wider transition-all flex items-center gap-2 ${
-                    moveCategory === 'awakening' 
-                      ? 'bg-[#1c1810] text-[#e6c278] border border-[#c3a35e]/30' 
+                    moveCategory === k
+                      ? 'bg-[#1c1810] text-[#e6c278] border border-[#c3a35e]/30'
                       : 'text-[#8a857a] hover:text-[#c7c2b5] border border-transparent'
                   }`}
                 >
-                  <Sparkles className="w-3 h-3" />
-                  Awakening
+                  {k === 'awakening' && <Sparkles className="w-3 h-3" />}
+                  {KIT_LABEL[k]}
                 </button>
-              </div>
-            )}
+              ))}
+            </div>
+            <span className="hidden sm:block" />
           </div>
+
+          {editMode && (
+            <div className="mb-5">
+              <button type="button" className={smallBtnCls} onClick={() => setShowCopy((v) => !v)}>
+                Copy moveset…
+              </button>
+            </div>
+          )}
+          {editMode && showCopy && onCopyMoves && (
+            <CopyMovesetPanel
+              target={stand}
+              sources={allStands.filter((s) => s.id !== stand.id)}
+              onCopy={onCopyMoves}
+              onClose={() => setShowCopy(false)}
+            />
+          )}
 
           {/* Moves Grid */}
           <div className="flex flex-col gap-5">
@@ -2405,9 +2974,12 @@ const StandDetailScreen: React.FC<{
                   key={move.id}
                   move={move}
                   standColor={stand.color}
+                  kit={moveCategory}
+                  standId={stand.id}
                   edit={
                     editMode
                       ? {
+                          onTransfer: (to) => transferMove(i, to),
                           onChange: (m) => setMoves(displayedMoves.map((x, j) => (j === i ? m : x))),
                           onDelete: () => setMoves(displayedMoves.filter((_, j) => j !== i)),
                           onShift: (dir) => {
@@ -2422,6 +2994,9 @@ const StandDetailScreen: React.FC<{
                   }
                 />
               ))
+            ) : moveCategory === 'standon' ? (
+              // Stand On is intentionally blank for now
+              <div className="min-h-[240px] bg-black border border-[#14120d]" />
             ) : (
               <div className="col-span-full border border-dashed border-[#2a2418] bg-[#0a0a0d]/60 py-10 text-center">
                 <p className="font-mono text-xs uppercase tracking-widest text-[#5c584f]">
@@ -2433,7 +3008,7 @@ const StandDetailScreen: React.FC<{
 
           {editMode && (
             <button type="button" className={`${smallBtnCls} mt-4`} onClick={addMove}>
-              + Add move to {moveCategory === 'standard' ? 'Standard Kit' : 'Awakening'}
+              + Add move to {KIT_LABEL[moveCategory]}
             </button>
           )}
         </div>
@@ -2471,6 +3046,31 @@ const StandsSection: React.FC<{ initialStandId?: string | null }> = ({ initialSt
     setStands(stands.filter((s) => s.id !== id));
     setSelectedId(null);
   };
+  const copyMoves = (targetId: string, sourceId: string, what: 'all' | MoveKit, replace: boolean) => {
+    const src = stands.find((s) => s.id === sourceId);
+    const tgt = stands.find((s) => s.id === targetId);
+    if (!src || !tgt) return;
+    // Fresh ids so the copies never clash with moves already in the target.
+    const cloneInto = (from: Move[] | undefined, existing: Move[]): Move[] => {
+      const used = new Set(existing.map((m) => m.id));
+      return (from || []).map((m) => {
+        const copy: Move = JSON.parse(JSON.stringify(m));
+        let id = `${m.id}-copy`;
+        let n = 2;
+        while (used.has(id)) id = `${m.id}-copy-${n++}`;
+        used.add(id);
+        return { ...copy, id };
+      });
+    };
+    const next: Stand = { ...tgt };
+    KIT_ORDER.forEach((k) => {
+      if (what !== 'all' && what !== k) return;
+      const key = KIT_KEY[k];
+      const keep = replace ? [] : tgt[key] || [];
+      next[key] = [...keep, ...cloneInto(src[key], keep)];
+    });
+    setStands(stands.map((s) => (s.id === tgt.id ? next : s)));
+  };
   const addStand = () => {
     const name = window.prompt('New stand name?');
     if (!name) return;
@@ -2491,6 +3091,8 @@ const StandsSection: React.FC<{ initialStandId?: string | null }> = ({ initialSt
           editMode={editMode}
           onChange={updateStand}
           onDelete={() => deleteStand(selectedStand.id)}
+          allStands={stands}
+          onCopyMoves={(sourceId, what, replace) => copyMoves(selectedStand.id, sourceId, what, replace)}
         />
       ) : (
         <div className="animate-fadeIn">
@@ -2680,7 +3282,7 @@ export default function AbilitiesPage() {
         ))}
       </nav>
 
-      <main className="max-w-6xl mx-auto">
+      <main className="max-w-6xl mx-auto" data-no-site-edit>
         {activeTab === 'stands' && <StandsSection initialStandId={navStandId} />}
         {activeTab === 'specs' && (
           <PlaceholderSection

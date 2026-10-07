@@ -9,6 +9,7 @@ import Combat from '@/app/components/Combat';
 import Abilities from '@/app/components/Ability';
 import Background from '@/app/components/Background';
 import ScrollProgress from "@/app/components/ScrollProgress";
+import SiteEditor from '@/app/components/SiteEditor';
 
 export default function Home() {
   const [entered, setEntered] = useState(false);
@@ -74,6 +75,7 @@ export default function Home() {
     <main className="relative min-h-screen bg-[#0a0b0e] text-white">
 
       <ScrollProgress />
+      <SiteEditor />
 
       {/* LOADING SCREEN OVERLAY */}
       {!entered && (
