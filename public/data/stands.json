@@ -16,7 +16,8 @@
         "id": "m2-brute-force",
         "name": "M2/LMB - [Brute Force] 🔴",
         "description": "Star Platinum grabs the opponent's neck and performs a secondary punch with their other hand straight to the victim's skull, sending them hurdling back.\n\nDamage: 3.3(Grab) + 13.6 + (Skull Damage) | CD: 10s\nTags: Grab | Ragdoll+Knockback | Guardable | COMBO ENDER/GRAB | CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.15s",
-        "videoSrc": "MOVE VIDEO HERE/m2-brute-force.mp4",
+        "videoSrc": "https://youtu.be/Gb36vi3tY-A?si=Njcbi-_SOvjUFQh6&t=22",
+        "hasFinisher": false,
         "variants": [
           {
             "id": "m2-you-bastard",
@@ -31,7 +32,15 @@
             "videoSrc": "MOVE VIDEO HERE/m2-stand-uppercut.mp4"
           }
         ],
-        "hasVariant": true
+        "hasVariant": true,
+        "videos": [
+          {
+            "src": "https://youtu.be/Gb36vi3tY-A?si=Njcbi-_SOvjUFQh6&t=22",
+            "label": "Youtube2",
+            "start": "22",
+            "end": "25"
+          }
+        ]
       },
       {
         "id": "e-barrage",

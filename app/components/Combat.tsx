@@ -835,6 +835,9 @@ const heavyStrikeOptions: VideoOption[] = [
   }
 ];
 
+// Placeholder media for entries that don't have a clip yet (swap in a file path or YouTube link).
+const NEW_MEDIA = { videoSrc: "UNIQUE VIDEO HERE", posterSrc: "UNIQUE VIDEO HERE" };
+
 const criticalArtOptions: VideoOption[] = [
   {
     id: "m1-amp",
@@ -907,6 +910,17 @@ const criticalArtOptions: VideoOption[] = [
     stats: [{ label: "Type", value: "Max Critical (M2)" }, { label: "Knockback", value: "Grand Knockback" }],
     videoSrc: "UNIQUE VIDEO HERE",
     posterSrc: "UNIQUE VIDEO HERE"
+  },
+  {
+    id: "art-clash",
+    label: "Critical Art Clash",
+    badge: "STRENGTH QTE",
+    duration: "TBD",
+    inputTag: "Critical Art vs Critical Art",
+    description: "Critical Arts can also clash, putting both users into a Strength Based QTE.",
+    properties: ["Strength Based QTE", "Two-Player Clash"],
+    stats: [{ label: "Type", value: "Strength Based QTE" }],
+    ...NEW_MEDIA
   }
 ];
 
@@ -982,6 +996,458 @@ const mobilityOptions: VideoOption[] = [
     stats: [{ label: "Jump Height", value: "+80% Base Height" }, { label: "Glide Speed", value: "26 Studs/s" }, { label: "Drain Rate", value: "2 Heat/s" }],
     videoSrc: "UNIQUE VIDEO HERE",
     posterSrc: "UNIQUE VIDEO HERE"
+  },
+  {
+    id: "injury-walk",
+    label: "Walk & Injury Animations",
+    badge: "GROUND TRAVERSAL",
+    duration: "TBD",
+    inputTag: "W / A / S / D",
+    description: "Simple omni-directional walking. The only addition is custom injury animations: a crawl for a damaged torso or limbs, a dizzy walk for a damaged head, and holding the body part for a damaged arm or torso.",
+    properties: ["Omni-Directional", "Injury Animations", "Crawl / Dizzy Walk"],
+    stats: [{ label: "Damaged Torso / Limbs", value: "Crawl" }, { label: "Damaged Head", value: "Dizzy Walk" }, { label: "Damaged Arm / Torso", value: "Holds Body Part" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "sprint-tech",
+    label: "Sprinting Guard",
+    badge: "SPRINT TECH",
+    duration: "TBD",
+    inputTag: "Sprint + F",
+    description: "While sprinting you can Guard to block light projectiles, provided you have a weapon equipped. Dashing can also enable sprinting (this feature can be turned off).",
+    properties: ["Projectile Block (Weapon)", "Dashing Can Enable Sprint"],
+    stats: [{ label: "Input", value: "Sprint + F" }, { label: "Requirement", value: "Weapon Equipped" }, { label: "Blocks", value: "Light Projectiles" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "sprint-slide",
+    label: "Sprint Slide",
+    badge: "SPRINT TECH",
+    duration: "TBD",
+    inputTag: "Sprint + M1",
+    description: "You can perform a short slide by using M1 during your sprint. This makes your hitbox smaller, allowing you to dodge some moves, as well as trip ragdolling enemies. It can also be used down slopes to slide the whole incline faster than an average sprint, and it is directional.",
+    properties: ["Smaller Hitbox", "Trips Ragdolls", "Directional", "Faster Down Slopes"],
+    stats: [{ label: "Input", value: "Sprint + M1" }, { label: "Hitbox", value: "Reduced" }, { label: "Slopes", value: "Faster Than Sprint" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "sprint-dropkick",
+    label: "Dropkick",
+    badge: "SPRINT TECH",
+    duration: "TBD",
+    inputTag: "Sprint + Jump + M1",
+    description: "You can perform a dropkick by using M1 in the air during your sprint. This lets you kick enemies away from you for a sweet finish.",
+    properties: ["Dropkick Finisher", "Kicks Enemies Away"],
+    stats: [{ label: "Input", value: "Sprint + Jump + M1" }, { label: "Use", value: "Finisher" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "jump-blink",
+    label: "Jump & Jump Tags",
+    badge: "VERTICAL MOBILITY",
+    duration: "TBD",
+    inputTag: "SPACE",
+    description: "Simple jump mechanic. It can be used to dodge moves, pair with moves and dashes, and start ledge climbing and wall jumps. Double jumping is possible through upgrades. Jumps also have tags that limit how high you can leap, with the base jump acting as [Jump 1].",
+    properties: ["Jump Tags", "Double Jump (Upgrade)", "Dodges Moves", "Starts Ledge Climb / Wall Jump"],
+    stats: [{ label: "Base Jump", value: "[Jump 1]" }, { label: "Double Jump", value: "Via Upgrades" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "up-blink",
+    label: "Up-Blink",
+    badge: "VERTICAL MOBILITY",
+    duration: "TBD",
+    inputTag: "Hold SPACE",
+    description: "This leap allows you to instantly zip into the air, letting you start air combos a lot faster (stand jump can still be used).",
+    properties: ["Instant Air Start", "Air Combo Starter"],
+    stats: [{ label: "Input", value: "Hold SPACE" }, { label: "Jump Tags", value: "[Jump 1&2]" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "down-blink",
+    label: "Down-Blink",
+    badge: "VERTICAL MOBILITY",
+    duration: "TBD",
+    inputTag: "Hold SPACE (airborne)",
+    description: "This gets you back to the ground instantly, opening ways for ground follow-ups, evasives for aerial attacks, and more. Especially useful after any high aerial combo.",
+    properties: ["Instant Landing", "Evades Aerial Attacks", "Ground Follow-Ups"],
+    stats: [{ label: "Input", value: "Hold SPACE While Airborne" }, { label: "Use", value: "Escape / Follow-Up" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "step-dash",
+    label: "Step (Dash) & Step Variations",
+    badge: "DASH SYSTEM",
+    duration: "TBD",
+    inputTag: "Left Alt (+ W / A / S / D)",
+    description: "Steps have a 2 second cooldown and forward dashes do not hit the opponent. They pair with moves and are relatively short, except for the slightly longer forward dash. Variations: Landing Step (step right after landing for a rolling slide that trips the enemy), Blitz Step (step right after a perfect guard to follow up quickly), Perfect Step (a perfectly timed step evades the move entirely), Evasive Guard (step while blocking for a short neutral counter that opens the enemy up), Step Feinting (F during a step jumps mid-dash), and Vanishing Step (side dash during a move's endlag to vanish for 0.25s and reposition with a speed gain, up to 6 times in succession).",
+    properties: ["Landing Step", "Blitz Step", "Perfect Step", "Evasive Guard", "Step Feint", "Vanishing Step"],
+    stats: [{ label: "Cooldown", value: "2.0 Seconds" }, { label: "Vanishing Step", value: "0.25s Vanish" }, { label: "Vanish Chain", value: "Up to 6x" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "aerial-steps",
+    label: "Aerial Steps & Rush",
+    badge: "AIR DASH",
+    duration: "TBD",
+    inputTag: "SPACE + Dash",
+    description: "Airborne steps reach further and can be cancelled by using a move. Your aerial front dash changes in Stand On. The Aerial Front Step is the Aerial Boost, a short quick burst of movement that is shift lock aimable [Jump 3]. Hold dash instead for Rush [Jump 2&3], a prolonged omni-directional, shift-lock-aimable dash that stops on reaching an opponent. M1 when Rush connects gives Rush Kick (a swift stunning kick) and M2 gives Rush Strike (a high speed heavy impact that sends the enemy flying); Rush Strikes can Clash in a speed based QTE. The Aerial Back Step is a Backflip [Jump 3] and the Aerial Side Step is a Side Slide that skids much further and faster than a regular side step.",
+    properties: ["Aerial Boost", "Rush", "Rush Kick", "Rush Strike", "Backflip", "Side Slide"],
+    stats: [{ label: "Aerial Boost", value: "[Jump 3]" }, { label: "Rush", value: "[Jump 2&3]" }, { label: "Rush Strike Clash", value: "Speed Based QTE" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "air-shift",
+    label: "Air Shift",
+    badge: "AIR COMBO STARTER",
+    duration: "TBD",
+    inputTag: "Hold SPACE (Aerial Front Step)",
+    description: "Hold space to instantly zip to the opponent while hitting them with a low damaging kick whose sole purpose is to stun them and keep them juggled in the air, making it a reliable combo starter. This isn't a flight move like the stand dash.",
+    properties: ["Instant Gap Close", "Stun & Juggle", "Combo Starter"],
+    stats: [{ label: "Damage", value: "Low" }, { label: "Purpose", value: "Stun + Juggle" }, { label: "Jump Tags", value: "[Jump 2&3]" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "flash-hurl",
+    label: "Flash-Step Teleport & Flash Hurl",
+    badge: "TELEPORT DASH",
+    duration: "TBD",
+    inputTag: "Hold Left Alt / Flash Step + M2",
+    description: "Hold step to instantly teleport to your enemy. The windup is slightly longer than a regular dash and the range is limited, yet far (long). Flash Step + M2 gives Flash Hurl, teleporting to your enemy and throwing them away for further combo extension or as a redirection tool for setups. Flash Steps can also Clash; it is a neutral clash, so no one wins.",
+    properties: ["Instant Teleport", "Long Range", "Flash Hurl", "Neutral Clash"],
+    stats: [{ label: "Windup", value: "Longer than a Regular Dash" }, { label: "Range", value: "Long" }, { label: "Clash", value: "Neutral" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "phantom-steps",
+    label: "Phantom-Steps",
+    badge: "SIDE DASH",
+    duration: "TBD",
+    inputTag: "Hold Left Alt + Side Direction",
+    description: "This side dash confuses enemies with multiple clones and is one of the hardest skills to attain due to its high agility ceiling. Phantom-Steps + M1 gives Phantom-Assault: you and your afterimages perform a series of strikes before the afterimages dissipate, for further combo extension. Phantom-Steps + M2 gives Phantom-Strike: the same series of strikes ending in a throw, for combo extension or as a redirection tool. Phantom-Steps can also Clash as a neutral clash.",
+    properties: ["Afterimage Clones", "Phantom-Assault", "Phantom-Strike", "Neutral Clash"],
+    stats: [{ label: "Skill Ceiling", value: "High (Agility)" }, { label: "+ M1", value: "Phantom-Assault" }, { label: "+ M2", value: "Phantom-Strike" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "burst-utility",
+    label: "Burst Step",
+    badge: "DASH SYSTEM",
+    duration: "TBD",
+    inputTag: "Left Alt + Sprint",
+    description: "Basically a step for during your sprint. Each stand might have a different one, along with standless and specs.",
+    properties: ["Sprint Step", "Differs Per Stand / Spec"],
+    stats: [{ label: "Input", value: "Left Alt + Sprint" }, { label: "Variants", value: "Per Stand / Standless / Spec" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "shift-lock",
+    label: "Shift Lock",
+    badge: "MOVEMENT UTILITY",
+    duration: "TBD",
+    inputTag: "Left Shift",
+    description: "Smoother shift lock system for better aiming, with customizable crosshairs.",
+    properties: ["Smoother Lock", "Custom Crosshairs"],
+    stats: [{ label: "Input", value: "Left Shift" }, { label: "Crosshair", value: "Customizable" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "landing",
+    label: "Landing",
+    badge: "MOVEMENT UTILITY",
+    duration: "TBD",
+    inputTag: "Automatic",
+    description: "Landing is based on how high you fall (literally just an animation change). Landing and dashing gives a variant.",
+    properties: ["Automatic", "Height-Based Animation", "Dash Variant"],
+    stats: [{ label: "Input", value: "Automatic" }, { label: "Variant", value: "Land + Dash" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "vaulting",
+    label: "Vaulting",
+    badge: "MOVEMENT UTILITY",
+    duration: "TBD",
+    inputTag: "Automatic",
+    description: "You can automatically vault over short walls.",
+    properties: ["Automatic", "Short Walls"],
+    stats: [{ label: "Input", value: "Automatic" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "knockback-recovery",
+    label: "Knockback Recovery",
+    badge: "RECOVERY TECH",
+    duration: "TBD",
+    inputTag: "Spam SPACE in knockback flight",
+    description: "Knockback burst is done by spamming your space key while in heavy ragdoll: you gain temporary hyper armour and mini buffs, knock away nearby enemies, and ascend slightly. At lower HP it becomes harder to recover, but you get a stronger recovery.",
+    properties: ["Hyper Armor", "Mini Buffs", "Knocks Away Enemies"],
+    stats: [{ label: "Input", value: "Spam SPACE" }, { label: "Low HP", value: "Harder, Stronger Recovery" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "wall-ground-recovery",
+    label: "Wall / Ground Recovery",
+    badge: "RECOVERY TECH",
+    duration: "TBD",
+    inputTag: "Left Alt right before impact",
+    description: "Press Left Alt right before hitting a wall to cling on to it, or right before the floor to jump off it, without taking extra damage from the impact.",
+    properties: ["Cling To Wall", "Jump Off Floor", "Impact Damage Negation"],
+    stats: [{ label: "Input", value: "Left Alt Before Impact" }, { label: "Result", value: "No Extra Impact Damage" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "wall-crash",
+    label: "Wall Crash / Bump",
+    badge: "KNOCKBACK + WALLS",
+    duration: "TBD",
+    inputTag: "Hit a Wall While Ragdolled",
+    description: "If you hit a wall with enough force you break through it (Wall Crash). If you don't break the wall you simply bump off it (Wall Bump), though it still leaves a crater whose size depends on the force. The impact also deals extra damage depending on its force.",
+    properties: ["Wall Crash", "Wall Bump", "Crater", "Force-Scaled Damage"],
+    stats: [{ label: "Crash", value: "Breaks the Wall" }, { label: "Bump", value: "Bounces Off" }, { label: "Scaling", value: "Impact Force" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "wall-boost",
+    label: "Wall Boost",
+    badge: "WALL TECH",
+    duration: "TBD",
+    inputTag: "Jump + Left Alt (Near a Wall) - Directional",
+    description: "Gain extra height or confuse enemies mid-combat. Outside combat it can be done multiple times in succession. It is directional: your dash and camera facing decide which animation you perform.",
+    properties: ["Directional", "Extra Height", "Repeatable Out of Combat"],
+    stats: [{ label: "Input", value: "Jump + Left Alt" }, { label: "Out of Combat", value: "Repeatable" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "ledge-tech",
+    label: "Ledge Hanging",
+    badge: "LEDGE TECH",
+    duration: "TBD",
+    inputTag: "SPACE by a Wall Ledge",
+    description: "Instead of hanging on indefinitely, you have 10 seconds of idleness to jump up, which plays a smooth animation. You can also climb side to side and across corners without falling. If damaged, you fall.",
+    properties: ["10s Idle Hang", "Side / Corner Climbing", "Fall If Damaged"],
+    stats: [{ label: "Hang Time", value: "10s Idle" }, { label: "If Damaged", value: "You Fall" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "ledge-attack",
+    label: "Ledge Attack",
+    badge: "LEDGE TECH",
+    duration: "TBD",
+    inputTag: "Ledge Hang + M2",
+    description: "Recover from a ledge hang with an attack that deals slight damage and trips ragdoll.",
+    properties: ["Slight Damage", "Trips Ragdoll"],
+    stats: [{ label: "Input", value: "Ledge Hang + M2" }, { label: "Effect", value: "Slight Damage + Trip" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "ledge-roll",
+    label: "Ledge Roll",
+    badge: "LEDGE TECH",
+    duration: "TBD",
+    inputTag: "Left Alt + Ledge Hang",
+    description: "Recover from a ledge hang with Left Alt to roll, gaining a split second of iFrames to dodge any attacks.",
+    properties: ["Brief iFrames", "Dodges Attacks"],
+    stats: [{ label: "Input", value: "Left Alt + Ledge Hang" }, { label: "iFrames", value: "Split Second" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "non-combat",
+    label: "Wall Climbing",
+    badge: "STORY / EXPLORATION",
+    duration: "TBD",
+    inputTag: "Hold SPACE on a Wall (facing wall)",
+    description: "The player scales up a wall. Situational: used for story mode, some buildings and quests. Cannot be used while Combat Tagged.",
+    properties: ["Situational", "Disabled in Combat", "Story / Quests"],
+    stats: [{ label: "Input", value: "Hold SPACE Facing Wall" }, { label: "Combat Tagged", value: "Disabled" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "wall-running",
+    label: "Wall Running",
+    badge: "STORY / EXPLORATION",
+    duration: "TBD",
+    inputTag: "SPACE + Hold SPACE while sprinting",
+    description: "Allows the user to run on a wall before letting go. The player can jump off the wall at any time and can only run forward at sprint speed. Cannot be used while Combat Tagged.",
+    properties: ["Disabled in Combat", "Forward Only", "Sprint Speed"],
+    stats: [{ label: "Direction", value: "Forward Only" }, { label: "Speed", value: "Sprint Speed" }, { label: "Combat Tagged", value: "Disabled" }],
+    ...NEW_MEDIA
+  }
+];
+
+// Mobility tabs -> subtabs. Each category is a top-level tab; its options are the
+// subtabs inside the switcher. Precomputed at module scope so the arrays keep a
+// stable identity across renders (DynamicVideoPlate re-syncs on `options` changes).
+const pickMobilityOptions = (ids: string[]): VideoOption[] =>
+  ids
+    .map((id) => mobilityOptions.find((o) => o.id === id))
+    .filter((o): o is VideoOption => !!o);
+
+interface MobilityCategory {
+  id: string;
+  label: string;
+  hint: string;
+  options: VideoOption[];
+}
+
+const mobilityCategories: MobilityCategory[] = [
+  { id: "walk", label: "Walk", hint: "W A S D", options: pickMobilityOptions(["injury-walk"]) },
+  { id: "run-sprint", label: "Run & Sprint", hint: "Left Ctrl", options: pickMobilityOptions(["walk-sprint", "momentum-slide", "sprint-tech", "sprint-slide", "sprint-dropkick"]) },
+  { id: "jump", label: "Jump", hint: "SPACE", options: pickMobilityOptions(["jump-blink", "up-blink", "down-blink", "stand-assisted"]) },
+  { id: "steps", label: "Steps & Dashes", hint: "Left Alt", options: pickMobilityOptions(["step-dash", "aerial-steps", "air-shift", "flash-step", "flash-hurl", "phantom-steps", "burst-utility"]) },
+  { id: "utility", label: "Utility", hint: "Shift Lock / Landing", options: pickMobilityOptions(["shift-lock", "landing"]) },
+  { id: "knockback-walls", label: "Knockback + Walls", hint: "Recovery", options: pickMobilityOptions(["knockback-recovery", "tech-recovery", "wall-crash", "wall-ground-recovery", "wall-boost", "vaulting"]) },
+  { id: "ledge", label: "Ledge Hanging", hint: "Space at Ledge", options: pickMobilityOptions(["ledge-tech", "ledge-attack", "ledge-roll"]) },
+  { id: "non-combat", label: "Non-Combat", hint: "Out of Combat", options: pickMobilityOptions(["non-combat", "wall-running", "wall-run"]) },
+];
+
+const m1VariantOptions: VideoOption[] = [
+  {
+    id: "uppercut-m1",
+    label: "Uppercut M1",
+    badge: "LAUNCHER",
+    duration: "0:09",
+    inputTag: "Hold SPACE during any M1",
+    description: "Hold Space during any M1 to launch both yourself and your target into an airborne state, putting your M1 on cooldown, regardless of the sequence you were on. Execute it as a launcher to extend your combo.",
+    properties: ["Launcher", "Any M1 Sequence", "M1 Goes On Cooldown", "Combo Extension"],
+    stats: [{ label: "Damage Scale", value: "150%" }, { label: "Launch Height", value: "30 Studs" }, { label: "Input", value: "Hold SPACE + M1" }],
+    videoSrc: "UNIQUE VIDEO HERE",
+    posterSrc: "UNIQUE VIDEO HERE"
+  },
+  {
+    id: "aerial-m1",
+    label: "Aerial M1",
+    badge: "AIR COMBAT",
+    duration: "0:14",
+    inputTag: "M1 while airborne",
+    description: "While in the air, you can use M1s to juggle your opponents, allowing for air combos. Your falling is paused per M1, keeping you with your opponent manually instead of basic hovering.",
+    properties: ["Air Juggle", "Falling Paused Per M1", "Air Combo Enabler"],
+    stats: [{ label: "Input", value: "M1 While Airborne" }, { label: "Example", value: "LMB x3 Airborne" }, { label: "Fall", value: "Paused Per M1" }],
+    videoSrc: "/video/test.mp4",
+    posterSrc: "/public/about2.jpg"
+  },
+  {
+    id: "step-chain",
+    label: "Step Chain",
+    badge: "CHAIN EXTENDER",
+    duration: "TBD",
+    inputTag: "Forward Dash after the 5th M1",
+    description: "Using your forward dash immediately after your 5th M1 performs a follow-up strike that lets you start another chain of M1s. Depending on your skill tree you can do between 2 and 4 links. M1 hitstun decay, style rank repetitive move decay and combo rank damage decay still apply, so use it wisely.",
+    properties: ["Chain Restart", "2 - 4 Links (Skill Tree)", "Decay Still Applies"],
+    stats: [{ label: "Input", value: "Forward Dash after 5th M1" }, { label: "Links", value: "2 - 4" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "side-strikes",
+    label: "Swift Side Strikes",
+    badge: "REPOSITIONING",
+    duration: "TBD",
+    inputTag: "Side Dash after the first 2 M1s",
+    description: "Using your side dash after your first 2 M1s switches your position 120 degrees from your opponent's view to either side. You can repeat this up to 3 times for a total of 6 M1s before the 7th turns into a final M1 that knocks your opponent far away (disabling the follow-up ability). This gets you around blocks while leaving your opponent to predict where you'll end up next.",
+    properties: ["120 Degree Reposition", "Gets Around Blocks", "Final M1 Knockback"],
+    stats: [{ label: "Input", value: "Side Dash after 2 M1s" }, { label: "Repeats", value: "Up to 3x (6 M1s)" }, { label: "7th M1", value: "Far Knockback" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "finishing-strike",
+    label: "Finishing Strike",
+    badge: "CHAIN ENDER",
+    duration: "TBD",
+    inputTag: "Dash after the 1st - 4th M1",
+    description: "Using your dash after your 1st to 4th M1 performs a stronger strike that ends the chain with a harder punch and more knockback (a knockback rather than a stun or stagger).",
+    properties: ["Stronger Strike", "More Knockback", "No Stun / Stagger"],
+    stats: [{ label: "Input", value: "Dash after 1st - 4th M1" }, { label: "Effect", value: "Knockback" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "light-clash",
+    label: "Light Clash",
+    badge: "CLASH MECHANIC",
+    duration: "TBD",
+    inputTag: "Both players use their last M1",
+    description: "When 2 players use their last M1s against each other they perform a quick clash and punch each other. It is a non-competitive clash, so they end on even terms, and both players are damaged by it.",
+    properties: ["Non-Competitive", "Even Terms", "Both Damaged"],
+    stats: [{ label: "Trigger", value: "Last M1 vs Last M1" }, { label: "Victor", value: "None" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "stand-downslam",
+    label: "Stand-On Downslam M1",
+    badge: "STAND ON",
+    duration: "TBD",
+    inputTag: "M1 after an Uppercut M1 (Stand On)",
+    description: "With your Stand On, using M1 after an Uppercut M1 performs a Downslam M1 in which the Stand punches the enemy back down, causing them to rebound off the floor.",
+    properties: ["Stand On Only", "Rebound", "Combo Extension"],
+    stats: [{ label: "Input", value: "M1 after Uppercut M1" }, { label: "Result", value: "Floor Rebound" }],
+    ...NEW_MEDIA
+  }
+];
+
+const guardTechOptions: VideoOption[] = [
+  {
+    id: "jitter-guard",
+    label: "Jitter Guard Exhaustion",
+    badge: "GUARD LIMIT",
+    duration: "TBD",
+    inputTag: "Block 3 times in a short timeframe",
+    description: "Blocking 3 times instantly, or within a short timeframe, causes Jitter Guard Exhaustion: the 3rd block has a slowed end-lag and a 4 second cooldown. This stops you from spam-clicking your Guard key.",
+    properties: ["Anti-Spam", "Slowed End-Lag", "Cooldown"],
+    stats: [{ label: "Trigger", value: "3 Blocks, Quickly" }, { label: "Penalty", value: "Slowed End-Lag" }, { label: "Cooldown", value: "4.0 Seconds" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "counter-strike",
+    label: "Counter Strike",
+    badge: "PARRY FOLLOW-UP",
+    duration: "TBD",
+    inputTag: "M1 / M2 during the Perfect Guard animation",
+    description: "Perfectly time your M1 or M2 during the animation of a Perfect Guard. This removes the need for a Blitz Step, since you and the enemy stay at close range. It does 15% more damage than an average M1 or M2 and can use Critical Arts.",
+    properties: ["+15% Damage", "Keeps Close Range", "Critical Arts Compatible"],
+    stats: [{ label: "Input", value: "M1 / M2 in Parry Animation" }, { label: "Damage", value: "+15%" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "perfect-dodge",
+    label: "Perfect Dodge & Evasive Strike",
+    badge: "TIGHT-WINDOW DODGE",
+    duration: "TBD",
+    inputTag: "Guard + Side Dash (very tight window)",
+    description: "A perfect dodge is similar to a parry, but you must block and dodge within a very tight window. It stuns the enemy in Perception Zone for 1.5 seconds and leaves you behind them, with an animation similar to Sparking Zero's Sonic Sway. Using M1 or M2 right after a perfect dodge gives you an Evasive Strike, which deals massive damage to your opponent, similar to your Blitz Arts.",
+    properties: ["Perception Zone", "Repositions Behind Enemy", "Evasive Strike (M1 / M2)"],
+    stats: [{ label: "Stun", value: "1.5s Perception Zone" }, { label: "Follow-Up", value: "Evasive Strike" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "blitz-arts",
+    label: "Blitz Step & Blitz Arts",
+    badge: "PARRY FOLLOW-UP",
+    duration: "TBD",
+    inputTag: "Front Dash during Perception Zone",
+    description: "Using your front dash during Perception Zone is a Blitz Step, which instantly covers the distance of a parry's pushback. Using M1 or M2 right after the dash gives you a Blitz Strike, a step closer to something more powerful: the M1 stuns while the M2 knocks back. Blitz Steps can also clash with other players' Blitz Steps, but it is a neutral clash, so no one wins.",
+    properties: ["Closes Parry Pushback", "Blitz Strike (M1 / M2)", "Neutral Clash"],
+    stats: [{ label: "Input", value: "Front Dash in Perception Zone" }, { label: "Follow-Up", value: "M1 Stun / M2 Knockback" }, { label: "Clash", value: "Neutral" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "feinting",
+    label: "Feinting",
+    badge: "MIND GAMES",
+    duration: "TBD",
+    inputTag: "F during a move's windup",
+    description: "Pressing your Guard key during a move's windup effectively feints the move. This only applies to your base combat moves unless a stand or spec has the trait to use it.",
+    properties: ["Cancels Windup", "Base Combat Moves", "Stand / Spec Trait Required Otherwise"],
+    stats: [{ label: "Input", value: "F during Windup" }],
+    ...NEW_MEDIA
+  },
+  {
+    id: "ally-assist",
+    label: "Ally Assist",
+    badge: "ALLY SUPPORT",
+    duration: "TBD",
+    inputTag: "P during your block",
+    description: "Press P during your block to call in any ally you've chosen from your diary, provided they have a level 10 bond. The ally performs a move (described in their character profile), and if used after a parry it becomes a counter variant.",
+    properties: ["Level 10 Bond Required", "Counter Variant After Parry"],
+    stats: [{ label: "Input", value: "P while Blocking" }, { label: "Cooldown", value: "30 Seconds" }, { label: "Requirement", value: "Lvl 10 Bond" }],
+    ...NEW_MEDIA
   }
 ];
 
@@ -1809,6 +2275,16 @@ export default function GameGuide() {
   // four switchers — each one only reacts if the id actually belongs to
   // its own options array, so one piece of state is enough.
   const [navVariantId, setNavVariantId] = useState<string | null>(null);
+  // Active Mobility tab (category). Its options show up as the subtabs.
+  const [mobilityCat, setMobilityCat] = useState<string>(mobilityCategories[0].id);
+  const activeMobilityCat = mobilityCategories.find((c) => c.id === mobilityCat) || mobilityCategories[0];
+
+  // If search navigation targets a mobility variant, open the tab that owns it.
+  useEffect(() => {
+    if (!navVariantId) return;
+    const owner = mobilityCategories.find((c) => c.options.some((o) => o.id === navVariantId));
+    if (owner) setMobilityCat(owner.id);
+  }, [navVariantId]);
 
   const selectedStatObj = statAttributesList.find(s => s.id === selectedStatId) || statAttributesList[0];
 
@@ -2176,10 +2652,6 @@ export default function GameGuide() {
                               </CodexBox>
                             </div>
         
-                            <ul className="list-disc list-inside text-[#c7c2b5] text-base space-y-3 leading-relaxed my-6">
-                              <li><strong className="text-[#e6c278]">Uppercut M1 Branch:</strong> Hold <code className="bg-[#18161f] border border-[#3d3423] px-2 py-0.5 text-[#e6c278] font-mono text-sm">Space</code> during any M1 to launch both yourself and your target into an airborne state, putting your M1 on cooldown, regardless of the sequence.</li>
-                              <li><strong className="text-[#e6c278]">Aerial M1 Branch:</strong> While in the air, you can use M1's to juggle your opponents in the air, allowing for air combos, your falling is paused per M1 keeping you with your opponent manually instead of basic hovering.</li>
-                            </ul>
         
                             <VideoPlate 
                               title="Move Demonstration: 5-Hit Light Strike Chain & Aerial Variant"
@@ -2195,22 +2667,27 @@ export default function GameGuide() {
                               videoSrc="/video/test.mp4"
                               posterSrc="/public/about2.jpg"
                             />
-        
-                            <VideoPlate 
-                              title="Move Demonstration: Light Uppercut"
-                              inputTag="Airborne LMB (Post-Uppercut)"
-                              badge="COMBO EXTENSION"
-                              duration="0:09"
-                              description="Execute a launcher M1 by holding space with your M1, regardless of which sequence you were on."
-                              stats={[
-                                { label: "Damage Scale", value: "150%" },
-                                { label: "Launch Height", value: "30 Studs" }
-                              ]}
-                              videoSrc="UNIQUE VIDEO HERE"
-                              posterSrc="UNIQUE VIDEO HERE"
-                            />
                           </CodexBox>
         
+                          <div id="m1-variants" className="scroll-mt-24">
+                          <CodexBox title="M1 Chain Rules & Variants" badge="LIGHT STRIKE+">
+                            <ul className="list-disc list-inside space-y-2 text-base text-[#c7c2b5] mb-6">
+                              <li>Medium-high paced, similar to Devil May Cry Combo A and Dragon Ball: Sparking! ZERO, with smooth transitions between each M1.</li>
+                              <li><strong className="text-[#e6c278]">Directional:</strong> your WASD keys change the direction of your M1s, unlike games like YBA or USG where you can use bunny hop M1s.</li>
+                              <li>You can move forward during M1s, and the 1st M1 is a more dash-like strike that auto-stops to a target within range.</li>
+                              <li>M1s are Semi-True into each other, and each consecutive M1 does 5% less stun than the last.</li>
+                              <li>M1s flow until the last hit, disabling any unnecessary M1 reset techs. They reset after 3 seconds by default, and some moves can reset your M1 if stated.</li>
+                            </ul>
+                            <DynamicVideoPlate
+                              title="M1 Chain Variants"
+                              options={m1VariantOptions}
+                              defaultOptionId="uppercut-m1"
+                              sectionBadge="SELECT M1 VARIANT"
+                              externalSelectedId={navVariantId}
+                            />
+                          </CodexBox>
+                          </div>
+
                           <div id="heavy-strike" className="scroll-mt-24">
                           <CodexBox title="2. Heavy Strike (MMB / M2)" badge="HEAVY SYSTEM">
                             <div className="mb-6">
@@ -2250,6 +2727,7 @@ export default function GameGuide() {
                                 <li>Blocking attacks will 'wear down' that endurance bar, and upon complete depletion you are <strong className="text-[#e6c278]">Guard Broken</strong>.</li>
                                 <li>Blocking without receiving any attacks after 4 seconds will cause that bar to slowly deplete with <strong className="text-[#e6c278]">Guard Decay</strong>.</li>
                                 <li>Upon using moves such as <strong className="text-[#e6c278]">Perfect Guard</strong>, <strong className="text-[#e6c278]">Reflective Guard</strong> and <strong className="text-[#e6c278]">Evasive Guard</strong> you can recharge the bar.</li>
+                                <li>Blocking 3 times instantly, or within a short timeframe, triggers <strong className="text-[#e6c278]">Jitter Guard Exhaustion</strong>: the 3rd block has a slowed end-lag and a 4 second cooldown.</li>
                               </ul>
                               <p className="text-base text-[#c7c2b5]">
                                 <TypewriterText text="Should your block bar be full, it can overlap, storing as a golden charged bar. Once filled, this can be used as extra guard points as well, however this is used for something even greater!" />
@@ -2260,6 +2738,12 @@ export default function GameGuide() {
                                 </CodexBox>
                                 <CodexBox title="(DECAY) Guard Decay">
                                   <p className="text-sm text-[#c7c2b5]"><TypewriterText text="The result of staying in blocking stance for too long without incoming attacks, over-decaying the bar. Stun time: 1.5 – 2s." /></p>
+                                </CodexBox>
+                                <CodexBox title="(EXHAUST) Jitter Guard Exhaustion">
+                                  <p className="text-sm text-[#c7c2b5]"><TypewriterText text="Blocking 3 times instantly, or within a short timeframe, causes Jitter Guard Exhaustion: the 3rd block has a slowed end-lag and a 4 second cooldown. This stops you from spam-clicking your Guard key." /></p>
+                                </CodexBox>
+                                <CodexBox title="(FEINT) Feinting">
+                                  <p className="text-sm text-[#c7c2b5]"><TypewriterText text="Pressing your Guard key (F) during a move's windup effectively feints the move. This only applies to your base combat moves unless a stand or spec has the trait to use it." /></p>
                                 </CodexBox>
                               </div>
                               <VideoPlate 
@@ -2357,6 +2841,19 @@ export default function GameGuide() {
                               />
                             </div>
         
+                            <div id="guard-techniques" className="scroll-mt-24 space-y-4 border-t border-[#2a2418] pt-6 my-6">
+                              <h4 className="text-2xl font-['Gilda_Display',serif] text-[#e6c278]">Advanced Guard Techniques</h4>
+                              <p className="text-base text-[#c7c2b5]"><TypewriterText text="Beyond the basics, your guard opens into counters, evasion, follow-ups, feints and ally assists. Use the switcher below to preview each one." delay={100} /></p>
+                              <DynamicVideoPlate
+                                title="Advanced Guard Techniques"
+                                options={guardTechOptions}
+                                defaultOptionId="jitter-guard"
+                                sectionBadge="SELECT GUARD TECH"
+                                variantTheme="red"
+                                externalSelectedId={navVariantId}
+                              />
+                            </div>
+
                             <div className="space-y-6 border-t border-[#2a2418] pt-6 my-6">
                               <FadeScaleIn delay={100}>
                                 <h3 className="text-3xl font-['Cormorant_Upright',serif] font-bold text-[#e6c278] tracking-widest uppercase border-b border-[#2a2418] pb-3">Combat Add-Ons</h3>
@@ -2521,6 +3018,14 @@ export default function GameGuide() {
                                 </div>
                               </CodexBox>
                               </div>
+                              <CodexBox title="Style Gain & Drain Rules" badge="STYLE SYSTEM" className="mt-6">
+                                <ul className="list-disc list-inside space-y-2 text-base text-[#c7c2b5]">
+                                  <li>Each attack adds points toward your rank. Repeating the same combos and attacks diminishes your rank, and it also drains with inactivity and from missing too many attacks.</li>
+                                  <li>It does not drain when you are attacked (though some moves may delete style) or while charging your Stand endurance. Endurance charging pauses your style drain.</li>
+                                  <li>Aerial Combos and Awakenings give you a Style Multiplier, and Finishers give extra style.</li>
+                                  <li>Ranks unlock better moves such as Supers, Specials and Ultimates, and can lower the cooldown and windup time of some moves.</li>
+                                </ul>
+                              </CodexBox>
                             </div>
         
                             <VideoPlate 
@@ -2549,7 +3054,7 @@ export default function GameGuide() {
                                 <div id="status-overwhelmed" className="scroll-mt-24">
                                   <CodexBox title="[Overwhelmed]" badge="DEBUFF + BUFF">
                                     <p className="text-sm text-[#c7c2b5] leading-relaxed mb-2">
-                                      <TypewriterText text="Triggered taking combo damage reaching A Rank. Blurs vision 8%, darkens 6%, adds vignette. Clears after 5s without damage or using Burst." />
+                                      <TypewriterText text="Triggered taking combo damage reaching A Rank. Blurs vision 8%, darkens 6%, adds vignette. Clears after 5s without damage or using Burst. Using Burst while Overwhelmed buffs your next move by 30% and makes the Burst twice as strong." />
                                     </p>
                                   </CodexBox>
                                 </div>
@@ -2584,6 +3089,18 @@ export default function GameGuide() {
                                       <div>• <strong className="text-[#e6c278]">Legs:</strong> Sprint, jump, and speed nerfed</div>
                                       <div>• <strong className="text-[#e6c278]">Arms:</strong> Block & damage nerfed, ledge grab jump spam</div>
                                     </div>
+                                  </CodexBox>
+                                </div>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                                  <CodexBox title="DOT Tick Speed & Tiers" badge="DOT SCALING">
+                                    <ul className="list-disc list-inside space-y-2 text-sm text-[#c7c2b5]">
+                                      <li>Tier 1: 1 tick/s, Tier 2: 2 ticks/s, Tier 3: 4 ticks/s.</li>
+                                      <li>Damage varies with the player’s Endurance, and all effects last 4 seconds.</li>
+                                      <li>If a move inflicts 2 of the same tier at once, the tier increases (Tier 1 + Tier 1 = Tier 2).</li>
+                                    </ul>
+                                  </CodexBox>
+                                  <CodexBox title="Body Part Damage Timing" badge="LOCATIONAL DAMAGE">
+                                    <p className="text-sm text-[#c7c2b5] leading-relaxed">Continuously damaging a body part over the course of 1 minute can injure it, causing slight nerfs for 15 seconds.</p>
                                   </CodexBox>
                                 </div>
                               </div>
@@ -2631,6 +3148,89 @@ export default function GameGuide() {
                                 </CodexBox>
                                 </div>
                               </div>
+
+                              <div id="advanced-extras" className="scroll-mt-24 grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                                <CodexBox title="Knockback Levels" badge="KNOCKBACK">
+                                  <p className="text-sm text-[#c7c2b5] leading-relaxed mb-3">Knockback is heightened far beyond most Jojo games. There are 6 levels, each knocking you back a different range, typically around 25 to 75 studs, which gives base combat a hefty, impactful feel while keeping it agile and controlled.</p>
+                                  <div className="flex flex-wrap gap-2">
+                                    {["Normal", "Standing", "Super", "Heavy", "Grand", "Extreme"].map((lvl) => (
+                                      <span key={lvl} className="font-mono text-[11px] px-2 py-1 border border-[#3d3423] bg-[#14121a] text-[#e6c278]">{lvl}</span>
+                                    ))}
+                                  </div>
+                                </CodexBox>
+                                <CodexBox title="Close Quarter Combat" badge="CLOSE RANGE">
+                                  <p className="text-sm text-[#c7c2b5] leading-relaxed">Close combat is meant to be strong yet meaningful. There will be M1 trades and openings to find, but you should never be afraid to use your abilities to get the edge over your opponent.</p>
+                                </CodexBox>
+                                <CodexBox title="Combat Techniques" badge="MOBILITY + COMBAT">
+                                  <p className="text-sm text-[#c7c2b5] leading-relaxed">Your mobility options aren’t only for getting around. Flash-Step, Up and Down Blinks, Wall Leaps, Ledge attacks and rolls, and more pair with your fighting, so use them wisely and creatively to take the advantage.</p>
+                                </CodexBox>
+                                <CodexBox title="Destruction Details" badge="MAP DESTRUCTION">
+                                  <ul className="list-disc list-inside space-y-2 text-sm text-[#c7c2b5]">
+                                    <li>Some map parts have a durability: hit them hard enough, or enough times, and they break.</li>
+                                    <li>Destroying a wall while in knockback deals you extra damage.</li>
+                                    <li>Some abilities and clashes have secret secondary AOE destruction, damaging buildings and shattering glass around them even if the attack doesn’t have the range to hit you.</li>
+                                    <li>Some 1v1 map stages have Stage Destruction, which needs a strong enough move, finisher or ultimate.</li>
+                                  </ul>
+                                </CodexBox>
+                                <CodexBox title="Amplification Arts [増幅術]" badge="CRITICAL HITS">
+                                  <p className="text-sm text-[#c7c2b5] leading-relaxed">The simpler counterpart to Critical Arts: standard critical hits that have a low chance of happening with any move or attack, regardless of what it is. They also multiply the style points gained from the attack.</p>
+                                </CodexBox>
+                                <CodexBox title="Ally Assist" badge="ALLY SUPPORT">
+                                  <p className="text-sm text-[#c7c2b5] leading-relaxed mb-3">Press <code className="bg-[#18161f] border border-[#3d3423] px-1.5 py-0.5 text-[#e6c278] font-mono text-xs">P</code> during your block to call in any ally you've chosen from your diary, provided they have a level 10 bond. The ally performs a move (described in their character profile), and if used after a parry it becomes a counter variant.</p>
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {["Level 10 Bond Required", "Counter Variant After Parry", "30s Cooldown"].map((t) => (
+                                      <span key={t} className="font-mono text-[11px] px-2 py-0.5 border border-[#3d3423] bg-[#14121a] text-[#e6c278]">{t}</span>
+                                    ))}
+                                  </div>
+                                </CodexBox>
+                                <CodexBox title="Sudden Death [急死]" badge="LOW HP CLASH" className="md:col-span-2">
+                                  <p className="text-sm text-[#c7c2b5] leading-relaxed mb-3">If two users clash while both at low HP they enter SUDDEN DEATH and take a combat stance, then play a rock paper scissors situation:</p>
+                                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm mb-3">
+                                    <div className="p-3 bg-[#0a0a0d] border border-[#1a1820]"><strong className="text-[#e6c278] block mb-1">Rock</strong>Elbow Jab</div>
+                                    <div className="p-3 bg-[#0a0a0d] border border-[#1a1820]"><strong className="text-[#e6c278] block mb-1">Paper</strong>Ground High Kick</div>
+                                    <div className="p-3 bg-[#0a0a0d] border border-[#1a1820]"><strong className="text-[#e6c278] block mb-1">Scissors</strong>Shin Kick</div>
+                                  </div>
+                                  <ul className="list-disc list-inside space-y-1 text-sm text-[#c7c2b5]">
+                                    <li>Rock vs Paper: the Elbow Jab misses as the high kick connects.</li>
+                                    <li>Scissors vs Rock: the shin kick hits the ground kicker’s face.</li>
+                                    <li>Paper vs Scissors: the Elbow Jab hits first.</li>
+                                    <li>Picking the same option causes a clash, which becomes a Precision Based QTE. The loser is hit and collapses, and if both are equal, both die.</li>
+                                    <li>You can also dodge an attack if you predict your opponent’s move correctly, which gives you an opening for a quick jab. Your stats, such as agility, can influence some attributes like dodge speed and opening time.</li>
+                                  </ul>
+                                </CodexBox>
+
+                                <FadeScaleIn className="md:col-span-2">
+                                  <style>{`@keyframes bbRainbowShift { from { background-position: 0% 50%; } to { background-position: 200% 50%; } }`}</style>
+                                  <div
+                                    id="all-star-attack"
+                                    className="scroll-mt-24 group relative overflow-hidden rounded-sm border border-[#2a2418] bg-[#0a0a0d] p-8 md:p-12 transition-all duration-500 transform hover:-translate-y-1 hover:scale-[1.01] hover:border-transparent hover:shadow-[0_0_45px_rgba(255,255,255,0.25)]"
+                                  >
+                                    <div
+                                      aria-hidden="true"
+                                      className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                      style={{
+                                        backgroundImage: 'linear-gradient(110deg,#ff1744,#ff9100,#ffea00,#00e676,#00b0ff,#651fff,#e040fb,#ff1744)',
+                                        backgroundSize: '200% 100%',
+                                        animation: 'bbRainbowShift 4s linear infinite',
+                                      }}
+                                    />
+                                    <div aria-hidden="true" className="pointer-events-none absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-500" />
+                                    <div className="relative z-10">
+                                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 pb-4 border-b border-[#2a2418] group-hover:border-white/40 transition-colors">
+                                        <h4 className="text-3xl md:text-4xl font-['Gilda_Display',serif] text-[#e6c278] group-hover:text-white group-hover:[text-shadow:0_2px_14px_rgba(0,0,0,0.75)] transition-colors tracking-wide">
+                                          All Star Attack! [全星攻撃]
+                                        </h4>
+                                        <span className="self-start sm:self-auto bg-[#1c1a24] text-[#e6c278] border border-[#3d3423] group-hover:border-white/60 group-hover:bg-black/50 group-hover:text-white text-xs font-mono px-3 py-1 transition-colors">
+                                          ULTIMATE
+                                        </span>
+                                      </div>
+                                      <p className="text-base md:text-lg text-[#c7c2b5] group-hover:text-white group-hover:[text-shadow:0_1px_8px_rgba(0,0,0,0.7)] leading-relaxed transition-colors">
+                                        Your STRONGEST ULTIMATE MOVE in your kit. A full breakdown is coming soon.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </FadeScaleIn>
+                              </div>
                             </div>
                           </CodexBox>
                         </div>
@@ -2656,10 +3256,30 @@ export default function GameGuide() {
                               Interactive Mobility Mechanics
                             </h3>
                           </FadeScaleIn>
+                          <div role="tablist" aria-label="Mobility categories" className="flex flex-wrap gap-2 mb-6">
+                            {mobilityCategories.map((cat) => (
+                              <button
+                                key={cat.id}
+                                type="button"
+                                role="tab"
+                                aria-selected={mobilityCat === cat.id}
+                                onClick={() => setMobilityCat(cat.id)}
+                                className={`flex flex-col items-start px-4 py-2 border transition-all duration-200 ${
+                                  mobilityCat === cat.id
+                                    ? 'bg-[#032838] text-[#38bdf8] border-[#0284c7] shadow-[0_0_14px_rgba(2,132,199,0.4)] -translate-y-0.5'
+                                    : 'bg-[#09090c] text-[#8a8578] border-[#1e1b24] hover:text-[#c7c2b5] hover:border-[#3d3322]'
+                                }`}
+                              >
+                                <span className="font-['Cormorant_Upright',serif] text-base font-bold uppercase tracking-widest">{cat.label}</span>
+                                <span className="font-mono text-[10px] opacity-70">[{cat.hint}] · {cat.options.length} {cat.options.length === 1 ? 'move' : 'moves'}</span>
+                              </button>
+                            ))}
+                          </div>
                           <DynamicVideoPlate 
-                            title="Mobility & Traversal Demonstrations"
-                            options={mobilityOptions}
-                            defaultOptionId="walk-sprint"
+                            key={activeMobilityCat.id}
+                            title={`Mobility: ${activeMobilityCat.label}`}
+                            options={activeMobilityCat.options}
+                            defaultOptionId={activeMobilityCat.options[0]?.id}
                             sectionBadge="SELECT MOBILITY TECH"
                             variantTheme="cyan"
                             externalSelectedId={navVariantId}
