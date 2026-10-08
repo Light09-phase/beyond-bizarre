@@ -5,7 +5,7 @@
     "part": "Part 3",
     "color": "#8144e4",
     "confirmed": true,
-    "pfpSrc": "Source Here",
+    "pfpSrc": "https://tr.rbxcdn.com/180DAY-901c70aa1deaa0179685c4a69e3f2628/420/420/BackAccessory/Webp/noFilter",
     "fullArtSrc": "/Star Platinum Full Art.png",
     "quote": "I can't beat your ass without getting closer",
     "description": "Awakened in 1988, Jotaro Kujo was possessed by what he deemed an evil spirit. Star Platinum is the pinnacle of close-range combat, capable of breaking even the planet.\n\nBase Stats: M1 Damage: 8.1, M1 Uppercut: 10.2, Speed Tier: A, Power Tier: A.\n\nExtra Traits: Combo Break [Star Burst + Unstoppable Force] replaces standard combo break, stunning nearby opponents and canceling non-I-Frame moves.\n\nAdd-on Passives:\n- Star Guardian: Guard hitbox increased from 200° to 300°. Guard HP increases 100%-200% based on player's hp loss. Perfect Guards trigger a swift jab doing 20hp (cannot kill) and grant 10% more damage on the next hit.\n- True Stardust Spirit: Awakening costs 20 meters and 25% Stand Endurance. Special moves use 25% less endurance but require more heat. Dashes in awakening become flash warps. Awakening grants Super Armour (tanks up to 50 damage).\n\nMaturity Refineries:\n- Power (Immesurable Power): All damage becomes TRUE DAMAGE. Barrage Finisher gets a true block break end hit.\n- Agility (Shooting Star): Grab moves get 10% damage increase. Attack speed increases by 35% under 50% HP or in awakening.\n- Endurance (Unstoppable Force): Perfect guards give 15% more guard bar and 10 heat. Under 20% HP, combo break does a burst Timestop automatically putting you in awakening.",
@@ -13,390 +13,210 @@
     "standType": "Awakening (Class: Strength/Pow) - Close Range Grappler",
     "moves": [
       {
-        "id": "m2-brute-force",
-        "name": "M2/LMB - [Brute Force] 🔴",
-        "description": "Star Platinum grabs the opponent's neck and performs a secondary punch with their other hand straight to the victim's skull, sending them hurdling back.\n\nDamage: 3.3(Grab) + 13.6 + (Skull Damage) | CD: 10s\nTags: Grab | Ragdoll+Knockback | Guardable | COMBO ENDER/GRAB | CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.15s",
-        "videoSrc": "https://youtu.be/Gb36vi3tY-A?si=Njcbi-_SOvjUFQh6&t=22",
-        "hasFinisher": false,
-        "variants": [
-          {
-            "id": "m2-you-bastard",
-            "name": "M2/LMB [🧱] - [\"You Bastard!\"] 🔴",
-            "description": "Star Platinum chokes the enemy to the wall before using their other arm to release a one armed barrage of strikes to the opponent before punching them through the wall.\n\nDamage: 1.2 + 0.5*10 + 5.3 | CD: 10s\nTags: Ragdoll+Knockback | Guardable | Wall Crash | COMBO ENDER | CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.2s",
-            "videoSrc": "MOVE VIDEO HERE/m2-you-bastard.mp4"
-          },
-          {
-            "id": "m2-stand-uppercut",
-            "name": "M2/LMB [🔼] - [Stand Uppercut] 🔴",
-            "description": "The stand uppercuts the enemy into the air, allowing for air combos.\n\nDamage: 8.5 | CD: 10s\nTags: Stun (1.0s) | Guardable | Upper-Spike | COMBO EXTENDER | CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.1s",
-            "videoSrc": "MOVE VIDEO HERE/m2-stand-uppercut.mp4"
-          }
-        ],
-        "hasVariant": true,
+        "id": "so-e-blitz",
+        "name": "E - [Blitz Strike] 🔴",
+        "description": "Star Platinum zooms forward to punch the nearest opponent if they're in range.\n\nDamage: 8.5 | CD: 12s\nTags: Auto-Aim | Stun (0.7s) | Guardable | MIXUP | CLOSE RANGE+ | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 10",
+        "videoSrc": "https://youtu.be/ixdiHoJrkq4?si=3IE2eeNOeEMeILa3&t=42"
+      },
+      {
+        "id": "so-ee-rising",
+        "name": "E+E - [Rising Star] 🔴",
+        "description": "Star Platinum follows up with an upper punch that knocks the opponent away.\n\nDamage: 7.9 | CD: 10s\nTags: Follow-Up | Knockback+Ragdoll | Guard Break | Rebound | Light Parriable | Upper-Spike | ENDER | CLOSE RANGE+ | STAND POSITIONABLE\nResolve Cost: 5 | Resolve Gain: 0",
+        "videoSrc": "https://youtu.be/ixdiHoJrkq4?si=Uak-lfuPswMWZrZ0&t=54"
+      },
+      {
+        "id": "so-r-skull-shredder",
+        "name": "R - [Skull Shredder] 🔴",
+        "description": "Star Platinum blitzes out, grabs and crashes the victim to the floor and them tosses them away.\n\nDamage: 9.4 + 4.2 | CD: 15s\nTags: Knockback+Ragdoll | Guardable | COMBO ENDER | CLOSE+ RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 3+1",
+        "videoSrc": "https://drive.google.com/file/d/1ZBDqWW62xGuNOOP3iP41a3hu78h44lAb/view?usp=sharing",
         "videos": [
           {
-            "src": "https://youtu.be/Gb36vi3tY-A?si=Njcbi-_SOvjUFQh6&t=22",
-            "label": "Youtube2",
-            "start": "22",
-            "end": "25"
+            "src": "https://youtu.be/EVQkzgOdtjw?t=694",
+            "label": "REF2"
           }
         ]
       },
       {
-        "id": "e-barrage",
-        "name": "E [♦️] - [Barrage] 🔴",
-        "description": "Stand unleashes a burst of rapid punches, dealing stun (lasts 3.5s).\n\nDamage: 1.2*28 @8 hits/s | CD: 8s\nTags: Stun (0.5/hit) | Stun Evasive | Ragdoll Bypass | Guardable | Uncancellable | COMBO EXTENDER | EXTENDED CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 1*12 @4/s",
-        "videoSrc": "MOVE VIDEO HERE/star-platinum-barrage.mp4",
-        "hasFinisher": true,
-        "finisherDescription": "E+M2 - [Barrage Finisher] 🔴: Stand ends the barrage with a heavy strike that knocks away the opponent.\n\nDamage: 6.8 | CD: (E+2s)\nTags: Guard Break | True Follow-Up | Soft Ragdoll | Slight Knockback | Parriable | Uncancellable | COMBO ENDER [MINI CUTSCENE] | EXTENDED CLOSE RANGE\nHeat Cost: 5 | Heat Gain: 0 | Endlag: 0.15s",
-        "finisherVideoSrc": "MOVE VIDEO HERE/star-platinum-barrage-finisher.mp4"
-      },
-      {
-        "id": "r-star-breaker",
-        "name": "R - [Star Breaker] 🔴",
-        "description": "Star Platinum strikes the victim's skull with immense force, dealing massive damage.\n\nDamage: 19.5 | CD: 16s\nTags: Guard Break| Ragdoll | Heavy Knockback | Hyper Armor | Hyper Armor Crash | Heavy Parriable | Uncancellable | COMBO ENDER | CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 20 | Endlag: 0.3s",
-        "videoSrc": "MOVE VIDEO HERE/r-star-breaker.mp4",
-        "variants": [
-          {
-            "id": "r-skull-crusher",
-            "name": "R [🟥] - [Skull Crusher] 🔴",
-            "description": "Star Platinum charges its strike to unleash an even more powerful blow, crushing the opponents skull and sending them flying away. (User moves slightly forward upon use)\n\nDamage: 29.5 + (Skull Damage) | CD: 18s\nTags: Guard Break | Stand Crasher | Ragdoll | Heavy Knockback | Hyper Armor | Hyper Armor Bypass | Heavy Parriable | COMBO ENDER | CLOSE RANGE+ | STAND POSITIONABLE\nHeat Cost: 25 | Heat Gain: 0 | Endlag: 0.3s",
-            "videoSrc": "MOVE VIDEO HERE/r-skull-crusher.mp4",
-            "hasFinisher": true,
-            "finisherDescription": "R [🟥] - [Skull Crusher] Finisher: Partial Cutscene/Impact Frame. Star Platinum crushes the opponent's skull, shattering it 3 times before the entire skeleton is shattered, right before the stand launches the body miles away.\n\nHP Required: >40hp",
-            "finisherVideoSrc": "MOVE VIDEO HERE/r-skull-crusher-finisher.mp4"
-          }
-        ],
-        "hasVariant": true
-      },
-      {
-        "id": "t-star-finger",
-        "name": "T - [\"Star Finger!\"] 🔴",
-        "description": "Star Platinum extends its index and middle fingers to pierce anyone within its range.\n\nDamage: 10.3 + [BLEED(T1)] | CD: 12s\nTags: True Stun (0.85s) | Guardable | Dodge Bypass | Enemy Pull | Knockback Cancel | COMBO EXTENDER/MIXUP | CLOSE RANGE+\nHeat Cost: 0 | Heat Gain: 5",
-        "videoSrc": "MOVE VIDEO HERE/t-star-finger.mp4",
-        "variants": [
-          {
-            "id": "t-down",
-            "name": "T [🔝] - [\"I’ll stop him before he kills me!\"] 🔴",
-            "description": "Star Platinum swipes its finger, slicing the opponent downwards.\n\nDamage: 12.3 + [BLEED(T1)] | CD: 14s\nTags: Soft Ragdoll | Guardable | Rebound | Enemy Pull | Knockback Cancel | Grounded Bypass | Stun (0.45s) | COMBO EXTENDER/MIXUP | CLOSE RANGE+\nHeat Cost: 0 | Heat Gain: 5",
-            "videoSrc": "MOVE VIDEO HERE/t-down.mp4"
-          },
-          {
-            "id": "t-whirling",
-            "name": "T [✴️] - [Whirling Star] 🔴",
-            "description": "Star Platinum zooms out, grabs their opponent and spins them around a couple times, before throwing them away (User is left behind).\n\nDamage: 9.1 | CD: 12s\nTags: Aimable(Camera) | Guardable | Knockback | Stun (0.65s) | COMBO EXTENDER | SEMI MID RANGE\nHeat Cost: 0 | Heat Gain: 6",
-            "videoSrc": "MOVE VIDEO HERE/t-whirling.mp4"
-          }
-        ],
-        "hasVariant": true
-      },
-      {
-        "id": "g-stardust-smash",
-        "name": "G [♦️+❇️] - [Stardust Smash] 🔴",
-        "description": "Star Platinum destroys the ground beneath them with its fist, forming a massive crater that is larger and more spiked towards the front. Each of the 3 charge stages do 15% more dmg. Can be used to get out stun.\n\nDamage: 20.8 (Front) + 18.2 (AOE) | CD: 23s\nTags: Grounded Bypass | Guard Break | Knockback+Ragdoll | Stand Crash | Hyper Armor+Break | Heavy Parriable[Unparriable at 3rd charge] | Dodge Bypass | Stun Evasive | COMBO ENDER | AOE (SMALL - SUB-MID SCALE)\nHeat Cost: 0 | Heat Gain: 8 | Endlag: 0.35s",
-        "videoSrc": "MOVE VIDEO HERE/g-stardust-smash.mp4"
-      },
-      {
-        "id": "g-stardust-meteor",
-        "name": "G [⏏️]  - [Stardust Meteor] 🔴",
-        "description": "Star Platinum does a diving downward punch into the ground after a stand jump to unleash an even more powerful impact, destroying anything in the area.\n\nDamage: 28.7 | CD: 23s\nTags: Grounded Bypass | True Guard Break | Knockback+Ragdoll | Stand Crash | Hyper Armor+Hyper Armor Bypass | Aimable | Dodge Bypass | COMBO ENDER | AOE (SUB-MID - MID SCALE)\nHeat Cost: 0 | Heat Gain: 8 | Endlag: 0.35s",
-        "videoSrc": "MOVE VIDEO HERE/g-stardust-meteor.mp4"
-      },
-      {
-        "id": "x-mach-impact",
-        "name": "X [🛡️] - [Mach Impact] 🔴",
-        "description": "Star Platinum lunges forward for a powerful skull punch to the opponent, knocking them back from the impact (Has 3 charge stages, this is 1st stage).\n\nDamage: 16.2 | CD: 12s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | COMBO EXTENDER | SEMI-MID RANGE\nHeat Cost: 0 | Heat Gain: 5 | Endlag: 0.3s",
-        "videoSrc": "MOVE VIDEO HERE/x-mach-impact.mp4"
-      },
-      {
-        "id": "x-supersonic-impact",
-        "name": "X [1st 🟥] [🛡️] - [Supersonic Impact] 🔴",
-        "description": "Star Platinum lunges forward for a hard hitting punch to the opponent’s skull, (2nd Stage).\n\nDamage: 18.2 | CD: 12s\nTags: Knockback+Soft Ragdoll | Guard Break | Heavy Parriable | COMBO EXTENDER/ENDER | SEMI-MID RANGE\nHeat Cost: 0 | Heat Gain: 7 | Endlag: 0.35s",
-        "videoSrc": "MOVE VIDEO HERE/x-supersonic-impact.mp4"
-      },
-      {
-        "id": "x-hypersonic-impact",
-        "name": "X [ 2nd 🟥] [🛡️] - [Hypersonic Impact] 🔴",
-        "description": "Star Platinum lunges out for a powerful punch to the opponent’s skull, knocking them away from the impact. (Third and final charge of mach impact).\n\nDamage: 20.2 | CD: 12s\nTags: Heavy Knockback+Ragdoll | True Guard Break | COMBO ENDER | SEMI-MID RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 9 | Endlag: 0.4s",
-        "videoSrc": "MOVE VIDEO HERE/x-hypersonic-impact.mp4",
-        "hasFinisher": true,
-        "finisherDescription": "X [🟥] - [Hypersonic Impact] Finisher: Non-Cutscene. A hitstop effect occurs right before the victim is sent flying miles away (body causes destruction).\n\nHP Required >40hp",
-        "finisherVideoSrc": "MOVE VIDEO HERE/x-hypersonic-impact-finisher.mp4"
-      },
-      {
-        "id": "x-c-judge-you",
-        "name": "X [🟥]+C  - [\"I’ll Judge You Myself!\"] 🔴",
-        "description": "Star Platinum lunges forward and grabs the opponent before doing a series of punches with its right arm and finally uppercutting them into the air. Each charge variant does a different version upon impact (Variant 1: Non-Cutscene, Variant 2: Short Cutscene, Variant 3: Cutscene w/ Skull Damage + Grand Upper-Spike).\n\nDamage: Dependant on variant | CD: Dependant on Variant\nTags: Light Parriable[Unparriable at 3rd charge] | Guard Bypass | Knockback+Ragdoll | Grab | Hyper Armor Crash | Rebound | Uncancellable | Upper-Spike | COMBO ENDER [SUPER] | SEMI-MID RANGE | STAND POSITIONABLE\nHeat Cost: 40 | Heat Gain: 0 | Endlag: 0.5s (if missed)",
-        "videoSrc": "MOVE VIDEO HERE/x-c-judge-you.mp4",
-        "hasFinisher": true,
-        "finisherDescription": "X+C (Variant 3) - [\"I’ll Judge You Myself!\"] Finisher: Cutscene Finisher. On the final uppercut hit, Star Platinum puts in more force, releasing its punch as the victim is seen in the background flying in the sky with a cartoon twinkle.\n\nHP Required >65hp",
-        "finisherVideoSrc": "MOVE VIDEO HERE/x-c-judge-you-finisher.mp4"
-      },
-      {
-        "id": "x-t-beat-breath",
-        "name": "X+T - [\"Beat In A Breath\"] 🔴",
-        "description": "Star Platinum does a strong inhale that can pull multiple enemies towards him.\n\nDamage: 0 | CD: 10s\nTags: True Stun (0.75s) | Guard Bypass | Dodge Bypass | Enemy Pull | Knockback Cancel | COMBO EXTENDER/MIXUP | SEMI-MID | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 0 | Endlag: 0.45s (if missed)",
-        "videoSrc": "MOVE VIDEO HERE/x-t-beat-breath.mp4"
-      },
-      {
-        "id": "y-jaw-breaker",
-        "name": "Y - [Jaw Breaker] 🔴",
-        "description": "Star Platinum does a shoving elbow jab at the opponent’s jaw that stuns them.\n\nDamage: 9.5 | CD: 12s\nTags: Guardable | Stun (0.65s) | Push Back | MIXUP | EXTENDED CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 8",
-        "videoSrc": "MOVE VIDEO HERE/y-jaw-breaker.mp4"
-      },
-      {
-        "id": "c-immense-power",
-        "name": "C - [\"What Immense Power!\"] 🔴",
-        "description": "Star Platinum lunges out and drags the opponent on the ground before throwing them in the air.\n\nDamage: 5.3 | CD: 12s\nTags: Guardable | Grab | Medium Knockback+Soft Ragdoll | Stun (0.5s) | Rebound | COMBO EXTENDER/ENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 12 | Endlag: 0.2s",
-        "videoSrc": "MOVE VIDEO HERE/c-immense-power.mp4",
-        "variants": [
-          {
-            "id": "c-up-no-mercy",
-            "name": "C [⬆️] - [\"No Mercy!\"] 🔴",
-            "description": "Star Platinum does an uppercut, before slamming the opponent back down to the ground with a strong hit.\n\nDamage: 8.2 + 11.2 | CD: 12s\nTags: True Guard Break | Knockback+Ragdoll | Down-Spike | COMBO ENDER [PARTIAL CUTSCENE] | CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 4+10 | Endlag: 0.2s",
-            "videoSrc": "MOVE VIDEO HERE/c-up-no-mercy.mp4"
-          }
-        ],
-        "hasVariant": true
-      },
-      {
-        "id": "c-space-immense-power",
-        "name": "C+[SPACE]{HELD} [🔼] - [\"What Immense Power!\"] 🔴",
-        "description": "Star Platinum lunges out and drags the opponent on the ground before throwing them in the air.\n\nDamage: 5.3 | CD: 12s\nTags: Guardable | Grab | Knockback+Soft Ragdoll | Stun (0.5s) | Rebound | Upper-Spike | COMBO EXTENDER/ENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 12 | Endlag: 0.2s",
-        "videoSrc": "MOVE VIDEO HERE/c-space-immense-power.mp4"
-      },
-      {
-        "id": "z-star-synchrony",
-        "name": "Z - [Star Synchrony] 🔴",
-        "description": "The user runs up and grabs the opponent, tumbling over with the victim’s neck in their arms. Star Platinum summons and the user chokes the victim, allowing Star Platinum to M1 before spinning them around and throwing them away.\n\nDamage: 8.2 (grab) + 6.3 (throw) | CD: 25s\nTags: Grab | Guard-Bypass | Light Parriable | Hyper Armor | Dodge Bypass > Knockback + Ragdoll | Rebound | COMBO ENDER [SUPER & PARTIAL CUTSCENE] | MID RANGE\nHeat Cost: 30 | Heat Gain: 0 | Endlag: 0.5s(if missed)",
-        "videoSrc": "MOVE VIDEO HERE/z-star-synchrony.mp4",
-        "hasFinisher": true,
-        "finisherDescription": "Z - [Star Synchrony] Finisher: Cutscene. A cinematic beatdown where Star Platinum comes forward to face the victim, finishing with a black screen impact.\n\nHP Required >45hp",
-        "finisherVideoSrc": "MOVE VIDEO HERE/z-star-synchrony-finisher.mp4",
-        "variants": [
-          {
-            "id": "z-up-star-drive",
-            "name": "Z [⬆️/✴️] - [Star Drive] 🔴",
-            "description": "Star Platinum catches the enemy, throws them in the air, before catching them and pile driving them to the floor.\n\nDamage: 5.2 (grab) + 29.3 (ground hit) | CD: 20s\nTags: Camera Aimable | Hyper Armor | True Guard Bypass | Grab | Knockback+Ragdoll | COMBO ENDER | CLOSE RANGE\nHeat Cost: 20 | Heat Gain: 0 | Endlag: 0.4s(if missed)",
-            "videoSrc": "MOVE VIDEO HERE/z-up-star-drive.mp4"
-          }
-        ],
-        "hasVariant": true
-      },
-      {
-        "id": "h-stellar-resolve",
-        "name": "H - [Stellar Resolve] 🟣",
-        "description": "The user awakens its inner resolve and grows more powerful, as Star platinum goes in front of the user as the user does the iconic pose and yells in rage before returning to its original stance.\n\nDamage: 1*10+25 | CD: 50s\nTags: I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | Slows if in AOE | Stun (0.9s) | Push-Back | AWAKENING MOVE + PARTIAL-CUTSCENE | SUB-MID AOE\nHeat Cost: 50 | Heat Gain: 0",
-        "videoSrc": "MOVE VIDEO HERE/h-stellar-resolve.mp4",
-        "variants": [
-          {
-            "id": "h-up-stellar-resolve",
-            "name": "H [⬆️] - [Stellar Resolve] 🟣",
-            "description": "The user awakens its inner resolve and grows more powerful, as Star platinum bursts out with rage.\n\nDamage: 1*10+25 | CD: 50s\nTags: I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | Slows if in AOE | Stun (0.9s) | Push-Back | AWAKENING MOVE + PARTIAL-CUTSCENE | SUB-MID AOE\nHeat Cost: 50 | Heat Gain: 0",
-            "videoSrc": "MOVE VIDEO HERE/h-up-stellar-resolve.mp4"
-          },
-          {
-            "id": "h-red-stellar-resolve",
-            "name": "H [🟥] - [Stellar Resolve] 🟣",
-            "description": "CUTSCENE: The user drops to the floor on his knees then enters a flashback. Star Platinum's arm partially manifests and causes a massive crater, bigger than G move, and the roar stuns players and knocks them away at the end.\n\nDamage: 12.2+ 1.2*7+7.3 | CD: 50s\nTags: True I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | 90% Slowed after groundslam | Knockback+Ragdoll after roar | Stun (0.55s) | AWAKENING MOVE [SUPER & PARTIAL CUTSCENE] | MID+ AOE\nHeat Cost: 50 | Heat Gain: 0",
-            "videoSrc": "MOVE VIDEO HERE/h-red-stellar-resolve.mp4"
-          }
-        ],
-        "hasVariant": true
-      },
-      {
-        "id": "j-destructive-uppercut",
-        "name": "J - [Destructive Uppercut] 🔴",
-        "description": "Star Platinum lunges forward and grabs the opponent, and launches them into the air before doing a second uppercut punch.\n\nDamage: 3.2 (grab)+ 21.3 (punch)+ (Torso Damage) | CD: 16s\nTags: Guardable | Grab | Knockback | Soft Ragdoll | Upper-Spike | COMBO EXTENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.3s(if missed)",
-        "videoSrc": "MOVE VIDEO HERE/j-destructive-uppercut.mp4",
-        "hasFinisher": true,
-        "finisherDescription": "J - [Destructive Uppercut] Finisher: Cutscene. As the victim flies in the air, Star Platinum ZOOMS out to deliver a final punch to the victim.\n\nHP Required >30hp",
-        "finisherVideoSrc": "MOVE VIDEO HERE/j-destructive-uppercut-finisher.mp4",
-        "variants": [
-          {
-            "id": "j-up-sparking-fist",
-            "name": "J [🔼] - [Sparking Fist] 🔴",
-            "description": "Star Platinum and the user charges before lunging a punch forward that hits the enemy’s head before a second gut punch that sends the victim flying far away.\n\nDamage: 25.3 + (Aimed Body Part Damage) | CD: 16s\nTags: Guard Break | Knockback | Soft Ragdoll | Light Parriable | Hyper Armor | Grounded Bypass | COMBO EXTENDER | SEMI-MID RANGE\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.3s(if missed)",
-            "videoSrc": "MOVE VIDEO HERE/j-up-sparking-fist.mp4"
-          },
-          {
-            "id": "j-wall-crushing-fist",
-            "name": "J [🧱] - [Crushing Fist] 🔴",
-            "description": "Star Platinum does a series of punches to the victim on the wall before a final punch to send them away.\n\nDamage: 25.3 + (Aimed Body Part Damage) | CD: 16s\nTags: Guard Break | Knockback | Soft Ragdoll | Light Parriable | Hyper Armor | Grounded Bypass | COMBO EXTENDER | SEMI-MID RANGE\nHeat Cost: 0 | Heat Gain: 10 | Endlag: 0.3s(if missed)",
-            "videoSrc": "MOVE VIDEO HERE/j-wall-crushing-fist.mp4"
-          },
-          {
-            "id": "j-up-red-nova",
-            "name": "J [🔼🟥] - [Nova Sparking Fist] 🔴",
-            "description": "Star Platinum and the user charges even more before lunging a punch forward. Upon impact, the stand drives their fist into the victim slowly until they blow away from the impact.\n\nDamage: 29.3 (punch)+ (Aimed Body Part Damage) | CD: 16s\nTags: True Guard Break | Heavy Knockback | Ragdoll | Counter Bypass | Hyper Armor+ Crash | Grounded Bypass | COMBO ENDER | SEMI-MID RANGE\nHeat Cost: 15 | Heat Gain: 0 | Endlag: 0.4s(if missed)",
-            "videoSrc": "MOVE VIDEO HERE/j-up-red-nova.mp4",
-            "hasFinisher": true,
-            "finisherDescription": "J [🔼🟥] - [Nova Sparking Fist] Finisher: Non-Cutscene. Upon Impact, the screen goes grey for a second as the stand’s fist drives deeper into the victim's skull. Until their skull explodes due to the sheer force.\n\nHP Required >30hp",
-            "finisherVideoSrc": "MOVE VIDEO HERE/j-up-red-nova-finisher.mp4"
-          }
-        ],
-        "hasVariant": true
-      },
-      {
-        "id": "j-x-destructive-impact",
-        "name": "J+X - [Destructive Impact] 🔴",
-        "description": "Star Platinum lunges forward and grabs the opponent, and launches them into the air before doing a second skull punch to send them away.\n\nDamage: 3.2 (grab)+ 26.3 (punch)+ (Skull Damage) | CD: 16s\nTags: Guardable | Grab | Knockback | Soft Ragdoll | Rebound | COMBO EXTENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 12 | Endlag: 0.3s(if missed)",
-        "videoSrc": "MOVE VIDEO HERE/j-x-destructive-impact.mp4",
-        "hasFinisher": true,
-        "finisherDescription": "J+X - [Destructive Impact] Finisher: Cutscene. As the victim flies in the air, The user flash steps behind the enemy and follows up with an uppercut.\n\nHP Required >45hp",
-        "finisherVideoSrc": "MOVE VIDEO HERE/j-x-destructive-impact-finisher.mp4"
-      },
-      {
-        "id": "so-e-blitz",
-        "name": "[Stand-Off] E - [Blitz Strike] 🔴",
-        "description": "Star Platinum zooms forward to punch the nearest opponent if they're in range.\n\nDamage: 8.5 | CD: 12s\nTags: Auto-Aim | Stun (0.7s) | Guardable | MIXUP | CLOSE RANGE+ | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 10",
-        "videoSrc": "MOVE VIDEO HERE/so-e-blitz.mp4"
-      },
-      {
-        "id": "so-ee-rising",
-        "name": "[Stand-Off] E+E - [Rising Star] 🔴",
-        "description": "Star Platinum follows up with an upper punch that knocks the opponent away.\n\nDamage: 7.9 | CD: 10s\nTags: Follow-Up | Knockback+Ragdoll | Guard Break | Rebound | Light Parriable | Upper-Spike | ENDER | CLOSE RANGE+ | STAND POSITIONABLE\nHeat Cost: 5 | Heat Gain: 0",
-        "videoSrc": "MOVE VIDEO HERE/so-ee-rising.mp4"
-      },
-      {
-        "id": "so-r-skull-shredder",
-        "name": "[Stand-Off] R - [Skull Shredder] 🔴",
-        "description": "Star Platinum blitzes out, grabs and crashes the victim to the floor and them tosses them away.\n\nDamage: 9.4 + 4.2 | CD: 15s\nTags: Knockback+Ragdoll | Guardable | COMBO ENDER | CLOSE+ RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 3+1",
-        "videoSrc": "MOVE VIDEO HERE/so-r-skull-shredder.mp4"
-      },
-      {
         "id": "so-t-neo-star",
-        "name": "[Stand-Off] T [♦️] - [Neo Star Breaker] 🔴",
-        "description": "Star Platinum charges one of its strongest punches at the victim. For every 3 seconds this is held, the move gets 50% more damage.\n\nDamage: [Minimum] 16.0 | CD: 30s (+10s if past 4s charge)\nTags: Heavy Knockback+Ragdoll | True Guard Break | Counter Bypass | Dodge Bypass | COMBO ENDER | CLOSE+ RANGE | STAND POSITIONABLE | AUTO STAND SUMMON\nHeat Cost: 15 | Heat Gain: 0",
-        "videoSrc": "MOVE VIDEO HERE/so-t-neo-star.mp4"
+        "name": "T [♦️] - [Neo Star Breaker] 🔴",
+        "description": "Star Platinum charges one of its strongest punches at the victim. For every 3 seconds this is held, the move gets 50% more damage.\n\nDamage: [Minimum] 16.0 | CD: 30s (+10 seconds if past 4s charge)\nTags: Heavy Knockback+Ragdoll | True Guard Break | Counter Bypass | Dodge Bypass | COMBO ENDER | CLOSE+ RANGE | STAND POSITIONABLE | AUTO STAND SUMMON\nResolve Cost: 15 | Resolve Gain: 0 | Style Rank Requirement: BB+ | Endlag: 0.7s",
+        "videoSrc": "https://youtu.be/zBxzuTWiCKo?si=mgQ2ARK8AeG2a1o2&t=42",
+        "videos": [
+          {
+            "src": "https://youtu.be/6aoNFrm9f1k?t=21",
+            "label": "REF2"
+          }
+        ]
       },
       {
         "id": "so-y-back-off",
-        "name": "[Stand-Off] Y - [\"Back Off!\"] 🔴",
-        "description": "The user grabs the opponent as star platinum knocks them away.\n\nDamage: 9.2 | CD: 15s\nTags: Knockback+Soft Ragdoll | Guardable | Counter Bypass | COMBO ENDER/EXTENDER | CLOSE RANGE | AUTO STAND SUMMON\nHeat Cost: 0 | Heat Gain: 5",
-        "videoSrc": "MOVE VIDEO HERE/so-y-back-off.mp4",
+        "name": "Y - [“Back Off!”] 🔴",
+        "description": "The user grabs the opponent as star platinum knocks them away.\n\nDamage: 9.2 | CD: 15s\nTags: Knockback+Soft Ragdoll | Guardable | Counter Bypass | COMBO ENDER/EXTENDER | CLOSE RANGE | AUTO STAND SUMMON\nResolve Cost: 0 | Resolve Gain: 5",
+        "videoSrc": "https://youtu.be/R8dzW4BOffI?t=77",
         "variants": [
           {
             "id": "so-y-knockout",
-            "name": "[Stand-Off] Y [✴️] - [\"Knockout!\"] 🔴",
-            "description": "Star Platinum appears in front of the enemy and grabs them before slamming them vertically to the ground.\n\nDamage: 13.3 (-10% per 10 studs past 20 stud range, limit=70) | CD: 15s\nTags: Knockback+Soft Ragdoll | Guardable | Dodge Bypass | COMBO ENDER/EXTENDER | MID + RANGE\nHeat Cost: 15 | Heat Gain: 0",
-            "videoSrc": "MOVE VIDEO HERE/so-y-knockout.mp4"
+            "name": "Y [✴️] - [“Knockout!”] 🔴",
+            "description": "Star Platinum appears in front of the enemy and grabs them before slamming them vertically to the ground.\n\nDamage: 13.3 (-10% per 10 studs past 20 stud range,limit=70) | CD: 15s\nTags: Knockback+Soft Ragdoll | Guardable | Dodge Bypass | COMBO ENDER/EXTENDER | MID + RANGE\nResolve Cost: 15 | Resolve Gain: 0",
+            "videoSrc": "https://youtu.be/UlejUTQhFkw?t=1030"
           }
         ],
         "hasVariant": true
       },
       {
         "id": "so-yr-understand",
-        "name": "[Stand-Off] Y+R - [\"Do You Understand?\"] 🔴",
-        "description": "The user grabs the opponent and restrains from behind for a couple seconds.\n\nDamage: 2.1 | CD: 15s\nTags: Knockback+Soft Ragdoll | Guardable | Counter Bypass | COMBO ENDER/EXTENDER | CLOSE RANGE | AUTO STAND SUMMON\nHeat Cost: 0 | Heat Gain: 1",
-        "videoSrc": "MOVE VIDEO HERE/so-yr-understand.mp4",
+        "name": "Y+R - [“Do You Understand?”] 🔴",
+        "description": "The user grabs the opponent and restrains from behind for a couple seconds.\n\nDamage: 2.1 | CD: 15s\nTags: Knockback+Soft Ragdoll | Guardable | Counter Bypass | COMBO ENDER/EXTENDER | CLOSE RANGE | AUTO STAND SUMMON\nResolve Cost: 0 | Resolve Gain: 1",
+        "videoSrc": "https://youtu.be/R8dzW4BOffI?t=77",
         "variants": [
           {
             "id": "so-yr-missed",
-            "name": "[Stand-Off] Y+R [🛑] - [\"Do You Understand\" Missed] 🔴",
-            "description": "When Missed, Star Platinum does a strong inhale that pulls in the enemy.\n\nDamage: 0.0 | CD: 15s\nTags: True Stun (0.85s) | Guardable | Dodge Bypass | Enemy Pull | Knockback Cancel | COMBO EXTENDER/MIXUP | SEMI MID\nHeat Cost: 0 | Heat Gain: 0",
-            "videoSrc": "MOVE VIDEO HERE/so-yr-missed.mp4"
+            "name": "Y+R [🛑] - [“Do You Understand”] 🔴",
+            "description": "When Missed, Star Platinum does a strong inhale that pulls in the enemy.\n\nDamage: 0.0 | CD: 15s\nTags: True Stun (0.85s) | Guardable | Dodge Bypass | Enemy Pull | Knockback Cancel | COMBO EXTENDER/MIXUP | SEMI MID\nResolve Cost: 0 | Resolve Gain: 0",
+            "videoSrc": "https://youtu.be/R8dzW4BOffI?t=77"
           }
         ],
         "hasVariant": true
       },
       {
         "id": "so-yre-brutal",
-        "name": "[Stand-Off] Y+R+E - [Brutal Beatdown] 🔴",
-        "description": "When used, Star Platinum comes out and does a swift combo of attacks leading to an uppercut hit before throwing them away from their legs.\n\nDamage: 2.1 + X | CD: 15s\nTags: Knockback+Soft Ragdoll | Guardable | Counter Bypass | COMBO ENDER/EXTENDER | CLOSE RANGE | AUTO STAND SUMMON\nHeat Cost: 0 | Heat Gain: 1+X",
-        "videoSrc": "MOVE VIDEO HERE/so-yre-brutal.mp4"
+        "name": "Y+R+E - [Brutal Beatdown] 🔴",
+        "description": "When used, Star Platinum comes out and does a swift combo of attacks leading to an uppercut hit before throwing them away from their legs.\n\nDamage: 2.1 + X | CD: 15s\nTags: Knockback+Soft Ragdoll | Guardable | Counter Bypass | COMBO ENDER/EXTENDER | CLOSE RANGE | AUTO STAND SUMMON\nResolve Cost: 0 | Resolve Gain: 1+X | Style Rank Requirement: C+",
+        "videoSrc": "https://youtu.be/ItkvDX-Q0E8?t=486"
       },
       {
         "id": "so-h-platinum-fists",
-        "name": "[Stand-Off] H - [Platinum Fists] 🔴",
-        "description": "Star Platinum engulfs the user’s arms partially, acting as a damage, defence and attack speed buff. Mode can be toggled on and off freely.\n\nDamage: Null | CD: 10s\nTags: Move Buff | PASSIVE BUFFER | RANGE IRRELEANT\nHeat Cost: 20 + 5/s | Heat Gain: 0",
-        "videoSrc": "MOVE VIDEO HERE/so-h-platinum-fists.mp4"
+        "name": "H - [Platinum Fists] 🔴",
+        "description": "Star Platinum engulfs the user’s arms partially, acting as a damage, defence and attack speed buff, any move in the stand’s moveset used will end this mode. This mode can be toggled on and off freely.\n\nDamage: Null | CD: 10s\nTags: Move Buff | PASSIVE BUFFER | RANGE IRRELEANT\nResolve Cost: 20 + 5/s | Resolve Gain: 0 | Style Rank Requirement: B+",
+        "videoSrc": "https://youtu.be/vjrJTTPZ62o?t=345"
       }
     ],
     "awakeningMoves": [
       {
         "id": "awk-m2-crushing-grip",
         "name": "M2 - [Crushing Grip] 🔴",
-        "description": "Star Platinum grabs the opponent and throws them away with one arm.\n\nDamage: 14.2 | CD: 10s\nTags: Guardable | Knockback | Soft Ragdoll | COMBO ENDER | CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 6",
-        "videoSrc": "MOVE VIDEO HERE/awk-m2-crushing-grip.mp4"
+        "description": "Star Platinum grabs the opponent and throws them away with one arm.\n\nDamage: 14.2 | CD: 10s\nTags: Guardable | Knockback (Soft) | COMBO ENDER | CLOSE RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 6",
+        "videoSrc": "https://youtu.be/tQcAkIOVWd0?si=smEF8hGuG8k32g8K&t=539"
       },
       {
         "id": "awk-m2x-crushing-rage",
-        "name": "M2+X - [Crushing Rage] 🔴",
-        "description": "Star Platinum grabs the opponent and slams them on the ground before tossing them away with one arm.\n\nDamage: 17.2 + 3.2 + (Torso Damage) | CD: 10s\nTags: Guardable | Knockback | Soft Ragdoll | COMBO ENDER | CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 6",
-        "videoSrc": "MOVE VIDEO HERE/awk-m2x-crushing-rage.mp4"
+        "name": "M2+X (Before throw) - [Crushing Rage] 🔴",
+        "description": "Star Platinum grabs the opponent and slams them on the ground before tossing them away with one arm.\n\nDamage: 17.2 + 3.2 + (Torso Damage) | CD: 10s\nTags: Guardable | Knockback | Soft Ragdoll | COMBO ENDER | CLOSE RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 6",
+        "videoSrc": "https://youtu.be/SSyTqS5C8No?t=40"
       },
       {
         "id": "awk-m2xc-crushing-fury",
-        "name": "M2+X+C - [Crushing Fury] 🔴",
-        "description": "Star Platinum grabs the opponent and slams them on the ground, dragging them on the floor and throwing them into the air.\n\nDamage: 17.2 + 3.2 | CD: 10s\nTags: Guardable | Knockback | Soft Ragdoll | COMBO ENDER | CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 6",
-        "videoSrc": "MOVE VIDEO HERE/awk-m2xc-crushing-fury.mp4"
+        "name": "M2+X+C (Before throw) - [Crushing Fury] 🔴",
+        "description": "Star Platinum grabs the opponent and slams them on the ground, dragging them on the floor and throwing them into the air.\n\nDamage: 17.2 + 3.2 | CD: 10s\nTags: Guardable | Knockback | Soft Ragdoll | COMBO ENDER | CLOSE RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 6",
+        "videoSrc": "https://youtu.be/SSyTqS5C8No?t=60"
       },
       {
         "id": "awk-r-star-breaker",
         "name": "R [♦️] - [Star Breaker] 🔴",
-        "description": "This move loses the charged variant, however, for every 2 seconds this is held, the move’s power is increased by 50%.\n\nDamage: 20.0 + (Skull Damage) | CD: 18s\nTags: Guard Break | True Follow-Up | Ragdoll | Heavy Knockback | Hyper Armor | Hyper Armor Crash | Heavy Parriable | Uncancellable | COMBO ENDER | CLOSE RANGE",
-        "videoSrc": "MOVE VIDEO HERE/awk-r-star-breaker.mp4"
+        "description": "This move loses the charged variant, however, for every 2 seconds this is held, the move’s power is increased by 50%. Similar props to base R.\n\nDamage: 20.0 + (Skull Damage) | CD: 18s\nTags: Guard Break | True Follow-Up | Ragdoll | Heavy Knockback | Hyper Armor | Hyper Armor Crash | Heavy Parriable | Uncancellable | COMBO ENDER | CLOSE RANGE",
+        "videoSrc": ""
       },
       {
         "id": "awk-x-lightspeed-impact",
         "name": "X [3nd 🟥] [🛡️] - [Lightspeed Impact] 🔴",
-        "description": "Star Platinum blitzes out for a powerful lightspeed punch to the opponent’s skull. The pressure from the wind acts as a projectile.\n\nDamage: 40.4 | CD: 20s\nTags: Heavy Knockback+Ragdoll | True Guard Bypass | Rebound | COMBO ENDER | MID RANGE + SEMI-MID RANGE | STAND POSITIONABLE\nHeat Cost: 15 | Heat Gain: 5 | Endlag: 0.8s",
-        "videoSrc": "MOVE VIDEO HERE/awk-x-lightspeed-impact.mp4"
+        "description": "Star Platinum blitzes out for a powerful lightspeed punch to the opponent’s skull, knocking them far away from the impact. Even if missed, the pressure from the wind acts as a projectile that shoots out. (New Fourth and final charge of mach impact).\n\nDamage: 40.4 | CD: 20s\nTags: Heavy Knockback+Ragdoll | True Guard Bypass | Rebound | COMBO ENDER | MID RANGE + SEMI-MID RANGE | STAND POSITIONABLE\nResolve Cost: 15 | Resolve Gain: 5 | Style Rank Requirement: B+ | Endlag: 0.8s",
+        "videoSrc": "https://youtu.be/lpfIu6ZN15Y?t=276&si=_8F2HqE2wYy1OXFR",
+        "videos": [
+          {
+            "src": "https://youtu.be/gRts1GZeBy4?t=31",
+            "label": "REF2"
+          }
+        ]
       },
       {
         "id": "awk-h-timestop",
-        "name": "H - [\"Star Platinum!\"] 🟣",
-        "description": "Star Platinum stops the flow of time down to a standstill. Can be pre-emptively ended. Counters other timestops.\n\nCD: 30s (-10s for each second cut short) | Cost: 50% Stand Endurance/s\nTags: True Stun | Hyper Armor | SPECIAL MOVE [PARTIAL CUTSCENE] | AOE (HYPER LARGE SCALE)\nHeat Requirement: 25 | Heat Gain Reduction: 50%",
-        "videoSrc": "MOVE VIDEO HERE/awk-h-timestop.mp4"
+        "name": "H - [“Star Platinum!”] 🟣",
+        "description": "Star Platinum uses its new found power to stop the flow of time down to a standstill. By pressing H again at any point in the timestop, the user can pre-emptively end the ability. And by pressing H during another timestop, a player can move as well, if the player stops moving or stands still their “countdown” for how long they move in ts is paused. If a player’s timestop extends beyond another’s timestop’s duration. The player simply outlast the other’s timestop. More features: see the linked doc (More Features).\n\nCD: 30s (-10s for each second cut short) | Cost: 50% Stand Endurance/s\nTags: True Stun | Hyper Armor | SPECIAL MOVE [PARTIAL CUTSCENE] | AOE (HYPER LARGE SCALE) | UTILITY\nResolve Requirement: 25 | Resolve Gain Reduction: 50% | Style Rank Requirement: A+",
+        "videoSrc": "https://youtu.be/pSa0eV9O5oQ?t=2",
+        "videos": [
+          {
+            "src": "https://www.youtube.com/shorts/FZtC52z8XRo?t=8&feature=share",
+            "label": "ANIM2"
+          },
+          {
+            "src": "https://youtu.be/tmMnf2CIMg0?t=24",
+            "label": "Utility"
+          },
+          {
+            "src": "https://docs.google.com/document/d/1E9KIOD-EWSJhtWT_VTRaGNbri5kxHTVkToBgDoRopH0/edit?tab=t.6jqm9xfj4qb2",
+            "label": "More Features"
+          }
+        ]
       },
       {
         "id": "awk-hm2-grab",
         "name": "H+M2/LMB - [Grab] 🔴",
-        "description": "Star Platinum simply grabs the opponent, clicking again throws them.\n\nDamage: 5.0 | CD: 10s\nTags: Grab | Ragdoll+Knockback | Guardable | GRAB | CLOSE RANGE\nHeat Cost: 0 | Heat Gain: 0 | Endlag: 0.15s",
-        "videoSrc": "MOVE VIDEO HERE/awk-hm2-grab.mp4"
+        "description": "Star Platinum simply grabs the opponent, clicking again throws them.\n\nDamage: 5.0 | CD: 10s\nTags: Grab | Ragdoll+Knockback | Guardable | GRAB | CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 0 | Endlag: 0.15s",
+        "videoSrc": "https://youtu.be/Gb36vi3tY-A?si=Njcbi-_SOvjUFQh6&t=22"
       },
       {
         "id": "awk-g-neo-stardust-smash",
-        "name": "G [♦️] + G [🔳] - [Neo Stardust Smash] 🔴",
-        "description": "Star Platinum does a charged ground slam, if pressed again at the right time, causes a stronger shockwave impact.\n\nDamage: 31.3 + 19.9 (shockwave) | CD: 23s\nTags: Follow-up | Guardable | Stun | Bypass Getup I-Frames | Grounded Bypass | Hyper Armor | Trip Ragdoll | Dodge Bypass | Stage Destruction | COMBO EXTENDER | AOE\nHeat Cost: 0 | Heat Gain: 2+2+5",
-        "videoSrc": "MOVE VIDEO HERE/awk-g-neo-stardust-smash.mp4"
+        "name": "(G [♦️]) + G [🔳] - [Neo Stardust Smash] 🔴",
+        "description": "Star Platinum does a charged ground slam, if pressed again at the right time, the immense strength will cause another shockwave to erupt, as a stronger impact.\n\nDamage: 31.3 + 19.9 (shockwave) | CD: 23s\nTags: Follow-up | Guardable | Stun (First 2 hits) | Bypass Getup I-Frames | Grounded Bypass | Hyper Armor | Trip Ragdoll (final hit) | Dodge Bypass | Stage Destruction | COMBO EXTENDER | AOE (MID [DIRECT]) | MID+ SCALE [SHOCKWAVES])\nResolve Cost: 0 | Resolve Gain: 2+2+5 | Style Rank Requirement: B+",
+        "videoSrc": "https://youtu.be/mEnYIPJUfpo?t=164"
       },
       {
         "id": "awk-gm2-meteor-launch",
         "name": "G+M2 - [Meteor Launch] 🔴",
-        "description": "Star Platinum punches the floor for a giant spiked boulder to flip out. Charges up to throw it.\n\nDamage: 44.2 | CD: 25s\nTags: True Guard Bypass | Counter Bypass | I-Frame Charge Up | Bypass Getup I-Frames | Insta Stand Crash | Ragdoll + Hyper Armor Bypass | Knockback + Ragdoll | Dodge Bypass | Grounded Bypass | COMBO ENDER / HEAVY PROJECTILE | MID RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 20",
-        "videoSrc": "MOVE VIDEO HERE/awk-gm2-meteor-launch.mp4",
+        "description": "After slamming the floor, Star Platinum punches the floor again for a giant, spiked boulder to flip out from the ground. The stand then holds it and charges up to throw it a far distance.\n\nDamage: 44.2 | CD: 25s\nTags: True Guard Bypass | Counter Bypass | I-Frame Charge Up | Bypass Getup I-Frames | Insta Stand Crash | Ragdoll + Hyper Armor Bypass | Knockback + Ragdoll | Dodge Bypass | Grounded Bypass | COMBO ENDER / HEAVY PROJECTILE | MID RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 20",
+        "videoSrc": "https://www.youtube.com/watch?v=-HgxuDuMKto",
         "hasFinisher": true,
         "finisherDescription": "G+M2 - [Meteor Launch] Finisher: Non-Cutscene. The victim just splats in blood upon impact.\n\nHP Required: >50hp",
-        "finisherVideoSrc": "MOVE VIDEO HERE/awk-gm2-meteor-launch-finisher.mp4"
+        "finisherVideoSrc": "https://youtu.be/443STqSgtfA?t=206"
       },
       {
         "id": "awk-y-keep-change",
-        "name": "Y [🟥] - [\"And Keep The Damn Change!\"] 🔴",
-        "description": "Star Platinum punches the enemy, does a long, extensive barrage of punches, with stronger individual punches in-between.\n\nDamage: 45.4 | CD: 30s\nTags: Guardable | Counter Bypass | Grab | Hyper Armor | Heavy Knockback + Ragdoll | COMBO ENDER [SUPER] | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 20 | Heat Gain: 0",
-        "videoSrc": "MOVE VIDEO HERE/awk-y-keep-change.mp4",
+        "name": "Y [🟥] - [“And Keep The Damn Change!”] 🔴",
+        "description": "Star Platinum punches the enemy, if hit successfully (The screen ui fade out as a zoom screen appears), the stand does a long, extensive barrage of punches, with stronger individual punches in-between.\n\nDamage: 5.2 + 0.7*15 + 4.3 + 6.2 + 0.5*20 + 9.2 + (Torso Damage) = 45.4 | CD: 30s\nTags: Guardable | Counter Bypass | Grab | Hyper Armor | Heavy Knockback + Ragdoll | COMBO ENDER [SUPER] | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: BB+",
+        "videoSrc": "https://youtu.be/aR8q48ZA-7c?t=50",
         "hasFinisher": true,
-        "finisherDescription": "Y [🟥] - [Platinum Fists] Finisher: Cutscene. A cinematic barrage sequence ending with an impact frame and shattered glass effect as the victim flies away.\n\nHP Required: >50hp",
-        "finisherVideoSrc": "MOVE VIDEO HERE/awk-y-keep-change-finisher.mp4"
+        "finisherDescription": "Y [🟥] - [Platinum Fists] Finisher: Cutscene. When the first hit lands, instead of the usual move, you instead get a cutscene resembling that of the Stand Proud outro, inclusive of the background. The only change is, coming down to the end of the barrage, we see a victim shot of the victim getting barraged, it cuts back to the user and Star Platinum about to punch together (Ref 1) and the glass crack effect stays the same with some impact once the cutscene ends. Once the cutscene is done the victim is flown away (Ref 2).\n\nHP Required: >50hp",
+        "finisherVideoSrc": "https://youtu.be/4U1fZBWMR8k?t=107",
+        "finisherVideos": [
+          {
+            "src": "https://youtu.be/dOQWNEv4_6U?t=73",
+            "label": "Ref 2"
+          }
+        ]
       },
       {
         "id": "awk-hy-ora-ora",
-        "name": "H+Y [🟥] - [\"Ora Ora Ora!\"] 🔴",
-        "description": "In timestop, Star Platinum uppercuts the enemy, cracks knuckles, delivers a swift barrage, and the user casually dodges the flying victim and writes a receipt.\n\nDamage: XX.XX | CD: 30s\nTags: Guardable | Counter Bypass | Grab | Hyper Armor | Heavy Knockback + Ragdoll | COMBO ENDER [SUPER + MINI CUTSCENE] | CLOSE RANGE\nHeat Cost: 20 | Heat Gain: 0",
-        "videoSrc": "MOVE VIDEO HERE/awk-hy-ora-ora.mp4"
+        "name": "H+Y [🟥] - [“Ora Ora Ora!”] 🔴",
+        "description": "In timestop, the move changes to a quick partial cutscene of Star Platinum instead uppercutting the enemy and doing a knuckle crack before a swift barrage to the opponent and a finishing blow where the user moves nonchalantly to dodge the flying victim and writes a receipt and throws it before turning away.\n\nDamage: XX.XX | CD: 30s\nTags: Guardable | Counter Bypass | Grab | Hyper Armor | Heavy Knockback + Ragdoll | COMBO ENDER [SUPER + MINI CUTSCENE] | CLOSE RANGE\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: BB+",
+        "videoSrc": ""
       },
       {
         "id": "awk-c-crusading-comet",
         "name": "C - [Crusading Comet] 🔴",
-        "description": "The user and star platinum rams a short distance, knocking away anyone in their path.\n\nDamage: 17.2 | CD: 19s\nTags: Guard Break | Counter Bypass | Hyper Armor | Light Parriable | Hyper Armor Bypass | Knockback + Soft Ragdoll | Dodge Bypass | Grounded Bypass | COMBO EXTENDER | SEMI-MID RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 7 | Endlag: 0.55s (if missed)",
-        "videoSrc": "MOVE VIDEO HERE/awk-c-crusading-comet.mp4",
+        "description": "The user and star platinum rams a short distance, knocking away anyone in their path.\n\nDamage: 17.2 | CD: 19s\nTags: Guard Break | Counter Bypass | Hyper Armor | Light Parriable | Hyper Armor Bypass | Knockback + Soft Ragdoll | Dodge Bypass | Grounded Bypass | COMBO EXTENDER | SEMI-MID RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 7 | Endlag: 0.55s (if missed)",
+        "videoSrc": "https://youtu.be/TMtfCOroYWw?si=lr3ENsfk0fZgHOfy&t=51",
+        "videos": [
+          {
+            "src": "https://youtu.be/SSyTqS5C8No?t=56",
+            "label": "REF2"
+          },
+          {
+            "src": "https://youtu.be/nTqGQ6zb7pE?list=PLIzIKYQOGaRfJnQYlcjJHJPT0at-vzzpS&t=18",
+            "label": "REF3"
+          }
+        ],
         "variants": [
           {
             "id": "awk-c-run-up",
             "name": "C [▶️/🟥] - [Crusading Comet] 🔴",
-            "description": "The user readies up and does a run up, grabbing anyone caught, holding them with Star Platinum's arms, then jumping and throwing them to the floor.\n\nDamage: 13.2 (Grab) + 8.2 (Throw) | CD: 19s\nTags: Guard Bypass | Grab | Hyper Armor Charge Up | Heavy Parriable | Insta Stand Crash | Hyper Armor Bypass | Knockback + Ragdoll | Dodge Bypass | Grounded Bypass | COMBO EXTENDER | LONG RANGE\nHeat Cost: 0 | Heat Gain: 3+2 | Endlag: 0.6s (if missed)",
-            "videoSrc": "MOVE VIDEO HERE/awk-c-run-up.mp4"
+            "description": "The user readies up and does a run up that’s quick, before using Star Platinum’s legs to go faster. Then if anyone is caught, the user grabs them and holds them with Star Platinum’s Arms in front before finally jumping and throwing the victim to the floor.\n\nDamage: 13.2 (Grab) + 8.2 (Throw) | CD: 19s\nTags: Guard Bypass (Active) | Grab | Hyper Armor Charge Up | Heavy Parriable | Insta Stand Crash | Hyper Armor Bypass | Knockback + Ragdoll | Dodge Bypass | Grounded Bypass | COMBO EXTENDER | LONG RANGE\nResolve Cost: 0 | Resolve Gain: 3+2 | Style Rank Requirement: B+ | Endlag: 0.6s (if missed)",
+            "videoSrc": "https://youtu.be/tMspeUifEJU?t=154",
+            "videos": [
+              {
+                "src": "https://youtu.be/tQcAkIOVWd0?t=1",
+                "label": "Throw"
+              }
+            ]
           }
         ],
         "hasVariant": true
@@ -404,58 +224,548 @@
       {
         "id": "awk-cg-destructive-rage",
         "name": "C [▶️/🟥]+G - [Destructive Rage] 🔴+🟣",
-        "description": "After the throw, a QTE triggers 2 extra punches. If successful, user flash-warps behind the victim for a final back punch.\n\nDamage: 17*3 + 25.9 + (Torso Damage) | CD: 30s | Cost: 20% Stand Endurance\nTags: Grab Follow Up | Heavy Knockback+Ragdoll | Guard Bypass | Heavy Parriable | Insta Stand Crash | Hyper Armor Bypass | Dodge Bypass | Grounded Bypass | COMBO ENDER\nHeat Cost: 0 | Heat Gain: 3+2",
-        "videoSrc": "MOVE VIDEO HERE/awk-cg-destructive-rage.mp4",
+        "description": "After the throw, the user aims a ground slam punch at the tumbling victim. After that punch a short button qte will play where the player can do 2 extra punches to the victim, bouncing back up in the air slightly after each one (So left side, right side, then the centre). If all 3 are successful, a short cutscene will play of the user flash-warpping behind the victim and doing a final punch to the victim’s back.\n\nDamage: 17*3 + (final hit) 25.9 + (Torso Damage) | CD: 30s | Cost: 20% Stand Endurance\nTags: Grab Follow Up | Heavy Knockback+Ragdoll | Guard Bypass (Active) | Heavy Parriable | Insta Stand Crash | Hyper Armor Bypass | Dodge Bypass | Grounded Bypass | COMBO ENDER\nResolve Cost: 0 | Resolve Gain: 3+2 | Style Rank Requirement: BB+",
+        "videoSrc": "https://youtu.be/4LMrOMXvJ_g?t=6",
+        "videos": [
+          {
+            "src": "https://youtu.be/FSPxigecECE?t=33",
+            "label": "Ref 2"
+          },
+          {
+            "src": "https://youtu.be/soyMVOxsy1Q?t=219",
+            "label": "Final Hit"
+          }
+        ],
         "hasFinisher": true,
-        "finisherDescription": "C [🟥]+G - [Destructive Rage] Finisher: Cutscene Ender. The final punch breaks ribs, then zooms out showing the skeleton fracturing, sending the body miles away.\n\nHP Required: >80hp",
-        "finisherVideoSrc": "MOVE VIDEO HERE/awk-cg-destructive-rage-finisher.mp4"
+        "finisherDescription": "C [🟥]+G - [Destructive Rage] Finisher: Cutscene Ender. The final punch is seen breaking the victim’s ribs, then zooms out dramatically to show the entire skeleton fracturing with the impact frame cracking up entirely. Then the body is seen being launched miles away.\n\nHP Required: >80hp",
+        "finisherVideoSrc": ""
       },
       {
         "id": "awk-fh-no-pity",
-        "name": "F+H [⚠️] - [\"I feel no pity for you at all...\"] 🟣",
-        "description": "Counter Move: Stops time, shatters victim's shins from behind, then gut punches them away. If missed, Star Platinum swipes fist.\n\nDamage: 6.2 + 15.1 + (Leg Damage) . 12.3 if missed | CD: 25s + 3s Block CD | Cost: 40% Stand Endurance\nTags: Ragdoll + Knockback | True Guard Break | Melee Counter | Missed > Stun + Push-Back | COMBO ENDER [MINI CUTSCENE + Counter] | SEMI-MID RANGE\nHeat Cost: 20 (1 bar) | Heat Gain: 0 | Endlag: 0.35s",
-        "videoSrc": "MOVE VIDEO HERE/awk-fh-no-pity.mp4"
+        "name": "F+H [⚠️] - [“I feel no pity for you at all…”] 🟣",
+        "description": "If triggered, The user briefly stops time and appears behind the victim, gripping their shoulder. Star platinum then shatters the victim’s shins before appearing in front the victim to deliver a gut punch that sends them flying away. If missed, Star Platinum a fist swipe and you lose 75% guard bar.\n\nDamage: 6.2 + 15.1 + (Leg Damage) . 12.3 if missed | CD: 25s + 3s Guard CD | Cost: 40% Stand Endurance\nTags: Ragdoll + Knockback | True Guard Break | Melee Counter | Missed > Stun + Push-Back | COMBO ENDER [MINI CUTSCENE + Counter] | SEMI-MID RANGE\nResolve Cost: 20 (1 bar) | Resolve Gain: 0 | Style Rank Requirement: BB+ | Endlag: 0.35s",
+        "videoSrc": "https://youtu.be/soyMVOxsy1Q?t=96",
+        "videos": [
+          {
+            "src": "https://youtu.be/_t79LEXcVwM?t=65",
+            "label": "REF2"
+          }
+        ]
       },
       {
         "id": "awk-x-ora-strike",
         "name": "X [⏩] - [Ora Strike] 🔴",
-        "description": "As the user flashsteps, Star Platinum has already prepared a skull crushing punch to knock the victim away.\n\nDamage: 18.5 | CD: 12s\nTags: Standing Knockback | Guardable | Stun (0.35s) | COMBO EXTENDER | SEMI-MID RANGE\nHeat Cost: 0 | Heat Gain: 8 | Endlag: 0.3s",
-        "videoSrc": "MOVE VIDEO HERE/awk-x-ora-strike.mp4",
+        "description": "As the user flashsteps, Star Platinum has already prepared a skull crushing punch to knock the victim away.\n\nDamage: 18.5 | CD: 12s\nTags: Standing Knockback | Guardable | Stun (0.35s) | COMBO EXTENDER | SEMI-MID RANGE\nResolve Cost: 0 | Resolve Gain: 8 | Endlag: 0.3s",
+        "videoSrc": "",
         "hasFinisher": true,
         "finisherDescription": "X [⏩] - [Ora Strike] Finisher: Cutscene Ender. The punch sends the victim flying as the user and Star Platinum swiftly follow up for a quick combo of punches, ending with a final one to the skull.\n\nHP Required: >20hp",
-        "finisherVideoSrc": "MOVE VIDEO HERE/awk-x-ora-strike-finisher.mp4"
+        "finisherVideoSrc": "https://youtu.be/iaCCJK-lgpg?t=27"
       },
       {
         "id": "awk-z-stardust-showdown",
         "name": "Z - [Stardust Showdown] 🔴+🟡",
-        "description": "Star Platinum strikes the opponent as the camera pans to cutscene mode. The stand then delivers a series of punches to the victim before its final strike.\n\nDamage: 10.0 + 2*49 + 42 | CD: 45s\nTags: Guard Bypass | Counter Bypass | Hyper Armor Charge Up | Parriable | Insta Stand Crash | Hyper Armor Bypass | Heavy Knockback + Ragdoll | Dodge Bypass | COMBO ENDER [ULTIMATE & CUTSCENE] | CLOSE RANGE+\nHeat Cost: 40 (2 Bars) | Heat Gain: 0 | Endlag: 0.85s",
-        "videoSrc": "MOVE VIDEO HERE/awk-z-stardust-showdown.mp4",
+        "description": "Star Platinum strikes the opponent as the camera pans to cutscene mode. The stand then delivers a series of punches to the victim before its final strike, which sends them flying away.\n\nDamage: 10.0 + 2*49 + 42 | CD: 45s\nTags: Guard Bypass (Active) | Counter Bypass | Hyper Armor Charge Up | Parriable | Insta Stand Crash | Hyper Armor Bypass | Heavy Knockback + Ragdoll | Dodge Bypass | COMBO ENDER [ULTIMATE & CUTSCENE] | CLOSE RANGE+\nResolve Cost: 40 (2 Bars) | Resolve Gain: 0 | Style Rank Requirement: SS+ | Endlag: 0.85s",
+        "videoSrc": "https://youtu.be/fa6uNxOPMM8?t=44",
         "hasFinisher": true,
-        "finisherDescription": "Z - [Stardust Showdown] Finisher: Cutscene. The victim imitates Dio in Cairo before the beatdown, ending with Star Platinum charging up its strongest skull punch to send the victim flying.\n\nHP Required: >150hp",
-        "finisherVideoSrc": "MOVE VIDEO HERE/awk-z-stardust-showdown-finisher.mp4"
+        "finisherDescription": "Z - [Stardust Showdown] Finisher: Cutscene. The initial strike sends the opponent tumbling away, the scene is switched to Cairo's roads as we see the victim imitating Dio (Ref 1). The cutscene basically plays out similar to the OVA at first, with the victim about to attack right before the beatdown. The beatdown ends with Star Platinum charging up his fist (Ref 2) to deliver the strongest skull punch it can throw out (Ref 3), breaking the cutscene and ending the finisher with the victim flying away.\n\nHP Required: >150hp",
+        "finisherVideoSrc": "https://youtu.be/_CNrNQjWGHI?t=282",
+        "finisherVideos": [
+          {
+            "src": "https://youtu.be/UlejUTQhFkw?t=983",
+            "label": "Ref 2"
+          },
+          {
+            "src": "https://youtu.be/PaCQ7pqESWA?t=7",
+            "label": "Ref 3"
+          }
+        ]
       },
       {
         "id": "awk-hz-time-stands-still",
-        "name": "H+Z - [\"While Time Stands Still\"] 🔴+🟡",
-        "description": "Similar beatdown, but extends the timestop and does not grant endurance fatigue immunity. Time resumes when finished.\n\nDamage: 125.0 | CD: 45s\nTags: Guard Bypass | Counter Bypass | Hyper Armor Charge Up | Parriable | Insta Stand Crash | Hyper Armor Bypass | Heavy Knockback + Ragdoll | Dodge Bypass | Auto Timestop Ender | COMBO ENDER [ULTIMATE & CUTSCENE] | CLOSE RANGE+\nHeat Cost: 40 (2 Bars) | Heat Gain: 0 | Endlag: 0.85s",
-        "videoSrc": "MOVE VIDEO HERE/awk-hz-time-stands-still.mp4"
+        "name": "H+Z - [“While Time Stands Still”] 🔴+🟡",
+        "description": "Similar to jump force’s beatdown, however without the timestop at the start. This move will extend the timestop, however, does not grant immunity to endurance fatigue. When the beatdown is finished, time will automatically resume.\n\nDamage: 125.0 | CD: 45s\nTags: Guard Bypass (Active) | Counter Bypass | Hyper Armor Charge Up | Parriable | Insta Stand Crash | Hyper Armor Bypass | Heavy Knockback + Ragdoll | Dodge Bypass | Auto Timestop Ender | COMBO ENDER [ULTIMATE & CUTSCENE] | CLOSE RANGE+\nResolve Cost: 40 (2 Bars) | Resolve Gain: 0 | Style Rank Requirement: SSS+ | Endlag: 0.85s",
+        "videoSrc": "https://youtu.be/sPzXhF_-npA?t=2"
       },
       {
         "id": "awk-j-supernova-strike",
         "name": "J - [Supernova Strike] 🔴",
-        "description": "Star Platinum charges up its strongest punch. Player mashes button to increase gigatons. Has 4 charges (Charged, Super Charged, Hyper Charged, Neo Charged).\n\nDamage: [Base] 55.9 [Ultra] 185.9 (+ Skull Damage) | CD: 80s (40s if missed)\nTags: True Guard Bypass | Counter Bypass | Hyper Armor | Heavy Parriable | Insta Stand Crash | Hyper Armor Bypass | Extreme Knockback + Ragdoll | True Damage | Dodge Bypass | COMBO ENDER [ULTIMATE & NON-CUTSCENE] | CLOSE RANGE+ | STAND POSITIONABLE\nHeat Cost: 40 (2 Bars) | Heat Gain: 0 | Endlag: 0.65s",
-        "videoSrc": "MOVE VIDEO HERE/awk-j-supernova-strike.mp4",
+        "description": "Star Platinum charges up its strongest punch (starting at 100 gigatons). Upon impact the player will be met with a button mash that increases in power by 50 gigatons. Depending on how many times the button is mashed in the 3 second window of the punch connecting with the victim. This move has 4 charges: Charged (0-6 clicks), Super Charged (6-12 clicks), Hyper Charged (12-18 clicks) and Neo Charged (18 clicks).\n\nDamage: [Base] 55.9 [Charged] 85.9 [Super] 115.9 [Ultra] 185.9 (All + Skull Damage) | CD: 80s, 40s if missed\nTags: True Guard Bypass | Counter Bypass | Hyper Armor | Heavy Parriable | Insta Stand Crash | Hyper Armor Bypass | Extreme Knockback + Ragdoll | True Damage | Dodge Bypass | COMBO ENDER [ULTIMATE & NON-CUTSCENE] | CLOSE RANGE+ | STAND POSITIONABLE\nResolve Cost: 40 (2 Bars) | Resolve Gain: 0 | Style Rank Requirement: SSS+ | Endlag: 0.65s",
+        "videoSrc": "https://youtu.be/F_hlkmjRZ_Q?t=19",
+        "videos": [
+          {
+            "src": "https://www.youtube.com/watch?v=gqbl_hsQaH4",
+            "label": "REF2"
+          },
+          {
+            "src": "https://youtu.be/X3Yy9153Vvw?si=19owV8Q6OnZPyFON&t=339",
+            "label": "REF3"
+          }
+        ],
         "hasFinisher": true,
-        "finisherDescription": "J - [Supernova Strike] Finisher: Cutscene. (Neo Charge) The stand downward hooks the victim, charging up to 100,000 gigatons and unleashing a punch that shatters the skeleton and sends a shockwave visible from outer space.\n\nHP Required: >200hp",
-        "finisherVideoSrc": "MOVE VIDEO HERE/awk-j-supernova-strike-finisher.mp4"
+        "finisherDescription": "J - [Supernova Strike] Finisher: Cutscene. (Only activates with Neo Charge) The first blow knocks the victim and they fall to their knees. The stand holds the victim’s head and then downward hooks them with a 2000 gigaton punch. As the victim is laying on the floor, Star Platinum charges up (Ref 1, Ref 2) from 1000, hitting all the thousands up to 100,000 gigatons and unleashes a punch to the user’s torso (impact frame from ribs then a sudden zoom out to entire skeleton shattering) and a massive shockwave (Ref 3) surrounds the area (a short zoom out scene to a visible shockwave seen from outer space with the shockwave destroying nearby planets as a result), destroying buildings nearby on the map and knocking away anyone in the vicinity from the wind. The victim is left as a bloody plot on the floor with their body parts scattered.\n\nHP Required: >200hp",
+        "finisherVideoSrc": "https://youtu.be/QiWToVCPj48?t=187",
+        "finisherVideos": [
+          {
+            "src": "https://youtu.be/QiWToVCPj48?t=587",
+            "label": "Ref 2"
+          },
+          {
+            "src": "https://youtu.be/jR6sVC5OhTw?si=FsMGPsa9WxyeZE-W&t=16",
+            "label": "Ref 3"
+          }
+        ]
       },
       {
         "id": "awk-hj-swift-fist",
         "name": "H+J [💠] - [Swift Fist] 🔴",
-        "description": "Star Platinum lunges out and does a straight jab. Can be re-casted a total of 5 times with the last one being a mini cutscene and stronger.\n\nDamage: 15.3 | CD: 0s\nTags: Guardable | Standing Knockback | Ragdoll Bypass | Stun | COMBO EXTENDER/ENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nHeat Cost: 0 | Heat Gain: 5",
-        "videoSrc": "MOVE VIDEO HERE/awk-hj-swift-fist.mp4"
+        "description": "Star Platinum lunges out and does a straight jab to the opponent. Can be re-casted a total of 5 times with the last one being a mini cutscene and a lot stronger.\n\nDamage: 15.3 | CD: 0s\nTags: Guardable | Standing Knockback | Ragdoll Bypass | Stun | COMBO EXTENDER/ENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 5",
+        "videoSrc": "https://youtu.be/3m-Na1vDyqE?si=cehFlurzeMdtEGkd&t=72"
       }
-    ]
+    ],
+    "standOnMoves": [
+      {
+        "id": "on-m2-lmb-all-star-attack-stardust-judgement",
+        "name": "M2/LMB [⭐] - [All Star Attack! - “Stardust Judgement!”] 🔴",
+        "description": "All Star Attack! Star Platinum enrages and strikes the enemy, following with a heavy and swift barrage of punches followed by a super heavy uppercut, but after the uppercut cuts to ref 2 where the user and star platinum punch together, the impact creates a star-like flare as the enemy is sent flying away.\n\nDamage: 150.0 | CD: 100s\nTags: Omni-Bypass | Ragdoll + Extreme Knockback (Staggering) | COMBO ENDER/GRAB [PARTIAL CUTSCENE] | CLOSE RANGE+\nResolve Cost: 100 | Resolve Gain: 0 | Style Rank Requirement: SSS+ | Endlag: 0.5s",
+        "videoSrc": "https://youtu.be/_hnYvYa5k0Q?t=8",
+        "videos": [
+          {
+            "src": "https://youtu.be/AgCEMPFlpVM?t=101",
+            "label": "REF2"
+          }
+        ],
+        "standalone": true
+      },
+      {
+        "id": "m2-brute-force",
+        "name": "M2/LMB - [Brute Force] 🔴",
+        "description": "Star Platinum grabs the opponent’s neck and performs a secondary punch with their other hand straight to the victim’s skull, sending them hurdling back.\n\nDamage: 3.3(Grab) + 13.6 + (Skull Damage) | CD: 10s\nTags: Grab | Ragdoll + Knockback (Staggering) | Guardable | COMBO ENDER/GRAB [PARTIAL CUTSCENE] | CLOSE RANGE+ | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 10 | Endlag: 0.15s",
+        "videoSrc": "https://youtu.be/Gb36vi3tY-A?si=Njcbi-_SOvjUFQh6&t=22",
+        "videos": [
+          {
+            "src": "https://youtu.be/Gb36vi3tY-A?si=Njcbi-_SOvjUFQh6&t=22",
+            "label": "Youtube2",
+            "start": "22",
+            "end": "25"
+          }
+        ],
+        "variants": [
+          {
+            "id": "on-m2-lmb-star-slammer",
+            "name": "M2/LMB [⬆️/✴️] - [Star Slammer] 🔴",
+            "description": "Star Platinum soars up to deliver a hefty double axe slam to the opponent.\n\nDamage: 16.5 + (Skull Damage) | CD: 10s\nTags: Guard Break+Parriable | Heavy Knockback+Ragdoll | Down-Spike | Counter + Dodge Bypass | COMBO ENDER | MID+ RANGE\nResolve Cost: 5 | Resolve Gain: 0 | Style Rank Requirement: B+",
+            "videoSrc": "https://youtu.be/ckXLwhAfEkQ?t=139"
+          },
+          {
+            "id": "m2-you-bastard",
+            "name": "M2/LMB [🧱] - [“You Bastard!”] 🔴",
+            "description": "Star Platinum chokes the enemy to the wall before using their other arm to release a one armed barrage of strikes to the opponent before punching them through the wall.\n\nDamage: 1.2 + 0.5*10 + 5.3 | CD: 10s\nTags: Ragdoll+Knockback (Soft) | Guardable | Wall Crash | COMBO ENDER | CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 10 | Endlag: 0.2s",
+            "videoSrc": ""
+          },
+          {
+            "id": "m2-stand-uppercut",
+            "name": "M2/LMB [🔼] - [Stand Uppercut] 🔴",
+            "description": "The stand uppercuts the enemy into the air, allowing for air combos.\n\nDamage: 8.5 | CD: 10s\nTags: Stun (1.0s) | Guardable | Upper-Spike | COMBO EXTENDER | CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 10 | Endlag: 0.1s",
+            "videoSrc": "https://youtu.be/fa6uNxOPMM8?si=2REO_ryzQp2wZCjB&t=23",
+            "videos": [
+              {
+                "src": "https://youtu.be/8bn7p5mXq-A?t=899",
+                "label": "REF2"
+              },
+              {
+                "src": "https://youtu.be/p1Pxi9YX5qM?t=176",
+                "label": "REF3"
+              }
+            ]
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "e-barrage",
+        "name": "E [♦️] - [Barrage] 🔴",
+        "description": "Stand unleashes a burst of rapid punches, dealing stun (lasts 3.5s).\n\nDamage: 1.2*28 @8 hits/s | CD: 8s\nTags: Stun (0.5s/hit) | Stun Evasive | Ragdoll Bypass | Guardable | Uncancellable | COMBO EXTENDER | EXTENDED CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 1*12 @4/s",
+        "videoSrc": ""
+      },
+      {
+        "id": "variant-1791396742121",
+        "name": "E+M2 [Variant] - [Barrage Ender] 🔴",
+        "description": "Stand ends the barrage with a heavy strike that knocks away the opponent.\n\nDamage: 6.8 | CD: (E+2s)\nTags: Guard Break | True Follow-Up | Soft Ragdoll | Slight Knockback (Soft) | Parriable | Uncancellable | COMBO ENDER [MINI CUTSCENE] | EXTENDED CLOSE RANGE\nResolve Cost: 5 | Resolve Gain: 0 | Endlag: 0.15s",
+        "videoSrc": "https://youtu.be/SmQc--ZC63M?si=VwgLUjBFq2hj3wni",
+        "parryable": true,
+        "blockExtras": [
+          "Block Break"
+        ]
+      },
+      {
+        "id": "r-star-breaker",
+        "name": "R - [Star Breaker] 🔴",
+        "description": "Star Platinum strikes the victim’s skull with immense force, dealing massive damage.\n\nDamage: 19.5 | CD: 16s\nTags: Guard Break | Ragdoll | Heavy Knockback (Staggering) | Hyper Armor | Hyper Armor Crash | Heavy Parriable | Uncancellable | COMBO ENDER | CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 20 | Endlag: 0.3s",
+        "videoSrc": "",
+        "variants": [
+          {
+            "id": "r-skull-crusher",
+            "name": "R [🟥] - [Skull Crusher] 🔴",
+            "description": "Star Platinum charges its strike to unleash an even more powerful blow, crushing the opponents skull and sending them flying away. (User moves slightly forward upon use).\n\nDamage: 29.8 + (Skull Damage) | CD: 18s\nTags: Guard Break | Stand Crasher | Ragdoll | Heavy Knockback (Staggering) | Hyper Armor | Hyper Armor Bypass | Heavy Parriable | COMBO ENDER | CLOSE RANGE+ | STAND POSITIONABLE\nResolve Cost: 25 | Resolve Gain: 0 | Style Rank Requirement: B+ | Endlag: 0.3s",
+            "videoSrc": "",
+            "hasFinisher": true,
+            "finisherDescription": "R [🟥] - [Skull Crusher] Finisher: Partial Cutscene/Impact Frame. Star Platinum crushes the opponent's skull, shattering it 3 times before the entire skeleton is shattered, right before the stand launches the body miles away. (But more intense!)\n\nHP Required: >40hp",
+            "finisherVideoSrc": "https://www.youtube.com/watch?v=sH2EA1aZQtk"
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "t-star-finger",
+        "name": "T - [“Star Finger!”] 🔴",
+        "description": "Star Platinum extends its index and middle fingers to pierce anyone within its range.\n\nDamage: 10.3 + [BLEED(T1)] | CD: 12s\nTags: True Stun (0.85s) | Guardable | Dodge Bypass | Enemy Pull | Knockback Cancel | COMBO EXTENDER/MIXUP | CLOSE RANGE+\nResolve Cost: 0 | Resolve Gain: 5",
+        "videoSrc": "https://youtu.be/eO820nABUFA?si=XePwRRo31kpfllpQ&t=203",
+        "videos": [
+          {
+            "src": "https://youtu.be/X2MJC_LC0CU?t=217",
+            "label": "REF2"
+          },
+          {
+            "src": "https://youtu.be/f036rIzzg0A?t=47",
+            "label": "REF3"
+          }
+        ],
+        "variants": [
+          {
+            "id": "t-down",
+            "name": "T [🔝] - [“I’ll stop him before he kills me!”] 🔴",
+            "description": "Star Platinum swipes its finger, slicing the opponent downwards.\n\nDamage: 12.3 + [BLEED(T1)] | CD: 14s\nTags: Soft Ragdoll | Guardable | Rebound | Enemy Pull | Knockback Cancel | Grounded Bypass | Stun (0.45s) | COMBO EXTENDER/MIXUP | CLOSE RANGE+\nResolve Cost: 0 | Resolve Gain: 5",
+            "videoSrc": "https://youtu.be/pRFWq4wzkIU?t=116"
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "on-g-1st-charge-part-1-3-star-shockwave",
+        "name": "G [1st Charge | Part 1/3] [❇️] - [Star Shockwave] 🔴",
+        "description": "Star Platinum destroys the ground beneath them with its fist, forming a massive crater. This move has 3 charges, the first charge is a 3 part move as seen in the function.\n\nDamage: 10.3 (AOE) | CD: 1s [20s if nothing]\nTags: Grounded Bypass | Guardable | Stun | Dodge Bypass | Stun Evasive | Uncancellable | COMBO EXTENDER | AOE [25 stds] (SMALL+)\nResolve Cost: 0 | Resolve Gain: 8 | Endlag: 0s",
+        "videoSrc": "https://youtu.be/Z67AZvXbvAM?t=330"
+      },
+      {
+        "id": "on-g-1st-charge-part-2-3-star-shockwave",
+        "name": "G [1st Charge | Part 2/3] [❇️] - [Star Shockwave] 🔴",
+        "description": "Star Platinum destroys the ground beneath them with its fist again, causing a stunning shockwave and forming another crater. This is the 2nd part to the 1’st charge and these don't need to be charged.\n\nDamage: 15.3 (AOE) | CD: 2s [21s if nothing]\nTags: Grounded Bypass | Guard Bypass [Passive] | Knockback [Staggering] | Hyper Armor Bypass | Dodge Bypass | Uncancellable | COMBO EXTENDER | AOE [25 stds] (SMALL+)\nResolve Cost: 0 | Resolve Gain: 8 | Endlag: 0s",
+        "videoSrc": "https://youtu.be/Z67AZvXbvAM?t=331"
+      },
+      {
+        "id": "on-g-1st-charge-part-3-3-star-shockwave",
+        "name": "G [1st Charge | Part 3/3] [❇️] - [Star Shockwave] 🔴",
+        "description": "Star Platinum does a stronger charged punch to the floor, creating a massive crater and blowing any enemy away from the impact. This is the 3rd and final charge to the first charge.\n\nDamage: 18.2 (AOE) | CD: 22s\nTags: Grounded Bypass | True Guard Bypass [Active] | Heavy Knockback [Staggering] | Stand Crash | Hyper Armor + Break | Dodge Bypass | COMBO ENDER | AOE [50 stds] (SUB-MID)\nResolve Cost: 0 | Resolve Gain: 10 | Style Rank Requirement: B+ | Endlag: 0.35s",
+        "videoSrc": "https://youtu.be/Z67AZvXbvAM?t=333"
+      },
+      {
+        "id": "on-g-2nd-charge-earthquake",
+        "name": "G [2nd Charge+❇️] - [EarthQuake] 🔴",
+        "description": "Star Platinum destroys the ground beneath them with its fist, forming a massive crater in the floor and knocking away enemies. If used at close range, the enemy will receive a short hitstun and will take more damage. The AOE additionally does a 2nd delayed impact.\n\nDamage: 23.8 (Initial) + 9.8 (AOE) | CD: 23s\nTags: Grounded Bypass | True Guard Bypass [Active] | Heavy Knockback [Staggering] | Stand Crash | Hyper Armor + Break | Dodge Bypass | COMBO ENDER | AOE [50 stds] (SUB-MID)\nResolve Cost: 0 | Resolve Gain: 8 | Endlag: 0.35s",
+        "videoSrc": "https://drive.google.com/file/d/1KaSyda-1HDSuTHlIETYdsMbqaqzSYsqW/view?usp=sharing&t=23",
+        "videos": [
+          {
+            "src": "https://youtu.be/J5zEfobI8Mg?t=192",
+            "label": "REF2"
+          }
+        ]
+      },
+      {
+        "id": "on-g-3rd-charge-star-breaker-smash",
+        "name": "G [3rd Charge+❇️] - [Star-Breaker Smash] 🔴",
+        "description": "Star Platinum destroys the ground beneath them with its fist, forming a massive crater that is larger and more spiked towards the front.\n\nDamage: 35.8 (Front) + 28.2 (AOE) | CD: 25s\nTags: Grounded Bypass | True Guard Bypass [Active] | Heavy Knockback [Staggering] | Stand Crash | Hyper Armor + Break | Dodge Bypass | COMBO ENDER | AOE [55 stds] (MID)\nResolve Cost: 0 | Resolve Gain: 15 | Endlag: 0.35s",
+        "videoSrc": "https://youtu.be/H4xWQ5tyA7k?si=7vPMVsClk3i7Rtwc&t=71",
+        "videos": [
+          {
+            "src": "https://drive.google.com/file/d/1mT7A2AP8-i9Uy67GMpRMgq8n5nK2wvd0/view?usp=drive_link",
+            "label": "REF2"
+          },
+          {
+            "src": "https://youtu.be/SSyTqS5C8No?t=23",
+            "label": "REF3"
+          }
+        ]
+      },
+      {
+        "id": "g-stardust-meteor",
+        "name": "G [⏏️] - [Stardust Meteor] 🔴",
+        "description": "Star Platinum does a diving downward punch into the ground after a stand jump to unleash an even more powerful impact, destroying anything in the area.\n\nDamage: 30.2 | CD: 25s\nTags: Grounded Bypass | True Guard Bypass [Active] | Heavy Knockback [Staggering] | Stand Crash | Hyper Armor + Break | Dodge Bypass | COMBO ENDER | AOE [70 stds] (MID)\nResolve Cost: 0 | Resolve Gain: 15 | Endlag: 0.35s",
+        "videoSrc": "https://youtu.be/KdXE6s-TQGA?t=100",
+        "videos": [
+          {
+            "src": "https://youtu.be/SSyTqS5C8No?t=33",
+            "label": "REF2"
+          },
+          {
+            "src": "https://youtu.be/vjrJTTPZ62o?t=1372",
+            "label": "REF3"
+          }
+        ]
+      },
+      {
+        "id": "x-mach-impact",
+        "name": "X [1st Charge] [🛡️] - [Mach Impact] 🔴",
+        "description": "Star Platinum lunges forward for a powerful uppercut, knocking them up from the impact. If hit during the windup, it does a double impact.\n\nDamage: 16.2 / 8.3 + 9.9 | CD: 12s\nTags: Upper-Spike | Guard Break | Stun (0.35s) | Light Parriable | Rebound | COMBO EXTENDER | SEMI-MID RANGE\nResolve Cost: 0 | Resolve Gain: 5 | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/gRts1GZeBy4?list=PLOO2o6Kew2GOgh4ISBSjuoaUwD8toQK78&t=43"
+      },
+      {
+        "id": "x-supersonic-impact",
+        "name": "X [2nd Charge] - [Supersonic Impact] 🔴",
+        "description": "Star Platinum lunges forward for a hard hitting elbow jab. If the enemy hits a wall, they bounce back.\n\nDamage: 18.2 | CD: 12s\nTags: Knockback (Soft) | Guard Break | Heavy Parriable | COMBO EXTENDER/ENDER | SEMI-MID RANGE\nResolve Cost: 0 | Resolve Gain: 7 | Endlag: 0.35s",
+        "videoSrc": "https://youtu.be/gRts1GZeBy4?list=PLOO2o6Kew2GOgh4ISBSjuoaUwD8toQK78&t=62"
+      },
+      {
+        "id": "x-hypersonic-impact",
+        "name": "X [3rd Charge] - [Hypersonic Impact] 🔴",
+        "description": "Star Platinum lunges out for a powerful punch to the opponent’s skull, knocking them away from the impact.\n\nDamage: 20.2 | CD: 12s\nTags: Heavy Knockback (Staggering) | True Guard Break | COMBO ENDER | SEMI-MID RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 9 | Endlag: 0.4s",
+        "videoSrc": "https://youtu.be/gRts1GZeBy4?list=PLOO2o6Kew2GOgh4ISBSjuoaUwD8toQK78&t=73",
+        "hasFinisher": true,
+        "finisherDescription": "X [🟥] - [Hypersonic Impact] Finisher: Non-Cutscene. A hitstop effect occurs right before the victim is sent flying miles away (body causes destruction).\n\nHP Required: >40hp",
+        "finisherVideoSrc": ""
+      },
+      {
+        "id": "on-x-3rd-charge-x-hypersonic-rush",
+        "name": "X [3rd Charge]+X - [Hypersonic Rush] 🔴",
+        "description": "Star Platinum lunges out for a powerful punch to the opponent’s skull, knocking them away from the impact.\n\nDamage: 20.2 | CD: 12s\nTags: Heavy Knockback (Staggering) | True Guard Break | COMBO ENDER | SEMI-MID RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 9 | Endlag: 0.4s",
+        "videoSrc": "https://youtu.be/3CK-gVTZrSo?si=OcxKjUWESYKh23ID&t=116"
+      },
+      {
+        "id": "x-c-judge-you",
+        "name": "X [3rd Charge]+C - [“I’ll Judge You Myself!”] 🔴",
+        "description": "Star Platinum lunges forward and grabs the opponent before doing a series of punches with its right arm and finally uppercutting them into the air. Each charge variant does a different version upon impact…\n- Variant 1: [NON-CUTSCENE]\n- Variant 2: [SHORT CUTSCENE]\n- Variant 3: [CUTSCENE] (Gets (Skull Damage) + Grand Upper-Spike)\n\nDamage: Dependant on variant | CD: Dependant on Variant\nTags: Light Parriable[Unparriable at 3rd charge] | Guard Bypass (Active) | Super Knockback (Staggering)+Ragdoll | Grab | Hyper Armor Crash | Rebound | Uncancellable | Upper-Spike | COMBO ENDER [SUPER] | SEMI-MID RANGE | STAND POSITIONABLE\nResolve Cost: 40 | Resolve Gain: 0 | Style Rank Requirement: A+ | Endlag: 0.5s (if missed)",
+        "videoSrc": "https://youtu.be/FSPxigecECE?si=bVYpozcka-9BFRtu&t=16",
+        "videos": [
+          {
+            "src": "https://youtu.be/wd7X1h9hirM?si=CZsZYwBAztxeGVlW&t=55",
+            "label": "Variant 2"
+          },
+          {
+            "src": "https://youtu.be/Uduyj0NisyQ?si=ToiDYUiIF0npJujR&t=245",
+            "label": "Variant 3"
+          }
+        ],
+        "hasFinisher": true,
+        "finisherDescription": "X+C (Variant 3) - [“I’ll Judge You Myself!”] Finisher: Cutscene. On the final uppercut hit, Star Platinum puts in more force and as a result (Ref 1), the stand releases its punch as the victim is seen in the background flying in the sky with a cartoon twinkle in the sky (Ref 2).\n\nHP Required: >65hp",
+        "finisherVideoSrc": "https://youtu.be/a8T6XQ2BAjs?t=4",
+        "finisherVideos": [
+          {
+            "src": "https://youtu.be/SmQc--ZC63M?t=14",
+            "label": "Ref 2"
+          }
+        ]
+      },
+      {
+        "id": "x-t-beat-breath",
+        "name": "X+T - [“Beat In A Breath”] 🔴",
+        "description": "Star Platinum does a strong inhale that can pull multiple enemies towards him.\n\nDamage: 0 | CD: 10s\nTags: True Stun (0.75s) | Guard Bypass (Semi Active) | Dodge Bypass | Enemy Pull | Knockback Cancel | COMBO EXTENDER | SEMI-MID | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 0 | Endlag: 0.45s (if missed)",
+        "videoSrc": "https://youtu.be/y5q93Stavaw?t=261",
+        "videos": [
+          {
+            "src": "https://youtu.be/EhJ1JUyaBrA?t=158",
+            "label": "REF2"
+          }
+        ]
+      },
+      {
+        "id": "on-x-ora-rush",
+        "name": "X [▶️] - [Ora Rush] 🔴",
+        "description": "Star Platinum does an initial hit, and is then followed by 2 punches, a swift barrage and a finishing punch.\n\nDamage: 5.0 + 3.1*2 + 0.5*8 + 8.3 | CD: 15s\nTags: True Rush | Guardable | Heavy Knockback (Staggering) | COMBO EXTENDER/MIXUP | MID | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 0 | Style Rank Requirement: B+ | Endlag: 0.45s (if missed)",
+        "videoSrc": "https://youtu.be/NH68yqoPg0U?t=19"
+      },
+      {
+        "id": "on-y-part-1-2-whirlwing-throw",
+        "name": "Y [Part 1/2] - [Whirlwing Throw] 🔴",
+        "description": "Star Platinum grabs the opponent and spins them around a couple times, before throwing them away (User is left behind).\n\nDamage: 9.1 | CD: 12s\nTags: Aimable(Camera) | Guardable | Knockback (Soft) | Stun (0.65s) | COMBO EXTENDER | SEMI MID RANGE\nResolve Cost: 0 | Resolve Gain: 6",
+        "videoSrc": "https://youtu.be/tQcAkIOVWd0?t=1"
+      },
+      {
+        "id": "on-y-part-2-2-breakneck-hold",
+        "name": "Y [Part 2/2] - [Breakneck Hold] 🔴",
+        "description": "The user and Star Platinum rush again, if caught, the stand does 1 punch with one hand while holding the enemy in the other, and ends with a stronger punch.\n\nDamage: 8.1 + 9.1 | CD: 12s\nTags: Aimable(Camera) | Guardable | Knockback (Soft) | Stun (0.65s) | COMBO EXTENDER | SEMI MID RANGE\nResolve Cost: 0 | Resolve Gain: 6",
+        "videoSrc": "https://youtu.be/Z67AZvXbvAM?t=388"
+      },
+      {
+        "id": "on-y-part-2-2-held-sheer-strength",
+        "name": "Y [Part 2/2] [Held] - [“Sheer Strength”] 🔴",
+        "description": "The user and Star Platinum rush again, if caught, the stand does 1 strong punch with one hand while holding the enemy in the other that knocks them away from the sheer impact.\n\nDamage: 8.1 + 9.1 | CD: 12s\nTags: Aimable(Camera) | Guardable | Knockback (Soft) | Stun (0.65s) | COMBO EXTENDER | SEMI MID RANGE\nResolve Cost: 0 | Resolve Gain: 6",
+        "videoSrc": "https://youtu.be/Z67AZvXbvAM?t=407"
+      },
+      {
+        "id": "on-y-part-2-2-g-star-shattering-slams",
+        "name": "Y [Part 2/2] + G - [Star Shattering Slams] 🔴",
+        "description": "Star Platinum slams the opponent's face on the ground 5 times, each creating a wider crater before throwing the victim away.\n\nDamage: 5.3 + 10.3 + 15.3 + 20.3 + 25.3 | CD: 12s\nTags: Aimable(Camera) | Guardable | Knockback (Soft) | Stun (0.65s) | COMBO EXTENDER | AOE RANGE: [30,40,50,60,85]\nResolve Cost: 0 | Resolve Gain: 6 | Style Rank Requirement: A+ | Endlag: 0.5s",
+        "videoSrc": "https://youtu.be/lMPBH9FVbVQ?t=1432"
+      },
+      {
+        "id": "c-immense-power",
+        "name": "C - [“What Immense Power!”] 🔴",
+        "description": "Star Platinum lunges out and drags the opponent on the ground before throwing them in the air.\n\nDamage: 5.3 | CD: 12s\nTags: Guardable | Grab | Knockback (Soft) | Stun (0.5s) | Rebound | COMBO EXTENDER/ENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 12 | Endlag: 0.2s",
+        "videoSrc": "https://youtu.be/iaCCJK-lgpg?t=74",
+        "variants": [
+          {
+            "id": "c-up-no-mercy",
+            "name": "C [⬆️] - [“No Mercy!”] 🔴",
+            "description": "Star Platinum does a rush. When landed, Star Platinum gut punches the enemy, holds them with another hand and does a one arm barrage to their body before an uppercut that sends them away.\n\nDamage: 8.2 + 1*15 + 9.8 | CD: 22s\nTags: Rush [True] | Knockback (Staggering) | Grand Upper-Spike | Block Bypass [Active] | Heavy Parriable | Hyper Armor | COMBO ENDER [PARTIAL CUTSCENE] | CLOSE RANGE\nResolve Cost: 30 | Resolve Gain: 0 | Style Rank Requirement: A+ | Endlag: 0.2s",
+            "videoSrc": "https://youtu.be/FcVlKFvZl98?t=64"
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "c-space-immense-power",
+        "name": "C+[HOLD SPACE] - [“What Immense Power!”] 🔴",
+        "description": "Star Platinum lunges out and drags the opponent on the ground before throwing them in the air.\n\nDamage: 5.3 | CD: 12s\nTags: Guardable | Grab | Knockback (Soft) | Stun (0.5s) | Rebound | Upper-Spike | COMBO EXTENDER/ENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 12 | Endlag: 0.2s",
+        "videoSrc": "https://youtu.be/xzqLlhCePlU?t=33"
+      },
+      {
+        "id": "on-c-hold-space-x-ora-ora",
+        "name": "C+[HOLD SPACE]+X - [“Ora Ora!”] 🔴",
+        "description": "Star Platinum catches the opponent with a critical strike to their abdomen, then another to their head.\n\nDamage: 5.3 | CD: 12s\nTags: Guardable | Grab | Knockback (Soft) | Stun (0.5s) | Rebound | Upper-Spike | COMBO EXTENDER/ENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 12 | Endlag: 0.2s",
+        "videoSrc": "https://youtu.be/tQcAkIOVWd0?t=70"
+      },
+      {
+        "id": "on-c-g-meteor-breaker",
+        "name": "C [⬆️]+G - [Meteor Breaker] 🔴+🟣",
+        "description": "After the rush, using G can result in star platinum flash-warping up and slamming down the opponent.\n\nDamage: 32.3 | CD: 25s + E CD\nTags: Follow Up [True] | Down Spike | Ground Pin | True Block Bypass [Active] | Hyper Armor | COMBO ENDER [PARTIAL CUTSCENE] | CLOSE RANGE\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: S+ | Endlag: 0.5s",
+        "videoSrc": "https://youtu.be/FcVlKFvZl98?t=64"
+      },
+      {
+        "id": "z-star-synchrony",
+        "name": "Z - [Star Synchrony] 🔴",
+        "description": "The user runs up and grabs the opponent, tumbling over with the victim’s neck in their arms. Then Star Platinum summons as the camera shifts to the stand’s pov, who backs away to face the user who’s choking the victim. In this move Star Platinum can use M1’s only until the user lets go. In the end, Star Platinum grabs the opponent, spins them around before throwing them away.\n\nDamage: 8.2 (grab) + 6.3 (throw) | CD: 25s\nTags: Run Up: Grab | Guard-Bypass | Light Parriable | Hyper Armor | Dodge Bypass > Move: Knockback (Staggering) + Ragdoll | Rebound | COMBO ENDER [SUPER & PARTIAL CUTSCENE] | MID RANGE\nResolve Cost: 30 | Resolve Gain: 0 | Style Rank Requirement: BB+ | Endlag: 0.5s(if missed)",
+        "videoSrc": "https://youtu.be/EhJ1JUyaBrA?si=YmIjXJtRq3yzKy6b&t=187",
+        "hasFinisher": true,
+        "finisherDescription": "Z - [Star Synchrony] Finisher: Cutscene. As the user grabs the victim, they do this start up (Ref 1) (Star Platinum menacingly looks out before the black screen). At the end of the barrage Star Platinum comes forward to face the victim as the camera follows their fist (Ref 2). The cutscene then ends with (Ref 3).\n\nHP Required: >45hp",
+        "finisherVideoSrc": "https://www.youtube.com/watch?v=FA8Nsu_kzMg",
+        "finisherVideos": [
+          {
+            "src": "https://youtu.be/h1irN53vmf8?t=11",
+            "label": "Ref 2"
+          },
+          {
+            "src": "https://youtu.be/JJqfyQDUD7c?si=9QpezTxCFjob5Q0-&t=389",
+            "label": "Ref 3"
+          }
+        ],
+        "variants": [
+          {
+            "id": "on-z-star-shattering-combination",
+            "name": "Z [🔝] - [Star Shattering Combination] 🔴",
+            "description": "The user manifests Star Platinum as a foot and does an axe kick downwards, and upon impact, the user drops back as Star Platinum and the user does a series of punches that end in them punching the enemy together into the air.\n\nDamage: 11.2 (Kick) + 2.1*5 + 8.4 | CD: 20s\nTags: Untrue Rush | Guard Break | Heavy Knockback (Staggering) | Upper-Spike | Grounded Bypass | COMBO EXTENDER/MIXUP | EXTENDED CLOSE RANGE KICK | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 0 | Style Rank Requirement: BB+ | Endlag: 0.45s (if missed)",
+            "videoSrc": "https://youtu.be/Ua5WGnl64ts?t=74",
+            "videos": [
+              {
+                "src": "https://youtu.be/AL2SIANVi7M?t=316",
+                "label": "KICK"
+              }
+            ]
+          },
+          {
+            "id": "z-up-star-drive",
+            "name": "Z [⬆️/✴️] - [Star Drive] 🔴",
+            "description": "Star Platinum catches the enemy, throws them in the air, before catching them and pile driving them to the floor.\n\nDamage: 5.2 (grab) + 29.3 (ground hit) | CD: 20s\nTags: Camera Aimable | Hyper Armor | True Guard Bypass | Grab | Knockback (Staggering) | COMBO ENDER | CLOSE RANGE\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: C+ | Endlag: 0.4s(if missed)",
+            "videoSrc": "https://youtu.be/EhJ1JUyaBrA?t=125"
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "h-stellar-resolve",
+        "name": "H - [Stellar Resolve] 🟣",
+        "description": "The user awakens its inner resolve and grows more powerful, as Star platinum goes in front of the user as the user does the iconic pose and yells in rage before returning to its original stance.\n\nDamage: 1*10+25 | CD: 50s\nTags: I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | Slows if in AOE | Stun (0.9s) | Push-Back | AWAKENING MOVE + PARTIAL-CUTSCENE | SUB-MID AOE\nResolve Cost: 50 | Resolve Gain: 0 | Style Rank Requirement: A+",
+        "videoSrc": "https://youtu.be/l0X7d0XbTOY?t=107",
+        "variants": [
+          {
+            "id": "h-up-stellar-resolve",
+            "name": "H [⬆️] - [Stellar Resolve] 🟣",
+            "description": "The user awakens its inner resolve and grows more powerful, as Star platinum bursts out with rage.\n\nDamage: 1*10+25 | CD: 50s\nTags: I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | Slows if in AOE | Stun (0.9s) | Push-Back | AWAKENING MOVE + PARTIAL-CUTSCENE | SUB-MID AOE\nResolve Cost: 50 | Resolve Gain: 0 | Style Rank Requirement: A+",
+            "videoSrc": "https://youtu.be/LZpcSojBQ6E?t=96",
+            "videos": [
+              {
+                "src": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT11MOHnF5p9ucLFejDBHSoRjzb7CwfbUuBUw&s",
+                "label": "REF2"
+              }
+            ]
+          },
+          {
+            "id": "h-red-stellar-resolve",
+            "name": "H [🟥] - [Stellar Resolve] 🟣",
+            "description": "CUTSCENE (Player’s POV): The user drops to the floor on his knees then enters a flashback, with an unconscious Holly Joestar on the floor (Ref 1) and all the voices of her calling the player’s name (Ref 2) while the player looks down in anger (purple flames in the back turning yellow, while also getting faster with sparkles as well). (Cuts to fist) The user then punches the floor with Star Platinum’s arm slightly flaring and gets up, (shot of user’s back with the Joestar birthmark flashing) > stomps his foot forward (pan from foot to back to front body) and does the famous Jotaro pose (Ref 3) and summons Star Platinum who roars aloud.\n\n(To the outside): The user stays kneeling until the ground punch. Unlike the flashback, Star Platinum’s arm partially manifests and causes a massive crater, bigger than the G move, and the roar stuns players and knocks them away at the end (Ref 4).\n\nDamage: 12.2+ 1.2*7+7.3 | CD: 50s\nTags: True I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | 90% Slowed after groundslam | Knockback (Staggering) | Stun (0.55s after kb) | AWAKENING MOVE [SUPER & PARTIAL CUTSCENE] | MID+ AOE\nResolve Cost: 50 | Resolve Gain: 0 | Style Rank Requirement: S+",
+            "videoSrc": "https://youtu.be/DnNlFtgFBTs?si=YfgV-EAqCb_UN1ue&t=25",
+            "videos": [
+              {
+                "src": "https://youtu.be/QAuHQphwJLY?si=ECtWHKLS6pNfmb57&t=122",
+                "label": "Ref 2"
+              },
+              {
+                "src": "https://www.youtube.com/watch?v=Zv60npBN8F4",
+                "label": "Ref 3"
+              },
+              {
+                "src": "https://youtu.be/eO820nABUFA?si=5WmPunq9qhawB41M&t=223",
+                "label": "Ref 4"
+              }
+            ]
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "j-destructive-uppercut",
+        "name": "B - [Destructive Uppercut] 🔴",
+        "description": "Star Platinum lunges forward and grabs the opponent, and launches them into the air before doing a second uppercut punch.\n\nDamage: 3.2 (grab)+ 21.3 (punch)+ (Torso Damage) | CD: 16s\nTags: Guardable | Grab | Knockback (Soft) | Upper-Spike | COMBO EXTENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 10 | Endlag: 0.3s(if missed)",
+        "videoSrc": "https://youtu.be/Uduyj0NisyQ?t=252",
+        "hasFinisher": true,
+        "finisherDescription": "B - [Destructive Uppercut] Finisher: Cutscene. As the victim flies in the air, Star Platinum zooms out (Ref 1) to deliver a final punch to the victim (Ref 2).\n\nHP Required: >30hp",
+        "finisherVideoSrc": "https://youtu.be/FSPxigecECE?t=28",
+        "finisherVideos": [
+          {
+            "src": "https://youtu.be/FSPxigecECE?t=33",
+            "label": "Ref 2"
+          }
+        ],
+        "variants": [
+          {
+            "id": "on-b-suplex",
+            "name": "B [🟥] - [Suplex] 🔴",
+            "description": "Star Platinum grabs the opponent, using M1 will have the stand slam them to the floor and using M2 ends the move with a throw into the air and a gut punch.\n\nDamage: 4.9 (grab)+ 2.1 (M1)+ 11.5(M2) | CD: 25s\nTags: Guardable | Grab | Knockback (Soft) | Upper-Spike | COMBO EXTENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 10 | Endlag: 0.3s(if missed)",
+            "videoSrc": "https://youtu.be/gm5vZg0VtTk?t=470"
+          },
+          {
+            "id": "j-wall-crushing-fist",
+            "name": "B [🧱] - [Crushing Fist] 🔴",
+            "description": "Star Platinum does a series of punches to the victim on the wall before a final punch to send them away.\n\nDamage: 25.3 + (Aimed Body Part Damage) | CD: 16s\nTags: Guard Break | Knockback (Soft) | Light Parriable | Hyper Armor | Grounded Bypass | COMBO EXTENDER | SEMI-MID RANGE\nResolve Cost: 0 | Resolve Gain: 10 | Endlag: 0.3s(if missed)",
+            "videoSrc": "https://youtu.be/PakcZfxIMPk?t=193"
+          },
+          {
+            "id": "j-up-sparking-fist",
+            "name": "B [🔼] - [Sparking Fist] 🔴",
+            "description": "Star Platinum and the user charges before lunging a punch forward that hits the enemy’s head before a second gut punch that sends the victim flying far away.\n\nDamage: 25.3 + (Aimed Body Part Damage) | CD: 16s\nTags: Guard Break | Knockback (Soft) | Light Parriable | Hyper Armor | Grounded Bypass | COMBO EXTENDER | SEMI-MID RANGE\nResolve Cost: 0 | Resolve Gain: 10 | Endlag: 0.3s(if missed)",
+            "videoSrc": "https://youtu.be/7vHBUaxFRPI?t=4"
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "j-x-destructive-impact",
+        "name": "B+X - [Destructive Impact] 🔴",
+        "description": "Star Platinum lunges forward and grabs the opponent, and launches them into the air before doing a second skull punch to send them away.\n\nDamage: 3.2 (grab)+ 26.3 (punch)+ (Skull Damage) | CD: 16s\nTags: Guardable | Grab | Knockback (Soft) | Rebound | COMBO EXTENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 12 | Endlag: 0.3s(if missed)",
+        "videoSrc": "https://youtu.be/Lkshv3m0naM?t=27",
+        "hasFinisher": true,
+        "finisherDescription": "B+X - [Destructive Impact] Finisher: Cutscene. As the victim flies in the air, the user flash steps behind the enemy and follows up with an uppercut (Ref 1).\n\nHP Required: >45hp",
+        "finisherVideoSrc": "https://youtu.be/lcjRn9hePps?t=85"
+      },
+      {
+        "id": "j-up-red-nova",
+        "name": "J [🔼🟥] - [Nova Sparking Fist] 🔴",
+        "description": "Star Platinum and the user charges even more before lunging a punch forward. Upon impact, the stand drives their fist into the victim slowly until they blow away from the impact.\n\nDamage: 29.3 (punch)+ (Aimed Body Part Damage) | CD: 16s\nTags: True Guard Break | Heavy Knockback (Staggering) | Counter Bypass | Hyper Armor+ Crash | Grounded Bypass | COMBO ENDER | SEMI-MID RANGE\nResolve Cost: 15 | Resolve Gain: 0 | Endlag: 0.4s(if missed)",
+        "videoSrc": "https://youtu.be/KYZrKwy7VkI?t=108",
+        "hasFinisher": true,
+        "finisherDescription": "J [🔼🟥] - [Nova Sparking Fist] Finisher: Non-Cutscene. Upon impact, the screen goes grey for a second as the stand’s fist drives deeper into the victim's skull, until their skull explodes due to the sheer force.\n\nHP Required: >30hp",
+        "finisherVideoSrc": ""
+      }
+    ],
+    "movesetType": "awakening"
   },
   {
     "id": "the-world",
@@ -464,10 +774,527 @@
     "color": "#F1C232",
     "confirmed": true,
     "quote": "Invincibility, Immortality, STAND POWER!",
-    "description": "Desc Here",
+    "description": "Base Stats: M1 Damage: 8.1, Speed Tier: A, Power Tier: A.\n\nExtra Traits: Combo Break [Burst Timestop + “Weaklings!”] replaces standard combo break; The World stops time for a short 0.5 second frame. If an anti team burst is triggered, a flash-warp occurs where one of the teamers is blown away by a gut impact with Extreme Knockback, and the other is shin kicked and stunned for 2.5s.\n\nMove Effect [Countdown]: Some moves may inflict a special effect called Countdown. This effect allows the user to teleport to any victim hit with the effect once the user casts a new move, and the new move’s windup is also instantly gone, however not all moves can be used. Moves with a special countdown variant may be indicated with this mark > 🕰. All usage of this move uses 10% stand endurance.\n\nStatic Aura:\n- Overwhelming Fear: Opponents faced get a 10% damage buff, in exchange, a 10% speed nerf.\n\nAdd-on Passives:\n- Greatest High: Killing a player gives you +10% damage, and regen buffs for the next 45 seconds (Stackable). This passive has a different buff when paired with Vampirism.\n- Instant Excecution: Enemies under 5% are instantly killed/finished regardless of defences. A short timestop effect will play and the enemy will be ragdolled and sent flying far unless hit by a finisher move. However, you get a passive defence debuff for 10 seconds.",
     "rarity": "Desc Here",
-    "standType": "Desc Here",
-    "moves": []
+    "standType": "Base (Class: All-Rounder) - Zone Breaker, Close-Mid+ Range",
+    "pfpSrc": "https://tr.rbxcdn.com/180DAY-912af022ac95b4dc2487be9431eb9ccb/420/420/BackAccessory/Webp/noFilter",
+    "fullArtSrc": "https://static.jojowiki.com/images/7/7e/latest/20221004175724/The_World_Infobox_Anime.png",
+    "standOnMoves": [
+      {
+        "id": "tw-on-01-m2-lmb-all-star-attack-hell-ove",
+        "name": "M2/LMB [⭐] - [All Star Attack! - “Hell Over Heaven”] 🔴",
+        "description": "All Star Attack! The user does a backwards kick and follows with the world doing a brutal combo to the victim while the user is not seen, the world does a final downwards punch to the ground as the user returns with a large road roller that explodes.\n\nDamage: 145.0 | CD: 100s\nTags: Omni-Bypass | Ragdoll + Grand Knockback | COMBO ENDER/GRAB [PARTIAL CUTSCENE] | CLOSE RANGE+ / LARGE AOE ROAD ROLLER\nResolve Cost: 100 | Resolve Gain: 0 | Style Rank Requirement: SSS+ | Endlag: 0.5s",
+        "videoSrc": "https://youtu.be/_hnYvYa5k0Q?t=614",
+        "standalone": true
+      },
+      {
+        "id": "tw-on-02-m2-lmb-sudden-flash",
+        "name": "M2/LMB - [Sudden Flash] 🔴",
+        "description": "The User teleports to the user, works like Gojo’s R special from jjs.\n\nDamage: 1.0 (Grab) + 3.0*3 + 4.3 | CD: 10s\nTags: Grab | Ragdoll + Knockback | Guardable | Grounded Bypass | COMBO ENDER/GRAB | CLOSE RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 10 | Endlag: 0.15s",
+        "videoSrc": "https://youtu.be/RxpNMSXAHZU?t=25",
+        "variants": [
+          {
+            "id": "tw-on-05-m2-lmb-bloodstain",
+            "name": "M2/LMB [🧱] - [Blood-Stain] 🔴",
+            "description": "The World does a combo of jabs and ends with the user doing a roundhouse kick.\n\nDamage: 1.5*6 + 5.3 | CD: 10s\nTags: Ragdoll + Knockback | Guardable | Wall Crash | COMBO ENDER | CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 10 | Endlag: 0.2s",
+            "videoSrc": ""
+          },
+          {
+            "id": "tw-on-06-m2-lmb-stand-uppercut",
+            "name": "M2/LMB [🔼] - [Stand Uppercut] 🔴",
+            "description": "The stand uppercuts the enemy into the air, allowing for air combos.\n\nDamage: 8.5 | CD: 10s\nTags: Stun (1.0s) | Guardable | Upper-Spike | COMBO EXTENDER | CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 10 | Endlag: 0.1s",
+            "videoSrc": "https://youtu.be/fa6uNxOPMM8?si=2REO_ryzQp2wZCjB&t=23",
+            "videos": [
+              {
+                "src": "https://youtu.be/8bn7p5mXq-A?t=899",
+                "label": "REF2"
+              },
+              {
+                "src": "https://youtu.be/p1Pxi9YX5qM?t=176",
+                "label": "REF.3"
+              }
+            ]
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "tw-on-03-m2-lmb-after-move-kings-check",
+        "name": "M2/LMB [After Move] - [King’s Check] 🟢+🟣",
+        "description": "After any move (except any T move or M1’s), using M2 under 0.5s after a move lets the user perform a quick timeskip where knives surround the opponent.\n\nDamage: 1.5*10 | CD: 15s | Cost: 15% Stand Endurance\nTags: Stun (0.35s/knife) | Guardable | Grounded Bypass | COMBO EXTENDER / MIXUP | RANGE IRRELEVANT\nResolve Cost: 10 | Resolve Gain: 0 | Style Rank Requirement: C+ | Endlag: 0s",
+        "videoSrc": "https://youtu.be/zwlZE6u25No?t=59",
+        "variants": [
+          {
+            "id": "tw-on-04-m2-lmb-after-move-oblivion",
+            "name": "M2/LMB [After Move] [⬆️] - [Oblivion] 🟢+🟣",
+            "description": "After any move (except any T move or M1’s), using M2 under 0.5s after a move lets the user perform a quick timeskip where the user and the world slam down the opponent.\n\nDamage: 12.0 | CD: 15s | Cost: 15% Stand Endurance\nTags: Stun (0.35s/knife) | Guardable | Grounded Bypass | COMBO EXTENDER / MIXUP | RANGE IRRELEVANT\nResolve Cost: 10 | Resolve Gain: 0 | Style Rank Requirement: C+ | Endlag: 0s",
+            "videoSrc": "https://youtu.be/xP1Hc_EHnq8?t=82",
+            "videos": [
+              {
+                "src": "https://youtu.be/NcMm8Xh5td8?t=310",
+                "label": "REF2"
+              }
+            ]
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "tw-on-07-e-barrage",
+        "name": "E [♦️] - [Barrage] 🔴",
+        "description": "Stand unleashes a burst of rapid punches, dealing stun (lasts 3.5s).\n\nDamage: 1.2*28 @8 hits/s | CD: 8s\nTags: Stun (0.5s/hit) | Stun Evasive | Ragdoll Bypass | Guardable | Uncancellable | COMBO EXTENDER | EXTENDED CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 1*12 @4/s",
+        "videoSrc": ""
+      },
+      {
+        "id": "tw-on-08-e-m2-barrage-finisher",
+        "name": "E+M2 - [Barrage Finisher] 🔴",
+        "description": "Stand ends the barrage with a heavy strike that knocks away the opponent.\n\nDamage: 6.8 | CD: (E+2s)\nTags: Guard Break | True Follow-Up | Soft Ragdoll | Slight Knockback (Soft) | Parriable | Uncancellable | COMBO ENDER [MINI CUTSCENE] | EXTENDED CLOSE RANGE\nResolve Cost: 5 | Resolve Gain: 0 | Endlag: 0.15s",
+        "videoSrc": "https://youtu.be/vkLUJlNsoG4?t=33"
+      },
+      {
+        "id": "tw-on-09-r-savage-strike",
+        "name": "R - [Savage Strike] 🔴",
+        "description": "The World strikes the victim’s skull with immense force, dealing massive damage.\n\nDamage: 19.5 | CD: 16s\nTags: Guard Break | Ragdoll | Heavy Knockback | Hyper Armor | Hyper Armor Crash | Heavy Parriable | Uncancellable | COMBO ENDER | CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 20 | Endlag: 0.3s",
+        "videoSrc": "",
+        "variants": [
+          {
+            "id": "tw-on-10-r-gut-crusher",
+            "name": "R [🟥] - [Gut Crusher] 🔴",
+            "description": "The World charges its strike to unleash an organ crushing punch to the victim’s torso, leaving them stunned from the impact. (User moves slightly forward upon use)\n\nDamage: 26.5 + [Torso Damage] | CD: 18s\nTags: Guard Break | Stand Crasher | Stun (1.1s) | Hyper Armor | Hyper Armor Bypass | Heavy Parriable | Standing Knockback | COMBO EXTENDER | CLOSE RANGE+ | STAND POSITIONABLE\nResolve Cost: 25 | Resolve Gain: 0 | Endlag: 0.3s",
+            "videoSrc": "https://youtu.be/3m-Na1vDyqE?t=33",
+            "hasFinisher": true,
+            "finisherDescription": "R [🟥] - [Gut Crusher] Finisher: Partial Cutscene/Impact Frame. The World rips through the victim’s torso and disappears right before the user roundhouse kicks the victim’s head, sending them flying away. (But MUCH more intense!)\n\nHP Required: >40hp",
+            "finisherVideoSrc": "https://youtu.be/2ZHwBpEwXNw?t=15"
+          },
+          {
+            "id": "tw-on-11-r-destructive-blows",
+            "name": "R [🕰] - [Destructive Blows] 🔴",
+            "description": "The World does a straight jab, followed by another punch that sends the victim flying away.\n\nDamage: 26.5 + [Torso Damage] | CD: 18s\nTags: Guard Break | Stand Crasher | Hyper Armor Bypass | Heavy Parriable | Heavy Knockback + Ragdoll | COMBO ENDER | CLOSE RANGE+ | STAND POSITIONABLE\nResolve Cost: 20 | Resolve Gain: 0 | Endlag: 0.45s",
+            "videoSrc": "https://youtu.be/MbyJi11SO1w?t=57"
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "tw-on-12-t-knife-pitch",
+        "name": "T [💠] - [Knife Pitch] 🟢",
+        "description": "The user backdashes and throws a single high speed knife at the opponent. Can be done up to 4 times. Any follow-up variant can be casted up to 2 seconds after the original hit.\n\nDamage: 5.3 | CD: 10s\nTags: Stun (0.4s) | Guardable | Curser Aimable | Deflectable | Grounded Bypass | Push Back | PROJECTILE COMBO EXTENDER/MIXUP | LONG+\nResolve Cost: 0 | Resolve Gain: 5 | Endlag: 0.35s",
+        "videoSrc": "https://youtu.be/SmQc--ZC63M?t=49",
+        "videos": [
+          {
+            "src": "https://youtu.be/xP1Hc_EHnq8?t=142",
+            "label": "REF2"
+          }
+        ]
+      },
+      {
+        "id": "tw-on-13-t-sudden-slaughter",
+        "name": "T [🕰/⏩] - [Sudden Slaughter] 🟢",
+        "description": "The user jumps onto the victim’s back and slits their throat with a knive.\n\nDamage: 5.3 + [BLEED(T1)] | CD: 12s\nTags: Follow Up | Stun (0.75s) | Ragdoll Bypass | Hyper Armor Bypass | Light Parriable | PROJECTILE COMBO EXTENDER/MIXUP | LONG+\nResolve Cost: 0 | Resolve Gain: 5 | Style Rank Requirement: B+ | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/PgwJNbditcI?t=114",
+        "hasFinisher": true,
+        "finisherDescription": "T [🕰/⏩] - [Sudden Slaughter] Finisher: Mini-Cutscene. The user instead stabs the victim’s chin before a roundhouse kick to the torso.\n\nHP Required: >10hp",
+        "finisherVideoSrc": "https://youtu.be/EX_n7i1I3fw?t=387"
+      },
+      {
+        "id": "tw-on-14-t-flying-knives",
+        "name": "T [⬆️] - [Flying Knives] 🟢",
+        "description": "The user throws out several knives in the air vertically.\n\nDamage: 3.1*6 | CD: 10s\nTags: Stun (0.4s) | Guardable | Direction Aimable | Deflectable | Grounded Bypass | PROJECTILE COMBO EXTENDER | LONG+\nResolve Cost: 0 | Resolve Gain: 5 | Endlag: 0.5s",
+        "videoSrc": "https://youtu.be/Ua5WGnl64ts?t=155",
+        "videos": [
+          {
+            "src": "https://youtu.be/QgliNkVs9Vs?t=124",
+            "label": "KNIVES"
+          }
+        ]
+      },
+      {
+        "id": "tw-on-15-t-y-bloody-mary",
+        "name": "T [⬆️]+Y - [Bloody Mary] 🟣+🔴",
+        "description": "The user and stand tp’s to the opponent and does a double axe handle to them.\n\nDamage: 16.2 | CD: 15s | Cost: 10% Stand Endurance\nTags: Down Spike | Heavy Knockback | Guardable | Ground Pin | COMBO ENDER | LONG+\nResolve Cost: 0 | Resolve Gain: 5 | Style Rank Requirement: B+ | Endlag: 0.5s",
+        "videoSrc": "https://youtu.be/Ua5WGnl64ts?t=155"
+      },
+      {
+        "id": "tw-on-16-t-from-above",
+        "name": "T [🔙] - [From Above] 🟢",
+        "description": "The user backdashes into the air and throws out several knives.\n\nDamage: 1.3*20 | CD: 10s\nTags: Stun (0.4s) | Guardable | Direction Aimable | Deflectable | Grounded Bypass | PROJECTILE COMBO EXTENDER | LONG+\nResolve Cost: 0 | Resolve Gain: 5 | Endlag: 0.5s",
+        "videoSrc": "https://youtu.be/epg_uZDHuAY?t=48"
+      },
+      {
+        "id": "tw-on-18-t-t-youve-gone-pale",
+        "name": "T+T - [“You’ve Gone Pale”] 🟢+🟣",
+        "description": "The World does a flash-warp effect where a volley of knives aimed at max speed flies to the victim if the first part is hit.\n\nDamage: 1.2*12 + [BLEED(T1)] | CD: 15s | Cost: 10% Stand Endurance\nTags: Follow Up | Guardable | Rebound | Knockback + Ragdoll | Auto Aimed | Deflectable | COMBO EXTENDER | LONG+\nResolve Cost: 5 | Resolve Gain: 0 | Style Rank Requirement: BB+",
+        "videoSrc": "https://youtu.be/SmQc--ZC63M?t=48",
+        "variants": [
+          {
+            "id": "tw-on-17-t-t-second-serving",
+            "name": "T [🔙] + T - [Second Serving] 🟢+🟣",
+            "description": "The user does a flash-warp where several knives appear behind them, shooting out at high speeds wherever the user’s cursor is aimed at.\n\nDamage: 1.3*20 | CD: 15s | Cost: 15% Stand Endurance\nTags: Stun (0.5s) | Guardable | Curser Aimable | Deflectable | Grounded Bypass | PROJECTILE COMBO EXTENDER | LONG+\nResolve Cost: 0 | Resolve Gain: 5 | Style Rank Requirement: B+ | Endlag: 0.5s",
+            "videoSrc": "https://youtu.be/epg_uZDHuAY?t=51",
+            "videos": [
+              {
+                "src": "https://youtu.be/epg_uZDHuAY?t=91",
+                "label": "REF2"
+              }
+            ]
+          }
+        ],
+        "hasVariant": true,
+        "videos": [
+          {
+            "src": "https://youtu.be/uYD1FUdB0bc?t=70",
+            "label": "REF"
+          }
+        ]
+      },
+      {
+        "id": "tw-on-19-t-t-t-just-one-more-to-be-sure",
+        "name": "T+T+T - [“Just one more to be sure”] 🟢+🟣",
+        "description": "The user, who’s playing with the final knife, throws it in the air and kicks it straight to the victim which does a hitstop effect before the victim is blown away. Can be used during 2nd casting and auto ends it hit.\n\nDamage: 1.1*20 + 11.9 | CD: 20s + (J) 20s | Cost: 10% Stand Endurance\nTags: Follow Up | Guardable | Rebound | Knockback + Ragdoll | Auto Aimed | Dodge Bypass | COMBO ENDER | LONG+\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: BB+",
+        "videoSrc": "https://youtu.be/2Svx4h73n_A?t=1042",
+        "hasFinisher": true,
+        "finisherDescription": "T+T+T - [“Just one more to be sure”] Finisher: Non-Cutscene. The final knife goes straight through the victim’s head, leaving them to collapse on the stop.\n\nHP Required: >35hp",
+        "finisherVideoSrc": "",
+        "videos": [
+          {
+            "src": "https://youtu.be/o49oS5grMlo?t=160",
+            "label": "Part2"
+          }
+        ]
+      },
+      {
+        "id": "tw-on-20-t-c-luminous-richochet",
+        "name": "T+C - [Luminous Richochet] 🟢+🟣",
+        "description": "Upon impact, the World disappears and does mini timestops around the victim where it redirects the knife in the area. This applies the [COUNTDOWN] effect.\n\nDamage: 1.1*20 + [BLEED(T1)] | CD: 20s + (C) 15s | Cost: 10% Stand Endurance\nTags: Follow Up | Guard Bypass (Passive) | True Stun (0.35s each) | Dodge Bypass | COMBO EXTENDER | LONG+\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: BB+",
+        "videoSrc": "https://youtu.be/4g49PD25vBI?t=98"
+      },
+      {
+        "id": "tw-on-21-y-roundhouse-rushdown",
+        "name": "Y - [Roundhouse Rushdown] 🔴",
+        "description": "The user grabs uppercuts and pushes them away. They then summon The World behind them who then tosses them to the front of itself and roundhouse kicks them away.\n\nDamage: 5.5 + 6.2 + 15.9 | CD: 17s\nTags: Grab | Knockback + Ragdoll | Guard Bypass (Active) | Uncancellable Startup | Light Parriable | Rush (True) | COMBO ENDER/GRAB | EXTENDED CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 2+2+6 | Endlag: 0.6s (if missed)",
+        "videoSrc": "https://youtu.be/tQcAkIOVWd0?si=gIIwOryGVizRx2_f&t=30",
+        "hasFinisher": true,
+        "finisherDescription": "Y - [Roundhouse Rushdown] Finisher: Non-Cutscene. The world does a series of kicks before a final one that sends the victim flying away.\n\nHP Required: >30hp",
+        "finisherVideoSrc": "https://www.youtube.com/watch?v=KdXE6s-TQGA",
+        "variants": [
+          {
+            "id": "tw-on-22-y-kick-volley",
+            "name": "Y [⬆️] - [Kick Volley] 🔴",
+            "description": "The World does a heavy kick barrage to the opponent before a final kick.\n\nDamage: 2*10 + 5.8 | CD: 17s\nTags: Guardable > Guard Break + Light Parriable | Heavy Knockback + Ragdoll | Hyper Armor Startup | COMBO ENDER | EXTENDED CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 1*5+5 | Endlag: 0.45s",
+            "videoSrc": "https://youtu.be/gxIhabKHQSk?t=107"
+          },
+          {
+            "id": "tw-on-23-y-holy-dive",
+            "name": "Y [🔝+💠] - [Holy Dive] 🔴",
+            "description": "The World and User does a swift foot dive downwards and brings the user and stand back up in the air if an opponent is hit. Can be casted thrice, with the final doing a bonus impact if hitting the opponent directly. (Can hit airborne targets)\n\nDamage: 9.3 (+5.8 for bonus impact) | CD: 20s\nTags: True Guard Break | Knockback + Ragdoll | Grounded Bypass | Down Spike | Ground Pin | Uncancellable (Dive) | Rebound (Last Hit) | COMBO EXTENDER | MID RANGE | AOE (SMALL +)\nResolve Cost: 0 | Resolve Gain: 8 each | Style Rank Requirement: C+ | Endlag: 0.5s",
+            "videoSrc": "",
+            "hasFinisher": true,
+            "finisherDescription": "Y [🔝+💠] - [Holy Dive] Finisher: Non-Cutscene. The world kick does a hit-stop where the screen has a black vignette and slight zoom in and an increasing after image effect similar to monster garou’s doom dive finisher, afterwards, the opponent is left as a bloody mess.\n\nHP Required: >15hp",
+            "finisherVideoSrc": ""
+          },
+          {
+            "id": "tw-on-24-y-one-above-all",
+            "name": "Y [✴️] - [“One Above All”] 🔴+🟣",
+            "description": "The World flash-warps and does overhead bicycle kick to the enemy, launching them downwards.\n\nDamage: 15.3 | CD: 13s | Cost: 10% Stand Endurance\nTags: Guard Break + Parriable | Heavy Knockback + Ragdoll | Down-Spike | Counter + Dodge Bypass | COMBO ENDER | MID+ RANGE\nResolve Cost: 5 | Resolve Gain: 0 | Style Rank Requirement: BB+",
+            "videoSrc": ""
+          },
+          {
+            "id": "tw-on-25-y-fatal-footwork",
+            "name": "Y [🧱] - [Fatal Footwork] 🔴",
+            "description": "The World does a series of stops to the victim on the wall and ends with a chin-to-knee kick, a shin jolt and a stomp to the face, knocking the victim through the wall. This applies the [COUNTDOWN] effect.\n\nDamage: 2.3 + 1*10 + 3.9 + 4.5 + 9.3 | CD: 13s\nTags: Guardable | Knockback + Ragdoll | COMBO ENDER/GRAB | CLOSE RANGE\nResolve Cost: 10 | Resolve Gain: 0 | Endlag: 0.3s",
+            "videoSrc": "https://youtu.be/aGVa_asRBFQ?t=336",
+            "hasFinisher": true,
+            "finisherDescription": "Y [🧱] - [Fatal Footwork] Finisher: Non-Cutscene. The world does couple more stomps to the victim’s face before a final one that splats their head into pieces.\n\nHP Required: >35hp",
+            "finisherVideoSrc": "https://www.youtube.com/watch?v=KdXE6s-TQGA"
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "tw-on-26-b-cleave",
+        "name": "B [♦️] - [Cleave] 🔴",
+        "description": "The World chops the victim’s shoulder-blade.\n\nDamage: 15.3 + [Arm Damage] + [BLEED(T1)] | CD: 15s\nTags: Guardable | Stun (0.65s) | COMBO EXTENDER | CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 5 | Endlag: 0.2s",
+        "videoSrc": "https://youtu.be/5dfvh5bjJc4?si=sdzNBxKjzIAn67eo&t=41",
+        "hasFinisher": true,
+        "finisherDescription": "B [♦️] - [Cleave] Finisher: Mini-Cutscene. The world chops off one arm, then the other, then ends with punching through the victim’s head (Ref).\n\nHP Required: >18hp",
+        "finisherVideoSrc": "https://youtu.be/8VsD2yvxeco?t=268"
+      },
+      {
+        "id": "tw-on-27-b-fatal-impact",
+        "name": "B [🕰/▶️] - [Fatal Impact] 🔴",
+        "description": "The World does a heavy punch to the victim’s gut that sends them flying in the air. This applies the [COUNTDOWN] effect.\n\nDamage: 19.9 + [Torso Damage] | CD: 15s\nTags: Guard Break | Heavy Parriable | Heavy Knockback (Staggering) | COMBO EXTENDER | CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 15 | Style Rank Requirement: B+ | Endlag: 0.5s",
+        "videoSrc": "https://youtu.be/PgwJNbditcI?t=26"
+      },
+      {
+        "id": "tw-on-28-b-unstoppable-demolition",
+        "name": "B [↔️] - [Unstoppable Demolition] 🔴",
+        "description": "The user does a combo with a stop sign that starts with them dragging the sign from the ground for an upward slash, the combo, and ends with a jumping aerial down slash. This move also has custom variations depending on if you are holding an environmental interactable item.\n\nDamage: 7.2 + 5.2*2 + 19.5 + [BLEED(T1)] | CD: 20s\nTags: Guardable (Start) + True Guard Break (End) | Grounded Bypass | Hyper Armor Startup | Stun (0.3s, except Final) | Rush (Untrue) | COMBO EXTENDER | SEMI-MID RANGE\nResolve Cost: 25 | Resolve Gain: 0 | Style Rank Requirement: BB+ | Endlag: 0.85s",
+        "videoSrc": "https://youtu.be/gxIhabKHQSk?si=C9udR_IudO9IVvVh&t=122",
+        "hasFinisher": true,
+        "finisherDescription": "B [↔️] - [Unstoppable Demolition] Finisher: Non-Cutscene. The user chops the victim in half for the final hit.\n\nHP Required: >25hp as of last hit",
+        "finisherVideoSrc": "https://youtu.be/T2A1N4Q-_z8?t=808",
+        "videos": [
+          {
+            "src": "https://youtu.be/jk1LkbNyFHs?si=8lcnp5koKJJN4X4e&t=187",
+            "label": "PART2"
+          }
+        ]
+      },
+      {
+        "id": "tw-on-29-b-from-above",
+        "name": "B [⏏️] - [From Above] 🔴",
+        "description": "While in the air, the user dives from the air to deliver a double arm chop. If missed, the chop does a slight ranged projectile of air chops.\n\nDamage: 13.2 | CD: 16s\nTags: Guard Bypass (Active) | Stun (0.5s) | Grounded Bypass | Hyper Armor Startup | Standing Knockback | COMBO EXTENDER | MID RANGE\nResolve Cost: 10 | Resolve Gain: 3 | Style Rank Requirement: B+ | Endlag: 0.75s",
+        "videoSrc": "https://youtu.be/qX2EuAbwLYY?t=87",
+        "videos": [
+          {
+            "src": "https://youtu.be/eFrZiTcOMAI?t=59",
+            "label": "REF2"
+          },
+          {
+            "src": "https://youtu.be/XqrAE0v8I14?t=13",
+            "label": "REF3"
+          }
+        ]
+      },
+      {
+        "id": "tw-on-30-x-sweep-kick",
+        "name": "X [♦️] - [Sweep Kick] 🔴",
+        "description": "The World does a heavy sweep kick.\n\nDamage: 9.2 | CD: 16s\nTags: Guardable | Tripping Ragdoll | Stun (0.6s) | Grounded Bypass | COMBO EXTENDER | EXTENDED CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 4 | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/swa62ZEBitM?t=11"
+      },
+      {
+        "id": "tw-on-31-x-its-a-road-roller",
+        "name": "X [🟥+🔝] - [“It’s A Road Roller”] 🔴+🟡",
+        "description": "The user jumps in the air and is able to aim a roadroller, by pressing X again they can land it at will, this ability is auto used when timestop has ended, but extends the timestop as well. The road roller explodes on Impact.\n\nDamage: 75.0 + [Full Body Damage] | CD: 50s\nTags: Heavy Knockback + Ragdoll | Guard Bypass | Direction Aimable | Deflectable | Grounded Bypass | Rebound | COMBO ENDER [SUPER & PARTIAL CUTSCENE] | STARTUP-RANGE IRRELEVANT / AOE - MID\nResolve Cost: 50 | Resolve Gain: 0 | Style Rank Requirement: S+ | Endlag: 1.0s",
+        "videoSrc": "https://youtu.be/cwEAE8z7lyo?t=187",
+        "hasFinisher": true,
+        "finisherDescription": "X [🟥+🔝] - [“It’s A Road Roller”] Finisher: Non-Cutscene. The victim is left as a blood splat on the floor.\n\nHP Required: >85hp",
+        "finisherVideoSrc": ""
+      },
+      {
+        "id": "tw-on-32-x-y-i-shall-strike-first",
+        "name": "X+Y - [“I Shall Strike First”] 🔴",
+        "description": "The user does another rising back kick as The World charges into a heavy roundhouse kick that sends the opponent upwards.\n\nDamage: 7.2 + 4.3 | CD: 16s\nTags: Upper-Spike | Ragdoll Bypass | Knockback + Ragdoll | Grounded Bypass | Stun (0.5s) | COMBO EXTENDER/ENDER | EXTENDED CLOSE RANGE\nResolve Cost: 5 | Resolve Gain: 0 | Endlag: 0.5s",
+        "videoSrc": "https://youtu.be/swa62ZEBitM?t=13",
+        "videos": [
+          {
+            "src": "https://youtu.be/IsoOAbgJuPw?t=125",
+            "label": "REF2"
+          }
+        ]
+      },
+      {
+        "id": "tw-on-33-x-c-onslaught",
+        "name": "X+C - [Onslaught] 🔴",
+        "description": "The user does another roundhouse kick as The World charges into a series of punches and ends with a timeskip behind the victim and a high speed spin kick.\n\nDamage: 3.2 + 2.5*5 + 19.2 | CD: 16s | Cost: 5% Stand Endurance\nTags: Rush (True) | Ragdoll Bypass | Grand Knockback | Guard Bypass (Active) | Heavy Parriable | Stun (0.6s) | COMBO ENDER | EXTENDED CLOSE RANGE\nResolve Cost: 35 | Resolve Gain: 0 | Style Rank Requirement: BB+ | Endlag: 0.6s",
+        "videoSrc": "https://youtu.be/Ua5WGnl64ts?t=146",
+        "videos": [
+          {
+            "src": "https://youtu.be/Kz20l138a10?t=269",
+            "label": "REF2"
+          }
+        ]
+      },
+      {
+        "id": "tw-on-34-x-y-j-merciless-assault",
+        "name": "X+Y+J - [Merciless Assault] 🔴",
+        "description": "The World does a combo of attacks that ends in the victim being punched away.\n\nDamage: 7.2 + 1.3*4 + 6.6 + 13.1 | CD: 16s\nTags: Guardable | Heavy Knockback + Ragdoll | Hyper Armor Bypass | COMBO ENDER | EXTENDED CLOSE RANGE\nResolve Cost: 15 | Resolve Gain: 0 | Style Rank Requirement: A+ | Endlag: 0.65s",
+        "videoSrc": "https://youtu.be/nFCVMM_FX_Y?t=30"
+      },
+      {
+        "id": "tw-on-35-x-y-t-checkmate",
+        "name": "X+Y+T - [“Checkmate!”] 🟣",
+        "description": "The World stops time and throws hundreds of knives to the opponent before resuming time itself.\n\nDamage: 45.0 + [Bleed (T2)] | CD: 25s | Cost: 40% Stand Endurance\nTags: Guard Bypass | Soft Ragdoll + Minor Upper-Spike | Stun (1.2s) | COMBO ENDER [SUPER & PARTIAL CUTSCENE] | EXTENDED CLOSE RANGE\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: A+ | Endlag: 0.7s",
+        "videoSrc": "https://youtu.be/PR_6WjDC4j0",
+        "hasFinisher": true,
+        "finisherDescription": "X+Y+T - [“Checkmate!”] Finisher: Cutscene. The User throws one more knife (Ref 1) and as time resumes the victim is hit (Ref 2).\n\nHP Required: >50hp",
+        "finisherVideoSrc": "https://youtu.be/cag8yV6ppW4?t=139",
+        "finisherVideos": [
+          {
+            "src": "https://youtu.be/T2A1N4Q-_z8?t=806",
+            "label": "HERE"
+          }
+        ]
+      },
+      {
+        "id": "tw-on-36-z-flash-warp",
+        "name": "Z [+⏺️] - [Flash Warp] 🟣",
+        "description": "The world and the user teleport to wherever the cursor lands, if the cursor is hovering over a player, they swap positions.\n\nDamage: 0 | CD: 15s | Cost: 15% Stand Endurance\nTags: Guard Bypass | COMBO EXTENDER | SEMI-LONG RANGE (Further with upgrades)\nResolve Cost: 5 | Resolve Gain: 0",
+        "videoSrc": "https://youtu.be/dc7dy5AHhNY?t=47",
+        "videos": [
+          {
+            "src": "https://youtu.be/ipcVBeKS5No?t=79",
+            "label": "REF2"
+          }
+        ]
+      },
+      {
+        "id": "tw-on-37-c-pulverize",
+        "name": "C [❇️] - [Pulverize] 🔴",
+        "description": "The world grabs the victim and throws them upward before punching them back downwards.\n\nDamage: 1.1 + 15.2 | CD: 16s\nTags: Guard Bypass | Soft Ragdoll | Stun (0.2s) | Grounded | Rebound | Light Parriable | Stun Evasive | COMBO EXTENDER/ENDER | CLOSE RANGE\nResolve Cost: 10 | Resolve Gain: 2 | Endlag: 0.6s",
+        "videoSrc": "https://youtu.be/vkLUJlNsoG4?t=22"
+      },
+      {
+        "id": "tw-on-38-c-disposal",
+        "name": "C [🔘/🕰] - [Disposal] 🟣",
+        "description": "The World flash warps and grabs the victim and throws them away.\n\nDamage: 4.3 | CD: 12s | Cost: 10% Stand Endurance\nTags: Guard Bypass | Soft Ragdoll | Stun (0.5s) | Follow Up | Heavy Knockback | COMBO EXTENDER/ENDER | FAR RANGE\nResolve Cost: 5 | Resolve Gain: 2",
+        "videoSrc": "https://youtu.be/29fZx3vklb8?t=137"
+      },
+      {
+        "id": "tw-on-39-c-h-clockstrike",
+        "name": "C+H [⚠️] - [Clock-Strike] 🔴+🟢+🟣",
+        "description": "If used during windup, this faints the move into a counter that if hit, will damage the offender and give them the [COUNTDOWN] effect. Has variants dependent on range.\n(Close range) The stand grabs the victim’s punch and the user chuckles behind the arm before the world skull punches the victim away.\n(Ranged move) The user dodges the attack and snaps their fingers, then 20 knives appear around the victim stabbing them.\n\nDamage: Dependant on Variant | CD: 16s | Cost: 30% Stand Endurance\nTags: Melee + Ranged Counter | Ragdoll + Knockback | COMBO ENDER [Counter] | RANGE IRRELEVANT\nResolve Cost: 25 | Resolve Gain: 2 | Style Rank Requirement: B+ | Endlag: 0.5s",
+        "videoSrc": "https://youtu.be/sB4t0nXcGB0?si=p0CKGPGAgV5Q2ZVT&t=246",
+        "standalone": true,
+        "videos": [
+          {
+            "src": "https://youtu.be/Xmds7jeNqvg?t=27",
+            "label": "CLOSE"
+          },
+          {
+            "src": "https://youtu.be/aK1K_SoMawg?t=3",
+            "label": "RANGED"
+          }
+        ]
+      },
+      {
+        "id": "tw-on-40-c-beneath-me",
+        "name": "C [⬆️] - [“Beneath Me”] 🔴",
+        "description": "The world grabs the victim and throws them to the ground.\n\nDamage: 3.4 | CD: 5s\nTags: Down-Spike | Guardable | Soft Ragdoll + Knockback | Ragdoll Bypass | Rebound | Stun (0.45s) | COMBO EXTENDER | CLOSE RANGE\nResolve Cost: 5 | Resolve Gain: 2",
+        "videoSrc": "https://youtu.be/6aoNFrm9f1k?t=42"
+      },
+      {
+        "id": "tw-on-41-c-h-witness-my-power",
+        "name": "C+H - [“Witness My Power!”] 🟣+🟡",
+        "description": "The user does an aimable dash to the opponent, if landed, the opponent tumbles back for a short cutscene. This applies the [COUNTDOWN] effect.\n\nDamage: 5.1 + 55.2 | CD: 16s | Cost: 20% Stand Endurance\nTags: Guard Bypass | Tripping Ragdoll | Stun | Grounded Bypass | COMBO ENDER [ULTIMATE & CUTSCENE] | CLOSE+ RANGE\nResolve Cost: 55 | Resolve Gain: 0 | Style Rank Requirement: S+ | Endlag: 0.85s",
+        "videoSrc": "https://youtu.be/4U1fZBWMR8k?t=86",
+        "hasFinisher": true,
+        "finisherDescription": "C+H - [“Witness My Power!”] Finisher: Cutscene. The User teleports behind the victim, mocking them before The World rips their heart out and barrages them before destroying them into nothing but bloody rain, where the user taunts their dead victim.\n\nHP Required: >70hp",
+        "finisherVideoSrc": "https://youtu.be/qJ5UzCW7mCY?t=212"
+      },
+      {
+        "id": "tw-on-42-h-the-world",
+        "name": "H - [“The World!”] 🟣",
+        "description": "The World uses its ultimate ability to stop the flow of time down to a standstill. By pressing H again at any point in the timestop, the user can pre-emptively end the ability. And by pressing H during another timestop, a player can move as well, if the player stops moving or stands still their “countdown” for how long they move in ts is paused. If a player’s timestop extends beyond another’s timestop’s duration. The player simply outlast the other’s timestop.\n\nCD: 25s (-10s for each second cut short) | Cost: 50% Stand Endurance per second\nTags: True Stun | Hyper Armor | SPECIAL MOVE [PARTIAL CUTSCENE] | AOE (HYPER LARGE SCALE)\nResolve Requirement: 35 | Resolve Gain Reduction: 50% | Style Rank Requirement: A+",
+        "videoSrc": "https://youtu.be/pSa0eV9O5oQ?t=2",
+        "videos": [
+          {
+            "src": "https://www.youtube.com/shorts/FZtC52z8XRo?t=8&feature=share",
+            "label": "ANIM2"
+          },
+          {
+            "src": "https://youtu.be/tmMnf2CIMg0?t=24",
+            "label": "UTILITY"
+          }
+        ]
+      },
+      {
+        "id": "tw-on-43-h-z-sudden-strikes",
+        "name": "H+Z - [Sudden Strikes] 🔴",
+        "description": "The world and user dash forward and strike the opponent. At the end of timestop, they receive multiple strikes before a final one that blows them away.\n\nDamage: 2.3*5 + 11.5 | CD: (Z) 17s\nTags: Guardable | Ragdoll + Heavy Knockback | Grounded Bypass | COMBO EXTENDER | SEMI-MID RANGE\nResolve Cost: 0 | Resolve Gain: 0 | Style Rank Requirement: B+",
+        "videoSrc": "https://youtu.be/swa62ZEBitM?t=11"
+      },
+      {
+        "id": "tw-on-44-h-y-final-punisher",
+        "name": "H+Y - [Final Punisher] 🔴",
+        "description": "The world does a series of heavy blows to the opponent.\n\nDamage: 4.1*7 + [Torso Damage] | CD: (Y) 17s\nTags: Guardable | Ragdoll + Heavy Knockback | Hyper Armor Bypass | COMBO ENDER | SEMI-MID RANGE\nResolve Cost: 0 | Resolve Gain: 0 | Style Rank Requirement: BB+",
+        "videoSrc": "https://youtu.be/j30PTa-g3EQ?si=NoWSo8qsBJW2h6da&t=47"
+      },
+      {
+        "id": "tw-on-45-h-t-a-familiar-fate",
+        "name": "H+T - [“A Familiar Fate”] 🟣",
+        "description": "The world throws a total of 12 knives forward.\n\nDamage: 1*12 | CD: 0.5s\nTags: Stun | Guardable | Curser Aimable | Deflectable | Grounded Bypass | COMBO EXTENDER | SEMI-LONG RANGE (Further with upgrades)\nResolve Cost: 5 | Resolve Gain: 0",
+        "videoSrc": "https://youtu.be/kKzm12fle-U?t=43"
+      },
+      {
+        "id": "tw-on-46-h-x-its-a-road-roller",
+        "name": "H+X [🟥+🔝] - [“It’s A Road Roller”] 🔴+🟡",
+        "description": "The user jumps in the air and is able to aim a roadroller, by pressing X again they can land it at will, this ability is auto used when timestop has ended, but extends the timestop as well. This is the regular timestop.\n\nDamage: 150.0 + [Full Body Damage] | CD: (X) 17s\nTags: Heavy Knockback + Ragdoll | Guard Bypass | Direction Aimable | Deflectable | Grounded Bypass | Rebound | COMBO ENDER [ULTIMATE & CUTSCENE] | STARTUP-RANGE IRRELEVANT / AOE - MID\nResolve Cost: 50 | Resolve Gain: 0 | Style Rank Requirement: SSS+ | Endlag: 1.0s",
+        "videoSrc": "https://youtu.be/KNUI5xWctnQ",
+        "hasFinisher": true,
+        "finisherDescription": "H+X [🟥+🔝] - [“It’s A Road Roller”] Finisher: Cutscene. The scene changes to Cairo’s Bridge and after the road roller The User does the “Invincibility, Immortality, STAND POWER!” scene, and ends with them scraping their head in excitement.\n\nHP Required: >175hp",
+        "finisherVideoSrc": "https://static.jojowiki.com/images/thumb/a/a6/latest/20220818063001/CairoOverpassASBR.jpg/1000px-CairoOverpassASBR.jpg",
+        "variants": [
+          {
+            "id": "tw-on-47-h-x-against-star-platinum-s-awakening-its-a-road-roller",
+            "name": "H+X [🟥+🔝] {AGAINST STAR PLATINUM’S AWAKENING} - [“It’s A Road Roller”] 🔴+🟡",
+            "description": "Similar to the previous version, however after landing, the Star Platinum User and The World User initiate a clash of sorts. Both parties will have a Button Mash clash. After, the ASBR interaction plays, however the SP user must land a QTE with their Timestop Key to activate this, if failed, the regular ending plays, if succeeded, the SP user takes 100 damage instead the ASBR reaction plays as well (if the SP user has over 150 hp).\n\nDamage: 150.0 + [Full Body Damage] | CD: (X) 17s\nTags: Heavy Knockback + Ragdoll | Guard Bypass | Direction Aimable | Deflectable | Grounded Bypass | Rebound | COMBO ENDER [ULTIMATE & CUTSCENE] | STARTUP-RANGE IRRELEVANT / AOE - MID\nResolve Cost: 50 | Resolve Gain: 0 | Style Rank Requirement: SSS+ | Endlag: 1.0s",
+            "videoSrc": "https://youtu.be/KNUI5xWctnQ"
+          }
+        ],
+        "hasVariant": true
+      }
+    ],
+    "awakeningMoves": [],
+    "moves": [
+      {
+        "id": "tw-so-01-e-futile-approach",
+        "name": "E [⚠️] - [Futile Approach] 🔴+🟣",
+        "description": "A counter that when triggered will pause time temporarily for the user to gut punch the opponent.\n\nDamage: 13.2 | CD: 15s | Cost: 15% Stand Endurance\nTags: Stun (0.8s) | Melee + Projectile Counter | Standing Knockback | COMBO EXTENDER [Counter] | RANGE | AUTO STAND SUMMON\nResolve Cost: 10 | Resolve Gain: 3",
+        "videoSrc": "https://youtu.be/QAsEo1z5ots?si=mVg7jFhqwAxnFYEX&t=43"
+      },
+      {
+        "id": "tw-so-02-e-t-futile-approach",
+        "name": "E+T [⚠️] - [Futile Approach] 🔴+🟣",
+        "description": "A counter that when the T key is used, a bunch of knives surround the opponent.\n\nDamage: 0.5*30 | CD: 15s | Cost: 15% Stand Endurance\nTags: Stun (0.8s) | Melee + Projectile Counter | Tripping Ragdoll | COMBO ENDER [Counter] | RANGE IRRELEVANT\nResolve Cost: 10 | Resolve Gain: 3",
+        "videoSrc": "https://youtu.be/ipcVBeKS5No?t=60"
+      },
+      {
+        "id": "tw-so-03-r-savage-strike",
+        "name": "R - [Savage Strike] 🔴",
+        "description": "A charged sweep kick that pushes the enemy back.\n\nDamage: 6.9 | CD: 12s\nTags: Stun (0.8s) | Guardable | Standing Knockback | COMBO EXTENDER | CLOSE\nResolve Cost: 0 | Resolve Gain: 8",
+        "videoSrc": "https://youtu.be/DGzlAW3VqZU?t=33"
+      },
+      {
+        "id": "tw-so-04-r-r-wryyy",
+        "name": "R+R - [“Wryyy!!!”] 🔴",
+        "description": "A charged downward scrape with your fingers.\n\nDamage: 13.5 | CD: 18s\nTags: Guard Break | Parriable | Knockback + Ragdoll | COMBO ENDER | CLOSE+\nResolve Cost: 10 | Resolve Gain: 0",
+        "videoSrc": "https://youtu.be/magWZVh4bWo?t=83"
+      },
+      {
+        "id": "tw-so-05-t-check",
+        "name": "T [♦️/2⃣/1] - [“Check”] 🟢",
+        "description": "The user throws a bundle of knives with one hand. Holding/Charging increases projectile speed.\n\nDamage: 5.3*3 | CD: 16s\nTags: Guardable | Parriable | Knockback + Ragdoll | COMBO ENDER | LONG+\nResolve Cost: 0 | Resolve Gain: 5",
+        "videoSrc": "https://youtu.be/4U1fZBWMR8k?t=111"
+      },
+      {
+        "id": "tw-so-06-t-mate",
+        "name": "T [1/2] - [“Mate”] 🟢+🟣",
+        "description": "The second part has The User flash-warps behind the victim in the air as they’ve already thrown several more knives.\n\nDamage: 1.0*15 | CD: 18s | Cost: 20% Stand Endurance\nTags: Guard Break | Parriable | Knockback + Ragdoll | COMBO ENDER | LONG+\nResolve Cost: 0 | Resolve Gain: 3*3",
+        "videoSrc": "https://youtu.be/p-cMNy_NWNI?t=66"
+      },
+      {
+        "id": "tw-so-07-t-bloody-hell",
+        "name": "T [🔝+1/2] - [Bloody Hell] 🟢+🟣",
+        "description": "The second part has The User flash-warps above the victim in the air as they’ve already thrown several more knives that rain down.\n\nDamage: 1.0*15 | CD: 18s | Cost: 20% Stand Endurance\nTags: Guard Break | Parriable | Knockback + Ragdoll | COMBO ENDER | LONG+\nResolve Cost: 0 | Resolve Gain: 3*3",
+        "videoSrc": "https://youtu.be/sGhIekAUuBA?t=528"
+      },
+      {
+        "id": "tw-so-08-y-just-a-glimpse",
+        "name": "Y [1/1] - [“Just A Glimpse…”] 🔴",
+        "description": "The World grabs the enemy and throws them upwards into the air.\n\nDamage: 5.3 | CD: 15s\nTags: Guardable | Grab | Medium Knockback + Soft Ragdoll | Stun (0.5s) | Rebound | COMBO EXTENDER/ENDER | EXTENDED CLOSE RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 12 | Endlag: 0.2s",
+        "videoSrc": ""
+      },
+      {
+        "id": "tw-so-09-y-of-my-full-power",
+        "name": "Y [1/2] - [“...Of My Full Power”] 🔴",
+        "description": "The World fully manifests and does a barrage that progresses forward.\n\nDamage: 1.5*10 + 10.0 | CD: 20s\nTags: Guard Break | Parriable | Knockback + Ragdoll | COMBO ENDER | CLOSE+ | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 5",
+        "videoSrc": "https://youtu.be/4U1fZBWMR8k?t=35"
+      },
+      {
+        "id": "tw-so-10-y-final-round",
+        "name": "Y [⚠️] - [Final Round] 🔴",
+        "description": "If hit during startup, The World fully manifests and does a barrage that progresses forward.\n\nDamage: XX | CD: 40s\nTags: Guard Break | Stand Crasher | Hyper Armor Bypass | Heavy Parriable | Heavy Knockback + Ragdoll | COMBO ENDER | CLOSE | AUTO STAND SUMMON\nResolve Cost: 40 | Resolve Gain: 0",
+        "videoSrc": "https://youtu.be/_fEjeQ_26jY?si=Tr_ch4W6xXe2edtB"
+      },
+      {
+        "id": "tw-so-11-z-flash-warp",
+        "name": "Z [+⏺️] - [Flash Warp] 🟣",
+        "description": "The world and the user teleport to wherever the cursor lands, if the cursor is hovering over a player, they swap positions, if combat marked, the user can teleport behind the marked person.\n\nDamage: 0 | CD: 15s | Cost: 15% Stand Endurance\nTags: Guard Bypass | COMBO EXTENDER | SEMI-LONG RANGE (Further with upgrades)\nResolve Cost: 5 | Resolve Gain: 0",
+        "videoSrc": "https://youtu.be/swa62ZEBitM?t=11"
+      }
+    ],
+    "movesetType": "base"
   },
   {
     "id": "silver-chariot",
@@ -476,10 +1303,494 @@
     "color": "#7CA9DE",
     "confirmed": true,
     "quote": "Bravo OH Bravo!",
-    "description": "Desc Here",
+    "description": "Base Stats: M1 Damage: 7.5, Speed Tier: A, Power Tier: B.\n\nExtra Traits: Combo Break [Pressure Release + After Image Army] replaces standard combo break; Silver Chariot releases its Armor, stunning anyone in range. If an anti team burst is triggered, Chariot creates 5 after images, two will pierce one of the teamers as they fling him away with Grand Knockback, and the other teamer is constantly attacked by the other clones for 2 seconds. The user still has their Chariot at this time, allowing them to use any move. The more teamers, the more after images.\n\nMove Effect [Lingering Silver]: This effect is applied from some moves. When applied, the victim has a 3 second window before a second series of remote, sure hit slashes that stun them for half a second and deal 13.5 damage. This is guardable.\n\nStatic Aura:\n- Overwhelming Speed: When facing a Silver Chariot player, your damage is increased by 10%, but your speed and attack speed are nerfed by 8%.\n\nAdd-on Passives:\n- Armored Clad: The Stand has 30% damage reduction when being used and 75 stand durability points. For each 15 stand dura. pts lost, you lose part of your armor, 5% of the damage reduction buff, and gain 10% speed. When you lose all, your stand is crashed.\n- Unguardable Precision: While in overdrive, anytime you are parried or reflected, you will do a quick counter to the person who parried you and deal some damage, however you still receive normal parry stun.\n\nPower-Up Mode:\n- Stand Tandem [Metallic Mirage]: Allows you to use your stand tandem up to 4 times SIMULTANEOUSLY! Even on the same person, without losing your stand.\n- Step Effect [Metallic Masquerade]: Using a dodge, you leave a clone at your location, that slowly fades away, somewhat tricking enemies.\n- Guard Effect [Shimmering Stance]: Your guard becomes 360 as chariot guards from every angle, but your guard hp is reduced.",
     "rarity": "Desc Here",
-    "standType": "Desc Here",
-    "moves": []
+    "standType": "Power-Up (Class: Speed) - Footsies, Close-Mid+ Range",
+    "pfpSrc": "https://tr.rbxcdn.com/180DAY-7122cd417ee51907d2fd6301f2b79654/420/420/BackAccessory/Webp/noFilter",
+    "fullArtSrc": "https://static.wikia.nocookie.net/jjba/images/8/88/SilverChariot_AnimeAV.png/revision/latest?cb=20240707133121",
+    "standOnMoves": [
+      {
+        "id": "sc-on-01-m2-lmb-all-star-attack-silver-s",
+        "name": "M2/LMB [⭐] - [All Star Attack! - “Silver Speedblitz”] 🔴",
+        "description": "All Star Attack! Chariot goes armor off as it blitzes throughout the area at light speeds, it leaves the user in armor off mode.\n\nDamage: 5 per hit (40 hits) | CD: 100s\nTags: Omni-Bypass | Ragdoll + Grand Knockback | COMBO ENDER [PARTIAL CUTSCENE] | LARGE AOE\nResolve Cost: 100 | Resolve Gain: 0 | Style Rank Requirement: SSS+ | Endlag: 0.5s",
+        "videoSrc": "https://youtu.be/_hnYvYa5k0Q?t=251",
+        "standalone": true
+      },
+      {
+        "id": "sc-on-02-m2-lmb-silver-sonata",
+        "name": "M2/LMB - [Silver Sonata] 🔴",
+        "description": "Silver Chariot and the user stances before dashing out for several swift piercing strikes to the enemy.\n\nDamage: 4.3*4 | CD: 10s\nTags: Stun | Air Ragdoll Juggle | Guardable (Uncancellable) | Grounded Bypass | COMBO EXTENDER | MID+ RANGE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 3*4 | Style Rank Requirement: B+ | Endlag: 0.15s",
+        "videoSrc": "https://static.wikia.nocookie.net/zenless-zone-zero/images/0/0c/Starshine_Waltz_Preview.gif",
+        "variants": [
+          {
+            "id": "sc-on-03-m2-lmb-silver-sonata",
+            "name": "M2/LMB [🟥] - [Silver Sonata] 🔴",
+            "description": "Silver Chariot and the user stances before dashing out for several swift piercing strikes to the enemy.\n\nDamage: 2.3*5 + 5.3 + 9.3 | CD: 20s\nTags: Knockback + Ragdoll | Air Ragdoll Juggle | Guardable (Uncancellable) | Grounded Bypass | COMBO EXTENDER | MID+ RANGE / SMALL AOE\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: B+ | Endlag: 0.15s",
+            "videoSrc": "https://youtu.be/pbfdg1yObBQ?t=41"
+          },
+          {
+            "id": "sc-on-04-m2-lmb-pincushion-peforations",
+            "name": "M2/LMB [🧱] - [Pincushion Peforations] 🔴",
+            "description": "Silver Chariot stabs the victim’s arm, pinning them to the wall and follows with 3 more slashes before the camera pans to chariot as he aims one last pierce that the player can aim to a body part, whichever they choose gets damaged.\n\nDamage: 5.3 + 2.4*3 + 8.1 + [Bleed T1] + [Body part damage] | CD: 10s\nTags: Ragdoll + Knockback | Guardable | Wall Crash | COMBO ENDER | CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 10 | Endlag: 0.2s",
+            "videoSrc": ""
+          },
+          {
+            "id": "sc-on-05-m2-lmb-stand-uppercut",
+            "name": "M2/LMB [🔼] - [Stand Uppercut] 🔴",
+            "description": "The stand uppercuts the enemy into the air, allowing for air combos.\n\nDamage: 8.5 | CD: 10s\nTags: Stun (1.0s) | Guardable | Upper-Spike | Air Juggle | COMBO EXTENDER | CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 10 | Endlag: 0.1s",
+            "videoSrc": "https://youtu.be/_aR1pJ72P4Y?t=76",
+            "videos": [
+              {
+                "src": "https://youtu.be/8bn7p5mXq-A?t=899",
+                "label": "REF2"
+              }
+            ]
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "sc-on-06-e-barrage",
+        "name": "E [♦️] - [Barrage] 🔴",
+        "description": "Stand unleashes a burst of rapid punches, dealing stun (lasts 3.5s).\n\nDamage: 0.9*35 @10 hits/s | CD: 8s\nTags: Stun (0.5s/hit) | Stun Evasive | Ragdoll Bypass | Guardable | Uncancellable | COMBO EXTENDER | EXTENDED CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 1*12 @4/s",
+        "videoSrc": ""
+      },
+      {
+        "id": "sc-on-07-e-m2-barrage-finisher",
+        "name": "E+M2 - [Barrage Finisher] 🔴",
+        "description": "Stand ends the barrage with a heavy strike that knocks away the opponent.\n\nDamage: 5.3 | CD: (E+2s)\nTags: Guard Break | True Follow-Up | Soft Ragdoll | Slight Knockback (Soft) | Parriable | Uncancellable | COMBO ENDER [MINI CUTSCENE] | EXTENDED CLOSE RANGE\nResolve Cost: 5 | Resolve Gain: 0 | Endlag: 0.15s",
+        "videoSrc": "https://youtu.be/eeB2LzzNWyA?t=48",
+        "videos": [
+          {
+            "src": "https://youtu.be/eeB2LzzNWyA?t=113",
+            "label": "AWK VAR"
+          }
+        ]
+      },
+      {
+        "id": "sc-on-08-r-rapier-slice",
+        "name": "R - [Rapier Slice] 🔴",
+        "description": "Silver Chariot does a quick and strong slash.\n\nDamage: 19.5 | CD: 18s\nTags: Guard Break | True Follow-Up | Ragdoll | Heavy Knockback | Hyper Armor | Hyper Armor Crash | Light Parriable | Uncancellable | COMBO ENDER | CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 20 | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/eeB2LzzNWyA?t=128",
+        "variants": [
+          {
+            "id": "sc-on-09-r-razor-blitz",
+            "name": "R [🟥] - [Razor Blitz] 🔴",
+            "description": "Silver Chariot charges its slash to unleash a ripping 360 slash around the user.\n\nDamage: 21.5 | CD: 18s\nTags: Guard Break | Stand Crasher | Stun (1.4s) | Hyper Armor | Hyper Armor Bypass | Heavy Parriable | Standing Knockback | COMBO EXTENDER | SUB MID | STAND POSITIONABLE\nResolve Cost: 15 | Resolve Gain: 0 | Endlag: 0.3s",
+            "videoSrc": "https://youtu.be/bDnHmNKUXWI?list=PLL56m5USzjkhQ5l02BoleegmFHWXIqAKR&t=7",
+            "hasFinisher": true,
+            "finisherDescription": "R [🟥] - [Razor Blitz] Finisher: Partial Cutscene/Impact Frame. Silver Chariot’s slash now drills into the opponent before the opponent is cut in half. (But more intense!)\n\nHP Required: >25hp",
+            "finisherVideoSrc": "https://trello.com/1/cards/683288da24be1e17a22618a5/attachments/684ce324fc1794cd0d880d51/download/Cycle_Slash_Finisher.gif"
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "sc-on-10-y-sparking-steel",
+        "name": "Y - [Sparking Steel] 🔴",
+        "description": "Silver Chariot does a ranged dash slash that stops at any opponent, once hit, chariot does a swift combo of slashes to the opponent ending with a final slash that knocks them away. (Applies [Lingering Silver] effect)\n\nDamage: 4.6*5 | CD: 17s\nTags: Guardable | Stand Crasher | Stun | Hyper Armor | Hyper Armor Bypass | Heavy Parriable | Standing Knockback | True Rush | COMBO EXTENDER | SUB MID | STAND POSITIONABLE\nResolve Cost: 15 | Resolve Gain: 0 | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/WXDyYVwbTng?t=64",
+        "hasFinisher": true,
+        "finisherDescription": "Y - [Sparking Steel] Finisher: Cutscene. Chariot final uppercutting strike sends the enemy in the air as the user does the video (Ref).\n\nHP Required: >40hp",
+        "finisherVideoSrc": "https://youtu.be/eeB2LzzNWyA?t=195",
+        "variants": [
+          {
+            "id": "sc-on-11-y-sparking-silver",
+            "name": "Y [🔝] - [Sparking Silver] 🔴",
+            "description": "Silver Chariot does a series of ranged slash projectiles to the opponent.\n\nDamage: 3.1*7 | CD: 16s\nTags: Stun (0.4s) | Guardable | Direction Aimable | Deflectable | Grounded Bypass | PROJECTILE COMBO EXTENDER | MID\nResolve Cost: 0 | Resolve Gain: 0 | Endlag: 0.3s",
+            "videoSrc": "https://youtu.be/YF1JzEe3M8k?list=PLUf-l2UJNNIer2bHWSMtLg9l2KtX9705C&t=261"
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "sc-on-12-y-g-sparking-whirlwind",
+        "name": "Y+G - [Sparking Whirlwind] 🔴",
+        "description": "After Y, Silver Chariot drags its blade on the ground and slashes up, doing a quick whirlwind around the opponent.\n\nDamage: [Sparking Steel] + 1*5 + 4.3 | CD: 17s [G] 5s\nTags: Guardable | Stand Crasher | Stun (0.8s) | Knockback + Ragdoll | Follow Up | COMBO EXTENDER | RANGE IRRELEVANT | STAND POSITIONABLE\nResolve Cost: 10 | Resolve Gain: 0 | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/pymkHWd_ZD8?list=PLUf-l2UJNNIer2bHWSMtLg9l2KtX9705C&t=127"
+      },
+      {
+        "id": "sc-on-13-g-iron-tempest",
+        "name": "G [❇️] - [Iron Tempest] 🔴",
+        "description": "Silver Chariot does multiple 360 slashes with a swing.\n\nDamage: 3.1*7 | CD: 22s\nTags: Grounded Bypass | Guard Bypass (Semi Active) | Stun | Hyper Armor + Bypass | Heavy Parriable | Dodge Bypass | Stun Evasive | COMBO EXTENDER | SUB MID AOE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 0 | Style Rank Requirement: C+ | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/gWVdthxXGbU?t=31"
+      },
+      {
+        "id": "sc-on-14-g-rising-tempest",
+        "name": "G [⬆️] - [Rising Tempest] 🔴",
+        "description": "Silver Chariot does multiple 360 slashes upwards.\n\nDamage: 3.1*7 | CD: 22s\nTags: Grounded Bypass | Guard Bypass (Passive) | Stun | Hyper Armor + Bypass | Heavy Parriable | Dodge Bypass | Stun Evasive | COMBO EXTENDER | SUB MID AOE | STAND POSITIONABLE\nResolve Cost: 0 | Resolve Gain: 0 | Style Rank Requirement: BB+ | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/JhaPxMPf3cI?t=580"
+      },
+      {
+        "id": "sc-on-15-x-piercing-thrust",
+        "name": "X [♦️] - [Piercing Thrust] 🔴",
+        "description": "Silver Chariot does a quick, high speed thrust forward. (Holdable for range)\n\nDamage: 16.6 | CD: 20s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | Air Juggle | COMBO EXTENDER | SEMI MID RANGE\nResolve Cost: 0 | Resolve Gain: 0 | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/_FQDcwy6hnU?t=58",
+        "hasFinisher": true,
+        "finisherDescription": "X [♦️] - [Piercing Thrust] Finisher: Non-Cutscene > Cutscene End. Chariot does multiple other thrusts to the opponent ending with a charged lunge stab to the head, chariot then throws the body into the air and the body is seen with multiple slashes before the user does a spinning axe kick to the body (Ref, Ref 2). Head Stab - Floor Drag - Stabs and Final Impact.\n\nHP Required: >20hp",
+        "finisherVideoSrc": "https://youtu.be/UzdHV_LrWT0?t=524",
+        "videos": [
+          {
+            "src": "https://youtu.be/gcqJDQmRhF0?t=36",
+            "label": "REF2"
+          }
+        ],
+        "finisherVideos": [
+          {
+            "src": "https://youtu.be/GPa8k7Csh6U?t=431",
+            "label": "REF2"
+          },
+          {
+            "src": "https://youtu.be/GPa8k7Csh6U?si=nuLsO4OORzEE136u&t=248",
+            "label": "HEAD STAB"
+          },
+          {
+            "src": "https://youtu.be/s6of1YPB1fQ?t=114",
+            "label": "FLOOR DRAG"
+          },
+          {
+            "src": "https://youtu.be/KLG5v_l3uTQ?t=138",
+            "label": "STABS AND FINAL IMPACT"
+          }
+        ]
+      },
+      {
+        "id": "sc-on-16-x-riposte-thrust",
+        "name": "X [⚠️] - [Riposte Thrust] 🔴",
+        "description": "If interrupted, Silver Chariot does a dodge into a quick, high speed thrust forward.\n\nDamage: 16.6 | CD: 20s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | Air Juggle | COMBO ENDER | SEMI MID RANGE\nResolve Cost: 0 | Resolve Gain: 0 | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/_FQDcwy6hnU?t=58",
+        "videos": [
+          {
+            "src": "https://youtu.be/gcqJDQmRhF0?t=36",
+            "label": "REF2"
+          }
+        ]
+      },
+      {
+        "id": "sc-on-17-x-x-million-strikes",
+        "name": "X+X - [Million Strikes] 🔴",
+        "description": "Silver Chariot follows up with a swift barrage of a million strikes and a final one.\n\nDamage: 1*20 + 6.3 | CD: 20s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | Air Juggle | COMBO ENDER | EXTENDED CLOSE RANGE\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: B+ | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/gcqJDQmRhF0?t=39",
+        "hasFinisher": true,
+        "finisherDescription": "X+X - [Million Strikes] Finisher: Cutscene Ender. Chariot does 2 other thrust and a blitz attack that shreds the enemy.\n\nHP Required: >30hp",
+        "finisherVideoSrc": "https://youtu.be/Fp7tFxXMoRM?si=XFNEkKHnhM-lv9CY&t=48"
+      },
+      {
+        "id": "sc-on-18-x-y-shredding-silver",
+        "name": "X+Y - [Shredding Silver] 🔴",
+        "description": "Silver Chariot follows up with a swift series of slashes ending with an upward slash.\n\nDamage: [Piercing Thrust] + 4.2*2 + 5.0 | CD: 20s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | Air Juggle | Rebound | COMBO ENDER | SEMI-MID RANGE\nResolve Cost: 10 | Resolve Gain: 0 | Style Rank Requirement: B+ | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/RlxcfKA9bWU?t=7",
+        "variants": [
+          {
+            "id": "sc-on-19-x-y-lunging-impale",
+            "name": "X [🟥]+Y - [Lunging Impale] 🔴",
+            "description": "Silver Chariot pierces and flings the body upward, then pierces again before throwing them away.\n\nDamage: [Piercing Thrust] + 19.3 | CD: 20s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | COMBO ENDER | SEMI-MID RANGE\nResolve Cost: 30 | Resolve Gain: 0 | Style Rank Requirement: BB+ | Endlag: 0.3s",
+            "videoSrc": "https://youtu.be/_FQDcwy6hnU?t=66"
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "sc-on-20-x-skyline-stinger",
+        "name": "X [🔝/💠] - [Skyline Stinger] 🔴",
+        "description": "Silver Chariot does a mid air stinger that is angled to the ground.\n\nDamage: 9.8 | CD: 20s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | COMBO EXTENDER | SEMI-MID RANGE\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: B+ | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/WXDyYVwbTng?t=84",
+        "videos": [
+          {
+            "src": "https://youtu.be/X5EfWv8uxVw?t=33",
+            "label": "REF2"
+          }
+        ]
+      },
+      {
+        "id": "sc-on-21-x-skyscraper",
+        "name": "X [🔼] - [Sky-Scraper] 🔴",
+        "description": "Silver Chariot does a stab and swiftly follows up with an upper slash.\n\nDamage: 9.8 | CD: 20s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | Air Juggle | Rebound | COMBO EXTENDER | SEMI-MID RANGE\nResolve Cost: 20 | Resolve Gain: 0 | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/YF1JzEe3M8k?list=PLUf-l2UJNNIer2bHWSMtLg9l2KtX9705C&t=236"
+      },
+      {
+        "id": "sc-on-22-x-h-light-speed-slice",
+        "name": "X+H - [Light Speed Slice] 🔴",
+        "description": "After the stab, Chariot goes armour off for a swift and powerful strike and acts as another way to enter awakening.\n\nDamage: 16.6 | CD: 20s\nTags: I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | Slows if in AOE | Stun (0.9s) | Push-Back | POWER UP MOVE + PARTIAL-CUTSCENE | RANGE IRRELEVANT\nResolve Cost: 35 | Resolve Gain: 0 | Style Rank Requirement: A+ | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/eeB2LzzNWyA?t=170",
+        "hasFinisher": true,
+        "finisherDescription": "X+H - [Light Speed Slice] Finisher: Cutscene. Chariot does what’s seen in the reference (Ref).\n\nHP Required: >40hp",
+        "finisherVideoSrc": "https://youtu.be/X5EfWv8uxVw?t=69",
+        "videos": [
+          {
+            "src": "https://static.wikia.nocookie.net/jujutsu-shenanigans/images/b/be/PressingCharges.gif",
+            "label": "REF2"
+          }
+        ]
+      },
+      {
+        "id": "sc-on-23-z-last-shot",
+        "name": "Z [🟥] - [Last Shot] 🔴",
+        "description": "Silver Chariot shoots out its blade at high speed, once hit, the blade sticks onto the enemy, only ricochettes once.\n\nDamage: 9.8 | CD: 20s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | Air Juggle | COMBO EXTENDER | SEMI-MID RANGE\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: BB+ | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/WXDyYVwbTng?t=51",
+        "videos": [
+          {
+            "src": "https://youtu.be/pbfdg1yObBQ?t=75",
+            "label": "AIM REF"
+          }
+        ]
+      },
+      {
+        "id": "sc-on-24-z-chariots-secret-techniqu",
+        "name": "Z [♦️] - [“Chariot’s Secret Technique!”] 🔴",
+        "description": "Silver Chariot shoots out its blade at high speed, once hit, it ricochets off the enemy and staggers several times into the air with each hit before returning to chariot.\n\nDamage: 4.3*7 | CD: 20s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | Air Juggle | COMBO EXTENDER | SEMI-MID RANGE\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: BB+ | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/WXDyYVwbTng?t=51",
+        "videos": [
+          {
+            "src": "https://youtu.be/pbfdg1yObBQ?t=75",
+            "label": "AIM REF"
+          }
+        ]
+      },
+      {
+        "id": "sc-on-25-t-sliver-strike",
+        "name": "T - [Sliver Strike] 🔴",
+        "description": "Silver Chariot does a quick backhand slash.\n\nDamage: 9.8 | CD: 20s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | Air Juggle | COMBO EXTENDER | SEMI-MID RANGE\nResolve Cost: 20 | Resolve Gain: 0 | Endlag: 0.3s",
+        "videoSrc": "https://www.youtube.com/watch?t=115&v=4YzOybRl8yw&feature=youtu.be"
+      },
+      {
+        "id": "sc-on-26-f-t-burn-in-hell",
+        "name": "F+T [⚠️] - [“Burn In Hell”] 🔴+🟡",
+        "description": "Silver Chariot stances in its counter, if hit, Silver Chariot does a behind barrage, followed by a series of pierces and strikes done to the enemy that sends them flying. This applies [Lingering Silver], If missed, chariot does a large aoe sweep and gets 50% resolve back.\n\nDamage: 1.1*40 (10/s) + 3.5 + 3.5*5 + 2.3*15 (10/s) + 8.2 [107.7] | CD: 80s\nTags: Melee + Ranged Counter | Ragdoll + Knockback | Stun (0.35s) | COMBO ENDER [ULTIMATE & CUTSCENE] | LARGE+ AOE\nResolve Cost: 80 | Resolve Gain: 0 | Style Rank Requirement: S+ | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/QfhXi2gEkLE?t=302",
+        "hasFinisher": true,
+        "finisherDescription": "F+T [⚠️] - [“Burn In Hell”] Finisher: Cutscene. After the knock back, the user tumbles back only to look up and see (Ref), after the pierce, chariot then SNAPS THEIR NECK before telling them to burn in hell.\n\nHP Required: >15hp",
+        "finisherVideoSrc": "https://youtu.be/QfhXi2gEkLE?t=245",
+        "finisherVideos": [
+          {
+            "src": "https://youtu.be/QfhXi2gEkLE?t=298",
+            "label": "SNAPS THEIR NECK"
+          }
+        ]
+      },
+      {
+        "id": "sc-on-27-t-x-silver-thrust",
+        "name": "T+X - [Silver Thrust] 🔴",
+        "description": "Silver Chariot follows up with a sharp thrust.\n\nDamage: 9.8 | CD: 20s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | COMBO EXTENDER | SEMI-MID RANGE\nResolve Cost: 20 | Resolve Gain: 0 | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/pymkHWd_ZD8?list=PLUf-l2UJNNIer2bHWSMtLg9l2KtX9705C&t=140"
+      },
+      {
+        "id": "sc-on-28-t-h-bravo-oh-bravo",
+        "name": "T+H - [“Bravo! Oh Bravo!”] 🔴",
+        "description": "Silver Chariot follows up winded up thrust with a quick beatdown with chariot’s un-armoured form.\n\nDamage: 9.8 | CD: 20s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | COMBO EXTENDER | SEMI-MID RANGE\nResolve Cost: 65 | Resolve Gain: 0 | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/X5EfWv8uxVw?t=69"
+      },
+      {
+        "id": "sc-on-29-t-g-silver-tempest",
+        "name": "T+G - [Silver Tempest] 🔴",
+        "description": "Silver Chariot follows with a blitzing whirlwind.\n\nDamage: 9.8 | CD: 20s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | COMBO EXTENDER | SEMI-MID RANGE\nResolve Cost: 20 | Resolve Gain: 0 | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/YF1JzEe3M8k?list=PLUf-l2UJNNIer2bHWSMtLg9l2KtX9705C&t=224"
+      },
+      {
+        "id": "sc-on-30-j-silver-wind",
+        "name": "J - [Silver Wind] 🔴",
+        "description": "Silver Chariot does 3 strong projectile slashes.\n\nDamage: 3.8*3 | CD: 20s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | Air Juggle | COMBO EXTENDER | SEMI-MID RANGE\nResolve Cost: 20 | Resolve Gain: 0 | Endlag: 0.3s",
+        "videoSrc": "https://static.wikia.nocookie.net/zenless-zone-zero/images/1/18/Aurora_Thrust_-_Southern_Cross_Preview.gif"
+      },
+      {
+        "id": "sc-on-31-j-x-french-kiss",
+        "name": "J+X [💠] - [French Kiss] 🔴",
+        "description": "Silver Chariot follows up with a ranged thrust (Applies [Lingering Silver]) and can be used 3 times in a row.\n\nDamage: 25.3 | CD: (2s)-(20s) after 3rd\nTags: Standing Knockback | Guard Break | Stun (0.85s) | Light Parriable | COMBO EXTENDER | MID+ RANGE\nResolve Cost: 35 | Resolve Gain: 0 | Style Rank Requirement: BB+ | Endlag: 0.7s",
+        "videoSrc": "https://static.wikia.nocookie.net/zenless-zone-zero/images/1/18/Aurora_Thrust_-_Southern_Cross_Preview.gif",
+        "hasFinisher": true,
+        "finisherDescription": "J+X [💠] - [French Kiss] Finisher: Cutscene. Chariot does what’s seen in the reference (Ref). First part without armor off, Final Hit.\n\nHP Required: >40hp",
+        "finisherVideoSrc": "https://youtu.be/5K64wEX7n7I?si=V2RM847cSyzh-VtS&t=111",
+        "videos": [
+          {
+            "src": "https://youtu.be/Ul0yAnuLgtM?si=wiudPwpILFvwBWZb&t=169",
+            "label": "REF2"
+          }
+        ],
+        "finisherVideos": [
+          {
+            "src": "https://youtu.be/ZcaR4j7rXEc?si=Ue9EDx1QUXnRLElV&t=161",
+            "label": "Final Hit"
+          }
+        ]
+      },
+      {
+        "id": "sc-on-32-h-chariots-true-speed",
+        "name": "H - [“Chariot’s True Speed”] 🔴",
+        "description": "Silver Chariot sheds its armor, unleashing its true speed.\n\nDamage: 0 | CD: 45s\nTags: I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | Slows if in AOE | Stun (0.9s) | Push-Back | AWAKENING MOVE + PARTIAL-CUTSCENE | RANGE IRRELEVANT\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: A+ | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/kbpUpEtaCJA?t=59",
+        "variants": [
+          {
+            "id": "sc-on-33-h-chariots-true-speed",
+            "name": "H [⬆️] - [“Chariot’s True Speed”] 🔴",
+            "description": "Silver Chariot sheds its armor, unleashing its true speed.\n\nDamage: 0 | CD: 45s\nTags: I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | Slows if in AOE | Stun (0.9s) | Push-Back | POWER UP MOVE + PARTIAL-CUTSCENE | RANGE IRRELEVANT\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: A+ | Endlag: 0.3s",
+            "videoSrc": "https://youtu.be/eeB2LzzNWyA?t=56",
+            "videos": [
+              {
+                "src": "https://youtu.be/oxwPYWK4gpM?t=259",
+                "label": "REF2"
+              }
+            ]
+          },
+          {
+            "id": "sc-on-34-h-chariots-true-speed",
+            "name": "H [🟥] - [“Chariot’s True Speed”] 🔴",
+            "description": "The user claps his hand while they’re posed like in Ref 1, then chariot goes in front of the camera while the user’s back is against it like in Ref 2, before finishing off.\n\nDamage: 15.2 | CD: 45s\nTags: I-frames | True Guard/Counter/Dodge/Ragdoll/Grounded Bypass | Slows if in AOE | Stun (0.9s) | Push-Back | AWAKENING MOVE + CUTSCENE | SMALL+ AOE\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: A+ | Endlag: 0.3s",
+            "videoSrc": "https://youtu.be/Lp7TAJ7tqng?t=82"
+          }
+        ],
+        "hasVariant": true
+      }
+    ],
+    "awakeningMoves": [
+      {
+        "id": "sc-pu-01-m2-lmb-silver-sonata",
+        "name": "M2/LMB [🟥] - [Silver Sonata] 🔴",
+        "description": "Silver Chariot’s after images now shoot out before the attack during the stance and then follows up with the normal several swift piercing strikes to the enemy.\n\nDamage: [Added 2.5*8] + 2.3*5 + 5.3 + 9.3 | CD: 20s\nTags: Knockback + Ragdoll | Air Ragdoll Juggle | Guardable (Uncancellable) | Grounded Bypass | COMBO EXTENDER | MID+ RANGE / SMALL AOE\nResolve Cost: 20 | Resolve Gain: 0 | Style Rank Requirement: B+ | Endlag: 0.15s",
+        "videoSrc": "https://youtu.be/pbfdg1yObBQ?t=41",
+        "videos": [
+          {
+            "src": "https://youtu.be/sGhIekAUuBA?t=501",
+            "label": "AFTER IMAGE"
+          }
+        ]
+      },
+      {
+        "id": "sc-pu-02-y-blitzwave-blade",
+        "name": "Y - [BlitzWave Blade] 🔴",
+        "description": "Silver Chariot does a long ranged dash that follows up into a strong lunge and a strong slash, the opponent has [Lingering Silver] afterwards.\n\nDamage: 12.3 + 5.4 | CD: 17s\nTags: Guardable | Stand Crasher | Stun | Hyper Armor | Hyper Armor Bypass | Heavy Parriable | Standing Knockback | True Rush | COMBO EXTENDER | SEMI-MID RANGE | STAND POSITIONABLE\nResolve Cost: 15 | Resolve Gain: 0 | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/HMWh4xZ-Yuo?t=86",
+        "variants": [
+          {
+            "id": "sc-pu-04-y-blitzwave-blade",
+            "name": "Y [🟥] - [BlitzWave Blade] 🔴",
+            "description": "Silver Chariot does a long ranged dash that blitzes past the opponent, the opponent is then struck multiple times.\n\nDamage: 4.5*6 | CD: 17s\nTags: Guardable | Stand Crasher | Stun | Hyper Armor | Hyper Armor Bypass | Heavy Parriable | Standing Knockback | True Rush | COMBO EXTENDER | MID RANGE | STAND POSITIONABLE\nResolve Cost: 15 | Resolve Gain: 0 | Endlag: 0.3s",
+            "videoSrc": "https://youtu.be/HMWh4xZ-Yuo?t=323",
+            "hasFinisher": true,
+            "finisherDescription": "Y [🟥] - [BlitzWave Blade] Finisher: Cutscene Ender. At the end, the camera shifts to chariot piercing the victim’s head (Ref).\n\nHP Required: >30hp",
+            "finisherVideoSrc": "https://youtu.be/eeB2LzzNWyA?t=20"
+          }
+        ],
+        "hasVariant": true
+      },
+      {
+        "id": "sc-pu-03-f-y-riposte-de-clatante",
+        "name": "F+Y [⚠️] - [Riposte de Éclatante] 🔴",
+        "description": "A counter that sends you and your after images for a sharp and quick slash to the offender.\n\nDamage: 7.8 + 4.3*2 + 5.3 + 6.5 | CD: 23s\nTags: Guardable | Stand Crasher | Stun | Hyper Armor | Hyper Armor Bypass | Heavy Parriable | Standing Knockback | True Rush | COMBO EXTENDER | SEMI-MID RANGE | STAND POSITIONABLE\nResolve Cost: 15 | Resolve Gain: 0 | Style Rank Requirement: C+ | Endlag: 0.9s (if missed)",
+        "videoSrc": "https://static.wikia.nocookie.net/zenless-zone-zero/images/7/7a/Starfall_Intermission_Preview.gif",
+        "hasFinisher": true,
+        "finisherDescription": "F+Y [⚠️] - [Riposte de Éclatante] Finisher: Non-Cutscene. The victim appears with multiple sparkles only to have holes in their body with chariot behind them (Ref).\n\nHP Required: >30hp",
+        "finisherVideoSrc": "https://youtu.be/eeB2LzzNWyA?t=160"
+      },
+      {
+        "id": "sc-pu-05-h-y-blitzwave-strikes",
+        "name": "H+Y [🟥] - [BlitzWave Strikes] 🔴",
+        "description": "Silver Chariot and its clones create a rotating circle and strike the enemy multiple times before a final strike where all remerge to one. This deletes your clones.\n\nDamage: 2.0*20 + 20 | CD: 17s\nTags: Guardable | Stand Crasher | Stun | Hyper Armor | Hyper Armor Bypass | Heavy Parriable | Standing Knockback | True Rush | COMBO EXTENDER | SUB MID AOE | STAND POSITIONABLE\nResolve Cost: 15 | Resolve Gain: 0 | Style Rank Requirement: A+ | Endlag: 0.3s",
+        "videoSrc": "https://youtu.be/jf_XnNMsb0k",
+        "hasFinisher": true,
+        "finisherDescription": "H+Y [🟥] - [BlitzWave Strikes] Finisher: Cutscene Ender. At the end, the clones perform the first video and all slash from different angles and end with the last video (Ref / Ender).\n\nHP Required: >75hp",
+        "finisherVideoSrc": "https://youtu.be/eeB2LzzNWyA?t=111",
+        "videos": [
+          {
+            "src": "https://drive.google.com/file/d/1E-4u2Qe2QKV22aMGo6HOPn4_oM91gjIE/view?usp=sharing",
+            "label": "REF2"
+          }
+        ],
+        "finisherVideos": [
+          {
+            "src": "https://youtu.be/rLwMLWvbCQs?t=149",
+            "label": "ENDER"
+          }
+        ]
+      },
+      {
+        "id": "sc-pu-06-h-g-quicksilver",
+        "name": "H+G [🟥] - [Quicksilver] 🔴",
+        "description": "Silver Chariot and its clones zoom out and zip back in for a large aoe slice wave.\n\nDamage: 8.0 + 9.0 + 10.0 | CD: 24s\nTags: True Guard Break | Light Parriable | Stun | Hyper Armor | Air Juggle | COMBO EXTENDER | SMALL+ AOE | STAND POSITIONABLE\nResolve Cost: 20 | Resolve Gain: 0 | Endlag: 0.5s",
+        "videoSrc": "https://youtu.be/woRt37TVyWY?t=70",
+        "hasFinisher": true,
+        "finisherDescription": "H+G [🟥] - [Quicksilver] Finisher: Cutscene. The last strike drills into the enemy as chariot then slows down perception to strike the enemy. Scene after attack:\n1- Chariot holds its blade in the centre of its face while it vibrates quickly and then dashes towards the victim who tries to attack.\n2- The screen slowly gains a light blue vignette effect and the victim’s movements are slowed and light beams are seen slowed too.\n3- The stand then slashes and blinks away like in the reference.\n4- The final slash is a closeup to where chariot dashes and is about to slash the blade which is also vibrating due to its speed.\n5- Chariot is behind the user and swings the sword as a glimmer shines on the blade itself as the slow-mo ends and the victim becomes a blood bag (Ref, Ref 2).\n\nHP Required: >30hp",
+        "finisherVideoSrc": "https://youtu.be/J3p_ou-Mi6I?si=vid8qGDzAPVQzNoB&t=30",
+        "finisherVideos": [
+          {
+            "src": "https://youtu.be/5zMOY_28DCI?si=2a9gjPj0fNBD3MUW&t=52",
+            "label": "REF2"
+          }
+        ]
+      },
+      {
+        "id": "sc-pu-07-h-after-image",
+        "name": "H - [After Image] 🔴",
+        "description": "Silver Chariot creates 3 after image clones that last for 30 seconds and can disappear if you’re knockbacked/heavily struck. All attacks of the clone follow what you do. Meaning if you use X, they do too. And they auto track to the opponent’s position, however follow the move’s range.\n\nDamage: N/A | CD: 20s\nTags: Clone | MOVESET AMP | RANGE N/A\nResolve Cost: 10 | Resolve Gain: 0 | Style Rank Requirement: A+",
+        "videoSrc": ""
+      },
+      {
+        "id": "sc-pu-08-any-move-h-speed-mirage",
+        "name": "{Any Move} + H [🟥] - [Speed Mirage] 🔴",
+        "description": "Holding H during a move leaves an after image clone that, when the move is used again lets the after imagine use said move again from where they’re standing. They will auto track to the victim hit by the original move.\n\nDamage: N/A | CD: 20s\nTags: Clone | MOVESET AMP | RANGE N/A\nResolve Cost: 10 | Resolve Gain: 0 | Style Rank Requirement: A+",
+        "videoSrc": "https://youtu.be/IVfOKav_P-E?t=99",
+        "videos": [
+          {
+            "src": "https://youtu.be/5PA7RtyoIfg?t=67",
+            "label": "REF2"
+          },
+          {
+            "src": "https://youtu.be/m4chwL_KgA0?t=432",
+            "label": "REF3"
+          }
+        ]
+      },
+      {
+        "id": "sc-pu-09-h-4-g-gleaming-glissade",
+        "name": "H [🟥]*4+G - [Gleaming Glissade] 🔴",
+        "description": "If you have 4 after images and use G. They all blitz around you and create a large aoe attack.\n\nDamage: 85.4 + [Bleed T1] | CD: 20s\nTags: True Stun | Guard Bypass (Active) | Parriable | Counter / Ragdoll / Grounded Bypass | Hyper Armor + Bypass | COMBO ENDER [SUPER] | MID+ RANGE\nResolve Cost: 50 | Resolve Gain: 0 | Style Rank Requirement: BB+",
+        "videoSrc": "https://youtu.be/5PA7RtyoIfg?t=68",
+        "videos": [
+          {
+            "src": "https://www.youtube.com/watch?v=AR2moto7Yyw&pp=ygUSanVkZ2VtZW50IGN1dCBkbWM0",
+            "label": "REF2"
+          }
+        ]
+      },
+      {
+        "id": "sc-pu-10-h-h-delay-shift",
+        "name": "H+H [🟥] - [Delay Shift] 🔴",
+        "description": "You get a mini menu where you can choose any of 3, Immediate, Haste, Normal, Slow. These 4 options shift the delay of each one your 3 after image’s attacks.\n\nDamage: 20.3 | CD: 20s\nTags: Standing Knockback | Guard Break | Stun (0.35s) | Light Parriable | COMBO EXTENDER | MID+ RANGE\nResolve Cost: 0 | Resolve Gain: 0 | Style Rank Requirement: N/A",
+        "videoSrc": ""
+      }
+    ],
+    "moves": [
+      {
+        "id": "sc-so-01-e-million-stings",
+        "name": "E - [Million Stings] 🔴",
+        "description": "Chariot comes out and does a quick barrage.\n\nDamage: 0.5*20 | CD: 15s\nTags: Stun (0.8s) | Guardable | COMBO EXTENDER [Counter] | RANGE | AUTO STAND SUMMON\nResolve Cost: 0 | Resolve Gain: 1*10",
+        "videoSrc": "https://youtu.be/eeB2LzzNWyA?t=177"
+      },
+      {
+        "id": "sc-so-02-r-perfected-precision",
+        "name": "R - [Perfected Precision] 🔴",
+        "description": "A charged close range lunch that gives the opponent bleed.\n\nDamage: 6.9 + [Bleed T1] | CD: 15s\nTags: Stun (0.7s) | Guardable | Standing Knockback | COMBO EXTENDER | CLOSE+ RANGE\nResolve Cost: 0 | Resolve Gain: 8",
+        "videoSrc": "https://youtu.be/nCDCBqGfHAY?si=IxQ_VVnskrsg4wFH&t=78"
+      },
+      {
+        "id": "sc-so-03-r-r-agression-and-victory",
+        "name": "R+R - [“Agression and Victory”] 🔴",
+        "description": "After the lunge, follow up with a super strong long range slash dash that severs anything in your path.\n\nDamage: 40.5 | CD: 18s\nTags: Guard Break | Parriable | Knockback + Ragdoll | COMBO ENDER [MINI CUTSCENE] | CLOSE+\nResolve Cost: 35 | Resolve Gain: 0",
+        "videoSrc": "https://youtu.be/s6of1YPB1fQ?t=82"
+      },
+      {
+        "id": "sc-so-04-t-clobber",
+        "name": "T - [Clobber] 🟢",
+        "description": "The user and chariot does a quick elbow shove.\n\nDamage: 6.5 | CD: 8s\nTags: Guardable | Stun (0.65s) | Push Back | MIXUP | EXTENDED CLOSE RANGE\nResolve Cost: 0 | Resolve Gain: 8",
+        "videoSrc": "https://youtu.be/QfhXi2gEkLE?si=VRADMnWNvFrHOATg&t=181"
+      },
+      {
+        "id": "sc-so-05-z-fleeting-retreat",
+        "name": "Z - [Fleeting Retreat] 🔴",
+        "description": "You do a simple backflip that can hit people. Upon using, casting any move can immediately cancel into the move, shortening the windup and extending their range.\n\nDamage: 5.0 | CD: 13s\nTags: Guardable | Tripping Ragdoll | COMBO EXTENDER | SEMI-MID RANGE (Further with upgrades)\nResolve Cost: 5 | Resolve Gain: 0 | Endlag: 0.5s",
+        "videoSrc": "https://youtu.be/g76n0X38gBE?t=34"
+      }
+    ],
+    "movesetType": "powerup"
   },
   {
     "id": "hierophant-green",
@@ -491,7 +1802,8 @@
     "description": "Desc Here",
     "rarity": "Desc Here",
     "standType": "Desc Here",
-    "moves": []
+    "moves": [],
+    "pfpSrc": "https://tr.rbxcdn.com/180DAY-16d1199b070272f0422733dca2d6ecc0/420/420/BackAccessory/Webp/noFilter"
   },
   {
     "id": "anubis",
@@ -503,7 +1815,8 @@
     "description": "Desc Here",
     "rarity": "Desc Here",
     "standType": "Desc Here",
-    "moves": []
+    "moves": [],
+    "pfpSrc": "https://tr.rbxcdn.com/180DAY-2085347be4ca5f3120a798d3aeb3922b/420/420/WaistAccessory/Webp/noFilter"
   },
   {
     "id": "magicians-red",
@@ -515,7 +1828,8 @@
     "description": "Desc Here",
     "rarity": "Desc Here",
     "standType": "Desc Here",
-    "moves": []
+    "moves": [],
+    "pfpSrc": "https://tr.rbxcdn.com/180DAY-43634d01c3ff5a35a5b467d680fb3951/420/420/BackAccessory/Webp/noFilter"
   },
   {
     "id": "cursed-chariot",

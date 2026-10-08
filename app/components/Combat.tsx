@@ -3225,7 +3225,8 @@ export default function GameGuide() {
                                         </span>
                                       </div>
                                       <p className="text-base md:text-lg text-[#c7c2b5] group-hover:text-white group-hover:[text-shadow:0_1px_8px_rgba(0,0,0,0.7)] leading-relaxed transition-colors">
-                                        Your STRONGEST ULTIMATE MOVE in your kit. A full breakdown is coming soon.
+                                        These are high damaging and quick moves that are only accessed during SSS combo rank that can be used by BOTH Stands and Specs.
+Some stands/specs may have beatdowns, some may have large aoe’s, some may have mega beams or even do quick transformations. It's similar to Final Smashes, they are quick and take no longer than 15-20 seconds MAX, however, they do MASSIVE DAMAGE. These moves can be survived if you play your cards right!
                                       </p>
                                     </div>
                                   </div>
